@@ -14,6 +14,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Done
+- 2026-10-21 evening, ES-M2.1 (branch `m2.1-bedtime`): Chase chose to combine this build with the original bedtime Energy Scanner (Claude artifact live on chaseholroyd.com) and keep the palm scan as an option. The app is now the bedtime flow (`src/app.ts`, logic in `src/bedtime/energy.ts` ported from the artifact) with a Palm scan / Photo scan switch; the photo scan's aura takes the level's colors and feel (`auraFeel`). Added `.github/workflows/pages.yml` for GitHub Pages; it only runs once Chase turns Pages on.
 - 2026-10-21 evening: Chase asked to merge everything. PRs #2-#6 merged down the stack, then #1 into the default branch; all v1 work is now on `claude/project-thread-xq47vx` and `main`.
 - 2026-10-21: studio session rules installed: `.claude/settings.json` SessionStart hook prints this file into every Claude Code session, `.github/workflows/handoff-check.yml` fails a PR that changes files without updating this file, and CLAUDE.md has a "Session rules" section.
 - 2026-10-21: plan and hard rules written (PLAN.md, CLAUDE.md). Role-Radar checked: no energy scanner files exist there, so the app starts from scratch.
@@ -35,6 +36,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 - Nothing. Waiting on a publishable photo for M1.5 screenshots.
 
 ## Exact next step
+- ES-M2.2: Chase turns on Pages (Settings → Pages → Source: GitHub Actions); the next push to the default branch then publishes chaseholroyd.com/energy-scanner/. CLAUDE.md still says never deploy; Chase should update that rule himself. Then ES-M2.3: update the portfolio's Energy Scanner page to link there.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
 - Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 

@@ -29,6 +29,11 @@ export function canRecordVideo(): boolean {
   );
 }
 
+/** "Mystic energy", or the name as is when it already says Energy ("Grey Energy"). */
+export function captionFor(energy: EnergyType): string {
+  return /energy$/i.test(energy.name) ? energy.name : `${energy.name} energy`;
+}
+
 /** Draws the aura frame with a small caption, the version people save and share. */
 export function drawCaptioned(target: HTMLCanvasElement, source: HTMLCanvasElement, energy: EnergyType): void {
   target.width = source.width;
@@ -47,7 +52,7 @@ export function drawCaptioned(target: HTMLCanvasElement, source: HTMLCanvasEleme
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#fff';
   ctx.font = `700 ${Math.round(unit * 1.3)}px system-ui, sans-serif`;
-  ctx.fillText(`${energy.name} energy`, unit, height - unit * 1.1);
+  ctx.fillText(captionFor(energy), unit, height - unit * 1.1);
   ctx.font = `500 ${Math.round(unit * 0.7)}px system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.75)';
   const brand = 'Energy Scanner';

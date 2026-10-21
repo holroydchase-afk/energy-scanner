@@ -32,6 +32,7 @@ test('dropping a photo onto the page loads it', async ({ page }) => {
 
 test('taking a photo with the camera captures a frame', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('radio', { name: /Photo scan/ }).click();
   await page.getByRole('button', { name: 'Take a photo' }).click();
   await expect(page.locator('.camera-video')).toBeVisible();
   await page.waitForFunction(() => (document.querySelector('.camera-video') as HTMLVideoElement).videoWidth > 0);

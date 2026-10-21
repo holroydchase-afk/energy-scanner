@@ -9,6 +9,16 @@ export interface ResultOptions {
   onReset: () => void;
   /** Shortest time the scan animation shows, so the reveal lands. */
   minScanMs?: number;
+  /** A fixed energy type (bedtime mode): skips the color pick and hides the type chips and slider. */
+  energy?: EnergyType;
+  intensity?: number;
+  /** Animation speed multiplier; sleepy energy moves slower. */
+  speed?: number;
+  resetLabel?: string;
+  /** Called once the aura is showing. */
+  onReady?: () => void;
+  /** Called when the photo has nobody in it. */
+  onNoPerson?: () => void;
 }
 
 export interface ResultView {
@@ -48,7 +58,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
         <button type="button" class="btn primary" data-action="share" hidden>Share</button>
         <button type="button" class="btn" data-action="save-image" hidden>Save image</button>
         <button type="button" class="btn" data-action="save-video" hidden>Save video</button>
-        <button type="button" class="btn" data-action="reset">New photo</button>
+        <button type="button" class="btn" data-action="reset">${options.resetLabel ?? 'New photo'}</button>
       </div>
     </div>
   `;
@@ -108,6 +118,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     if (!field.box) {
       status.textContent = 'No person found in this photo. Try one where someone is clearly visible.';
       status.classList.add('warn');
+      options.onNoPerson?.();
       return;
     }
 
@@ -121,16 +132,17 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     const pixels = ctx ? ctx.getImageData(0, 0, photo.width, photo.height).data : new Uint8ClampedArray(4);
     const personAt = (u: number, v: number) =>
       mask.data[Math.min(mask.height - 1, Math.floor(v * mask.height)) * mask.width + Math.min(mask.width - 1, Math.floor(u * mask.width))] ?? 0;
-    const picked = pickEnergyType(averagePersonColor(pixels, photo.width, photo.height, personAt));
+    const picked = options.energy ?? pickEnergyType(averagePersonColor(pixels, photo.width, photo.height, personAt));
     setEnergy(picked);
-    renderer.setIntensity(DEFAULT_INTENSITY);
+    renderer.setIntensity(options.intensity ?? DEFAULT_INTENSITY);
     renderer.canvas.setAttribute('aria-label', `Photo with a glowing ${picked.name} energy aura around the person`);
     status.textContent = '';
-    panel.hidden = false;
+    panel.hidden = Boolean(options.energy);
     showExportButtons();
+    options.onReady?.();
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const speed = reduceMotion ? 0.25 : 1;
+    const speed = (options.speed ?? 1) * (reduceMotion ? 0.25 : 1);
     const t0 = performance.now();
     const tick = (now: number) => {
       if (destroyed || !renderer) return;

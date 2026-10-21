@@ -1,34 +1,86 @@
-import { describe, expect, it } from 'vitest';
-import { mountApp } from './app';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { mountApp, type AppOptions } from './app';
 
-function mount() {
+function mount(options: AppOptions = {}) {
   const root = document.createElement('div');
   document.body.append(root);
-  mountApp(root);
+  mountApp(root, { random: () => 0.5, ...options });
   return root;
 }
 
-describe('mountApp', () => {
-  it('renders the shell with the privacy promise', () => {
+const click = (root: HTMLElement, sel: string) => root.querySelector<HTMLElement>(sel)!.click();
+
+describe('bedtime app', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.body.innerHTML = '';
+  });
+
+  it('renders the routine, scan choice and privacy promise', () => {
     const root = mount();
     expect(root.querySelector('h1')?.textContent).toBe('Energy Scanner');
+    expect(root.querySelectorAll('.step')).toHaveLength(5);
+    expect(root.querySelector('[data-mode="palm"]')!.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector('.pad')).not.toBeNull();
     expect(root.textContent).toContain('Photos never leave your device');
   });
 
-  it('offers camera and upload on the start screen', () => {
+  it('ticks off steps and remembers them tonight', () => {
     const root = mount();
+    click(root, '[data-step="teeth"]');
+    expect(root.querySelector('[data-step="teeth"]')!.getAttribute('aria-pressed')).toBe('true');
+    expect(root.querySelector('[data-count]')!.textContent).toBe('1 of 5');
+    const again = mount();
+    expect(again.querySelector('[data-step="teeth"]')!.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('switches to the photo scan and remembers the choice', () => {
+    const root = mount();
+    click(root, '[data-mode="photo"]');
     expect(root.querySelector('[data-action="camera"]')?.textContent).toBe('Take a photo');
-    expect(root.querySelector('[data-action="upload"]')?.textContent).toBe('Upload a photo');
+    expect(root.querySelector('.pad')).toBeNull();
+    expect(mount().querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('palm scan reads Grey with the grown-up switch on (the default)', async () => {
+    const root = mount({ holdMs: 1 });
+    root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
+    await new Promise((r) => setTimeout(r, 60));
+    const card = root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!;
+    expect(card.hidden).toBe(false);
+    expect(card.querySelector('.rc-name')!.textContent).toBe('Grey Energy');
+    expect(card.querySelector('.rc-todo')!.textContent).toMatch(/To drain the battery: Bath, PJs, Teeth, Potty, Book/);
+  });
+
+  it('a palm scan released too early is not counted', () => {
+    const root = mount({ holdMs: 10_000 });
+    const pad = root.querySelector('.pad')!;
+    pad.dispatchEvent(new Event('pointerdown'));
+    pad.dispatchEvent(new Event('pointerup'));
+    expect(root.querySelector('[data-hint]')!.textContent).toMatch(/Too fast/);
+    expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(true);
+  });
+
+  it('reads by the clock when Always Grey is off', async () => {
+    // Noon with an 8pm bedtime and nothing done: lots of energy.
+    const root = mount({ holdMs: 1, now: () => new Date(2026, 9, 21, 12, 0) });
+    const always = root.querySelector<HTMLInputElement>('[data-input="always"]')!;
+    always.checked = false;
+    always.dispatchEvent(new Event('change'));
+    root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
+    await new Promise((r) => setTimeout(r, 60));
+    expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
   });
 
   it('falls back to the native capture input when there is no camera API', () => {
     const root = mount();
+    click(root, '[data-mode="photo"]');
     const capture = root.querySelector<HTMLInputElement>('[data-input="capture"]')!;
     let clicked = false;
     capture.click = () => {
       clicked = true;
     };
-    root.querySelector<HTMLButtonElement>('[data-action="camera"]')!.click();
+    click(root, '[data-action="camera"]');
     expect(capture.getAttribute('capture')).toBe('user');
     expect(clicked).toBe(true);
   });
@@ -36,8 +88,7 @@ describe('mountApp', () => {
   it('shows an error for a file that is not an image', async () => {
     const root = mount();
     const upload = root.querySelector<HTMLInputElement>('[data-input="upload"]')!;
-    const file = new File(['hello'], 'notes.txt', { type: 'text/plain' });
-    Object.defineProperty(upload, 'files', { value: [file], configurable: true });
+    Object.defineProperty(upload, 'files', { value: [new File(['hello'], 'notes.txt', { type: 'text/plain' })], configurable: true });
     upload.dispatchEvent(new Event('change'));
     await new Promise((r) => setTimeout(r, 0));
     const error = root.querySelector<HTMLElement>('.error')!;
