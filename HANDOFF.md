@@ -13,6 +13,14 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | M6 / Hardening | ES-M1.6 | Harden | #6 |
 | (milestone) | ES-M1 | Demoable v1 | |
 
+## Portfolio / public presence
+_Updated 2026-10-21._
+- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`).
+- **Live demo:** https://chaseholroyd.com/demo/energy-scanner/
+- **Mismatch (decision for Chase):** the page and demo show the **earlier bedtime-routine prototype**, a Claude artifact with a "machine says it's time for bed" scan. They don't show the photo-aura web app in this repo. This app isn't deployed anywhere yet. If Chase OKs a deploy, a Pages site from this repo would serve at chaseholroyd.com/energy-scanner/. The portfolio page would then switch to the aura app, using screenshots made from a publishable photo (see Blockers).
+- **Demo data:** the bedtime demo starts empty and saves only in the visitor's browser. No photos.
+- **Keep in sync:** when a change here alters what the portfolio page or demo shows (features, numbers, screenshots, privacy claims), tell the portfolio thread ("Portfolio research and upgrade plan") or update the page in `holroydchase-afk.github.io` (`tools/build.py`). Any portfolio change that touches this product adds a dated line here.
+
 ## Done
 - 2026-10-21: plan and hard rules written (PLAN.md, CLAUDE.md). Role-Radar checked: no energy scanner files exist there, so the app starts from scratch.
 - M1.1 Scaffold (was M1) (branch `m1-scaffold`): Vite 8 + TypeScript 5.9, ESLint 10 + typescript-eslint, Vitest (jsdom), Playwright smoke test against `vite preview`. `npm run check`, `npm run build`, `npm run test:e2e` all green.
