@@ -19,3 +19,11 @@ IDs follow the studio standard (`docs/planning-ids.md` in holroydchase-afk/studi
 - [ ] **M1.5 Portfolio pack** (blocked: needs a publishable photo) (`m5-portfolio`): recruiter-readable README (what, why, how it works, privacy: photos never leave the device), Playwright screenshots/GIF of the core flow using sample images only, short CASE-STUDY.md. Done when README shows screenshots and explains the product in under 60 seconds of reading.
 
 - [x] **M1.6 Harden** (done) (`m6-harden`): edge cases (no person found, multiple people, tiny/huge images, dark photos), accessibility, performance, mobile layout.
+
+### M2: Bedtime Energy Scanner with a photo scan
+
+Chase's call (Oct 21): combine the photo aura with the original bedtime Energy Scanner (live on chaseholroyd.com) and keep the palm scan as an option.
+
+- [x] **M2.1 Bedtime flow + scan choice** (done) (`m2.1-bedtime`): routine steps, palm scan (press and hold), Grey to Rainbow levels, grown-ups panel (bedtime, pretend time, Always Grey, clear steps), ported from the original prototype. Photo scan renders the aura in the level's colors, softer and slower when sleepy. Done when both scans give a reading, with tests for the energy logic and both flows.
+- [ ] **M2.2 Publish the demo** (blocked: Chase turns on Pages) (`.github/workflows/pages.yml`): GitHub Pages build at chaseholroyd.com/energy-scanner/. Done when the link loads on a phone.
+- [ ] **M2.3 Point the portfolio at it** (todo): update the portfolio's Energy Scanner page and demo link (in the portfolio repo, not this one).

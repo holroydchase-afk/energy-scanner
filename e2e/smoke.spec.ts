@@ -22,3 +22,15 @@ test('the production build ships a Content Security Policy that blocks other ori
   });
   expect(blocked).toBe(true);
 });
+
+test('palm scan: hold the pad to get a reading', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Bath' }).click();
+  const pad = page.getByRole('button', { name: /Press and hold/ });
+  await pad.hover();
+  await page.mouse.down();
+  await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 6_000 });
+  await page.mouse.up();
+  await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
+  await expect(page.getByTestId('energy-reading')).toContainText('PJs, Teeth, Potty, Book');
+});

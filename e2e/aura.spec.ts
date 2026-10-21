@@ -24,18 +24,17 @@ test('a photo of a person gets an animated aura', async ({ page }) => {
   await page.locator('[data-input="upload"]').setInputFiles(samplePhoto!);
   const aura = page.locator('canvas.aura');
   await expect(aura).toBeVisible({ timeout: 45_000 });
-  await expect(page.getByTestId('reading')).toBeVisible();
-  await page.getByRole('radio', { name: 'Calm' }).click();
-  await expect(page.locator('.energy-name')).toHaveText('Calm');
+  // Always Grey is on by default, so the bedtime reading is Grey.
+  await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
 
   const image = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Save image' }).click();
-  expect((await image).suggestedFilename()).toBe('energy-scanner-calm.png');
+  expect((await image).suggestedFilename()).toBe('energy-scanner-grey.png');
 
   const video = page.waitForEvent('download', { timeout: 30_000 });
   await page.getByRole('button', { name: 'Save video' }).click();
   const saved = await video;
-  expect(saved.suggestedFilename()).toMatch(/^energy-scanner-calm\.(webm|mp4)$/);
+  expect(saved.suggestedFilename()).toMatch(/^energy-scanner-grey\.(webm|mp4)$/);
   const path = await saved.path();
   const { statSync } = await import('node:fs');
   expect(statSync(path).size).toBeGreaterThan(10_000);

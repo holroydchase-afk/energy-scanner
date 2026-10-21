@@ -99,6 +99,24 @@ describe('showResult', () => {
     view.destroy();
   });
 
+  it('uses a fixed energy without the type picker in bedtime mode', async () => {
+    const onReady = vi.fn();
+    const view = showResult(stage, photo(), {
+      getSegmenter: async () => fakeSegmenter((x, y) => Math.hypot(x - 32, y - 32) < 16),
+      onReset: () => undefined,
+      minScanMs: 0,
+      energy: { id: 'grey', name: 'Grey Energy', reading: '', colors: [[1, 1, 1], [0.7, 0.7, 0.8], [0.4, 0.4, 0.5]] },
+      intensity: 0.4,
+      onReady,
+    });
+    await flush();
+    expect(onReady).toHaveBeenCalled();
+    expect(setEnergy).toHaveBeenCalledWith(expect.objectContaining({ id: 'grey' }));
+    expect(setIntensity).toHaveBeenCalledWith(0.4);
+    expect(stage.querySelector<HTMLElement>('.panel')!.hidden).toBe(true);
+    view.destroy();
+  });
+
   it('says so when nobody is in the photo', async () => {
     showResult(stage, photo(), { getSegmenter: async () => fakeSegmenter(() => false), onReset: () => undefined, minScanMs: 0 });
     await flush();

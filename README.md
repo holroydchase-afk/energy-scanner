@@ -1,6 +1,6 @@
 # Energy Scanner
 
-**Take a photo of someone and watch their energy pour off them.** Energy Scanner finds the person in a photo and wraps them in an animated aura: flame-like light rising off their outline, colored by an "energy type" it reads from the photo. Save it as an image or a short video and share it.
+**A bedtime helper for kids: finish your routine, then scan your energy.** Bedtime used to be a nightly negotiation. Energy Scanner lets a neutral machine say it's time instead of a parent. Kids tick off their bedtime steps, then scan: press and hold the palm pad, or take a photo and watch their energy glow off them as an animated aura. The color reads from Rainbow (way too much sparkle for sleeping) down to Grey (battery empty, time to recharge). A grown-up switch can make every scan read Grey.
 
 Everything runs in your browser. **Photos never leave your device.** There is no server, no account and no tracking.
 
@@ -17,14 +17,16 @@ npm install
 npm run dev        # open the printed localhost URL
 ```
 
-1. **Take a photo** with your camera, or **upload** one (or drop it on the page).
-2. The scanner finds the person and the aura blooms around them, live.
-3. Switch the **energy type** (Radiant, Passion, Mystic, Calm, Vital, Spectrum) and the **intensity**.
-4. **Save image**, **Save video**, or **Share** straight to your phone's share sheet.
+1. Tick off the **bedtime steps**: Bath, PJs, Teeth, Potty, Book.
+2. Pick the scan: **Palm scan** (press and hold until the ring fills) or **Photo scan** (take or upload a photo).
+3. The reading shows an energy color, a battery level and what's left to do. In a photo scan the aura glows off the child in that color: softer and slower when sleepy, blazing when it's Rainbow.
+4. Grown-ups set bedtime and the Always Grey switch, and can **Save** or **Share** a photo scan.
+
+With the switch off, the reading follows the clock and the routine: the closer to bedtime and the more steps done, the sleepier the color. It never reads Rainbow once every step is done.
 
 ## Why I built it
 
-Most "AI photo" toys upload your face to someone's server. I wanted to see how far a delightful, visual product could go with zero backend: a person-segmentation model and a GPU shader running entirely on the phone in your pocket. It's also a small product exercise: one core moment (the aura blooming around you), cut everything that doesn't serve it, and make the result something people want to share. More in [CASE-STUDY.md](CASE-STUDY.md).
+Bedtime was a nightly negotiation with my kids. The first version was a palm scan: finish the routine, scan, and the machine says it's time. The obvious next step was a camera, but kids' faces should never go to a cloud model. So the photo scan runs entirely on the phone: a person-segmentation model and a GPU shader, no server, nothing uploaded. More in [CASE-STUDY.md](CASE-STUDY.md).
 
 ## How it works
 
@@ -34,15 +36,14 @@ flowchart LR
   B --> C[Person segmentation<br/>MediaPipe, on-device]
   C --> D[Distance field<br/>around the outline]
   D --> E[WebGL shader<br/>flames, halo, sparks]
-  C --> F[Energy type<br/>from the person's colors]
-  F --> E
+  F[Energy level<br/>clock + bedtime steps] --> E
   E --> G[Live aura<br/>save, record, share]
 ```
 
 - **Segmentation**: Google's MediaPipe selfie segmenter (a 250 KB model) runs in WebAssembly in the browser. The model and runtime are served by the app itself, so not even a CDN sees a request. An automated test checks that every request stays on the app's own origin.
 - **Aura field**: the person mask becomes a signed distance field (an exact Euclidean distance transform), so every pixel knows how far it is from the person's outline.
 - **Rendering**: a WebGL2 fragment shader turns that distance into rising flame tongues (domain-warped noise), a soft halo, outward waves, drifting sparks and a rim light along the body, and dims the background so the energy reads on any photo. Browsers without WebGL2 get a simpler Canvas 2D glow.
-- **Energy type**: the "scan" reads the average color of the person (clothes, hair) and maps it to one of six energy types. It's for fun, and you can change it.
+- **Energy level**: bedtime, the clock and the routine steps set an energy from 3 to 99, mapped to Grey, Blue Moon, Green Glow, Yellow, Red Rocket or Rainbow. That level picks the aura's colors and how strong and fast it moves.
 - **Export**: a captioned PNG, or a 4-second loop recorded from the live canvas with MediaRecorder (MP4 on Safari, WebM elsewhere), shared through the Web Share API on phones.
 
 ## Built with

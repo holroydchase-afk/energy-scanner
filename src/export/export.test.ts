@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { energyTypeById } from '../aura/presets';
-import { canShareFiles, exportFileName, extensionFor, pickVideoType } from './export';
+import { canShareFiles, captionFor, exportFileName, extensionFor, pickVideoType } from './export';
 
 describe('pickVideoType', () => {
   it('prefers MP4 where supported (Safari)', () => {
@@ -33,5 +33,12 @@ describe('canShareFiles', () => {
   it('asks canShare about files', () => {
     const nav = { share: () => Promise.resolve(), canShare: (d: ShareData) => Boolean(d.files?.length) } as unknown as Navigator;
     expect(canShareFiles(file, nav)).toBe(true);
+  });
+});
+
+describe('captionFor', () => {
+  it('adds "energy" only when missing', () => {
+    expect(captionFor(energyTypeById('mystic'))).toBe('Mystic energy');
+    expect(captionFor({ ...energyTypeById('calm'), name: 'Grey Energy' })).toBe('Grey Energy');
   });
 });
