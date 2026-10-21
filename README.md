@@ -61,3 +61,7 @@ npm run build && npm run test:e2e   # browser tests in headless Chromium
 - No analytics, cookies or accounts.
 
 *Energy Scanner is for fun. It does not measure anything about a person.*
+
+## License
+
+Code: MIT ([LICENSE](LICENSE)). The bundled MediaPipe model and runtime are Apache 2.0 from Google; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
