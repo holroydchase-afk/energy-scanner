@@ -10,11 +10,14 @@
 
 - M4 Save and share (branch `m4-export`): Save image (captioned PNG: "<Type> energy" + "Energy Scanner"), Save video (4s captioned loop via MediaRecorder; MP4 on Safari, WebM elsewhere), Share (native share sheet with the image when the browser can share files, else download).
 
+- M5 Portfolio pack (branch `m5-portfolio`, draft): recruiter README (what, try it, why, how it works with a diagram, privacy), CASE-STUDY.md (constraints, decision table, what's next), `npm run screenshots -- photo.jpg` script, start-screen screenshots committed. Result screenshots wait on a publishable photo.
+
 ## In progress
-- M5 Portfolio pack (branch `m5-portfolio`, stacked on `m4-export`).
+- Hardening (branch `m6-harden`, stacked on `m5-portfolio`).
 
 ## Exact next step
-- README for recruiters, screenshots via Playwright, CASE-STUDY.md. Screenshots need a person photo that is OK to publish (see Blockers).
+- When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR M5 ready.
+- Meanwhile harden: multiple people, tiny/huge/dark images, HEIC on non-Safari, model load failure retry, mobile layout, accessibility.
 
 ## Testing note
 - No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
@@ -33,6 +36,8 @@
 - Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.
 
 - Exports carry a small caption (energy type + app name) so shared images explain themselves.
+
+- README "Why I built it" and CASE-STUDY.md are written in Chase's first-person voice as a draft; he should edit them to sound like him.
 
 ## Blockers
 - Portfolio screenshots need a photo of a person that is OK to publish. The repo rule forbids real identifiable people, and image sites are blocked from this sandbox. Best option: Chase adds a photo of himself (his portfolio, his face).
