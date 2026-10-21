@@ -64,6 +64,10 @@ describe('showResult', () => {
     expect(setIntensity).toHaveBeenCalledWith(0.7);
     expect(view.energy()).not.toBeNull();
     expect(stage.querySelectorAll('[aria-checked="true"]')).toHaveLength(1);
+    expect(stage.querySelector<HTMLElement>('[data-action="save-image"]')!.hidden).toBe(false);
+    // jsdom has neither MediaRecorder nor the Web Share API.
+    expect(stage.querySelector<HTMLElement>('[data-action="save-video"]')!.hidden).toBe(true);
+    expect(stage.querySelector<HTMLElement>('[data-action="share"]')!.hidden).toBe(true);
     view.destroy();
   });
 
@@ -100,6 +104,7 @@ describe('showResult', () => {
     await flush();
     expect(stage.querySelector('.status')!.textContent).toMatch(/No person found/);
     expect(stage.querySelector<HTMLElement>('.panel')!.hidden).toBe(true);
+    expect(stage.querySelector<HTMLElement>('[data-action="save-image"]')!.hidden).toBe(true);
   });
 
   it('explains when the scanner cannot load', async () => {

@@ -8,11 +8,13 @@
 
 - M3 Aura render (branch `m3-aura`): MediaPipe selfie segmenter on-device (wasm copied from node_modules to `public/mediapipe` by `scripts/copy-mediapipe-wasm.mjs`, model committed in `public/models`), signed distance field around the person (`src/aura/field.ts`), WebGL2 aura shader (rising flame tongues, halo, waves, sparks, rim light, dimmed background) with a Canvas 2D fallback, 6 energy types auto-picked from the person's average color, intensity slider, scan animation, "no person found" and "scanner could not start" states. ~30fps even on SwiftShader (software GL).
 
+- M4 Save and share (branch `m4-export`): Save image (captioned PNG: "<Type> energy" + "Energy Scanner"), Save video (4s captioned loop via MediaRecorder; MP4 on Safari, WebM elsewhere), Share (native share sheet with the image when the browser can share files, else download).
+
 ## In progress
-- M4 Save and share (branch `m4-export`, stacked on `m3-aura`).
+- M5 Portfolio pack (branch `m5-portfolio`, stacked on `m4-export`).
 
 ## Exact next step
-- Add Save image (PNG), Save video (WebM loop via MediaRecorder on the aura canvas) and Share (Web Share API with files, when supported) to the result actions.
+- README for recruiters, screenshots via Playwright, CASE-STUDY.md. Screenshots need a person photo that is OK to publish (see Blockers).
 
 ## Testing note
 - No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
@@ -30,5 +32,7 @@
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.
 
+- Exports carry a small caption (energy type + app name) so shared images explain themselves.
+
 ## Blockers
-- None.
+- Portfolio screenshots need a photo of a person that is OK to publish. The repo rule forbids real identifiable people, and image sites are blocked from this sandbox. Best option: Chase adds a photo of himself (his portfolio, his face).
