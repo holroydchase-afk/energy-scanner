@@ -2,6 +2,7 @@ import { buildAuraField } from '../aura/field';
 import { averagePersonColor, ENERGY_TYPES, energyTypeById, pickEnergyType, type EnergyType } from '../aura/presets';
 import { createAuraRenderer, type AuraRenderer } from '../aura/renderer';
 import type { PersonMask, Segmenter } from '../segment/types';
+import { canRecordVideo, download, exportImage, exportVideo, shareOrDownload } from '../export/export';
 
 export interface ResultOptions {
   getSegmenter: () => Promise<Segmenter>;
@@ -44,6 +45,9 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
         </label>
       </div>
       <div class="actions" data-slot="actions">
+        <button type="button" class="btn primary" data-action="share" hidden>Share</button>
+        <button type="button" class="btn" data-action="save-image" hidden>Save image</button>
+        <button type="button" class="btn" data-action="save-video" hidden>Save video</button>
         <button type="button" class="btn" data-action="reset">New photo</button>
       </div>
     </div>
@@ -80,8 +84,19 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       console.error(e);
       if (destroyed) return;
       frame.classList.remove('scanning');
-      status.textContent = 'The energy scanner could not start on this device. Try another browser.';
+      status.textContent = 'The energy scanner could not start. Check your connection and try again, or try another browser. ';
       status.classList.add('warn');
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'btn';
+      retry.textContent = 'Try again';
+      retry.addEventListener('click', () => {
+        status.textContent = 'Scanning energy…';
+        status.classList.remove('warn');
+        frame.classList.add('scanning');
+        void run();
+      });
+      status.append(retry);
       return;
     }
     const wait = (options.minScanMs ?? 1200) - (performance.now() - started);
@@ -112,6 +127,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     renderer.canvas.setAttribute('aria-label', `Photo with a glowing ${picked.name} energy aura around the person`);
     status.textContent = '';
     panel.hidden = false;
+    showExportButtons();
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const speed = reduceMotion ? 0.25 : 1;
@@ -131,8 +147,63 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       renderer?.canvas.setAttribute('aria-label', `Photo with a glowing ${energyTypeById(id).name} energy aura around the person`);
     }
   });
+  // Arrow keys move between energy types, as in any radio group.
+  stage.querySelector('.chips')!.addEventListener('keydown', (e) => {
+    const key = (e as KeyboardEvent).key;
+    const step = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const chips = [...stage.querySelectorAll<HTMLButtonElement>('.chip')];
+    const current = Math.max(0, chips.findIndex((c) => c.getAttribute('aria-checked') === 'true'));
+    const next = chips[(current + step + chips.length) % chips.length]!;
+    next.focus();
+    next.click();
+  });
   stage.querySelector<HTMLInputElement>('[data-input="intensity"]')!.addEventListener('input', (e) => {
     renderer?.setIntensity(Number((e.target as HTMLInputElement).value) / 100);
+  });
+
+  const button = (action: string) => stage.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)!;
+  const showExportButtons = () => {
+    button('save-image').hidden = false;
+    button('save-video').hidden = !canRecordVideo();
+    // The share sheet is a phone thing; desktops get the save buttons.
+    button('share').hidden = typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function';
+  };
+  const busy = async (action: string, label: string, work: () => Promise<void>) => {
+    const b = button(action);
+    const original = b.textContent;
+    b.disabled = true;
+    b.textContent = label;
+    try {
+      await work();
+    } catch (e) {
+      console.error(e);
+      status.textContent = 'Saving did not work in this browser. Try a screenshot instead.';
+      status.classList.add('warn');
+    } finally {
+      b.disabled = false;
+      b.textContent = original;
+    }
+  };
+  stage.querySelector('[data-slot="actions"]')!.addEventListener('click', (e) => {
+    const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
+    if (!renderer || !energy) return;
+    const canvas = renderer.canvas;
+    const current = energy;
+    if (action === 'save-image') void busy('save-image', 'Saving…', async () => download(await exportImage(canvas, current)));
+    if (action === 'share')
+      void busy('share', 'Opening…', async () => {
+        await shareOrDownload(await exportImage(canvas, current), current);
+      });
+    if (action === 'save-video')
+      void busy('save-video', 'Recording…', async () => {
+        const b = button('save-video');
+        const file = await exportVideo(canvas, () => energy ?? current, undefined, (f) => {
+          b.textContent = `Recording… ${Math.round(f * 100)}%`;
+        });
+        download(file);
+      });
   });
 
   void run();

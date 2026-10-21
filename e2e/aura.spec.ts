@@ -27,4 +27,16 @@ test('a photo of a person gets an animated aura', async ({ page }) => {
   await expect(page.getByTestId('reading')).toBeVisible();
   await page.getByRole('radio', { name: 'Calm' }).click();
   await expect(page.locator('.energy-name')).toHaveText('Calm');
+
+  const image = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Save image' }).click();
+  expect((await image).suggestedFilename()).toBe('energy-scanner-calm.png');
+
+  const video = page.waitForEvent('download', { timeout: 30_000 });
+  await page.getByRole('button', { name: 'Save video' }).click();
+  const saved = await video;
+  expect(saved.suggestedFilename()).toMatch(/^energy-scanner-calm\.(webm|mp4)$/);
+  const path = await saved.path();
+  const { statSync } = await import('node:fs');
+  expect(statSync(path).size).toBeGreaterThan(10_000);
 });
