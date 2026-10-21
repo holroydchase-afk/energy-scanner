@@ -118,6 +118,42 @@ describe('showResult', () => {
     expect(stage.querySelector('.status')!.textContent).toMatch(/could not start/);
   });
 
+  it('retries a failed scanner load', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    let calls = 0;
+    showResult(stage, photo(), {
+      getSegmenter: async () => {
+        calls++;
+        if (calls === 1) throw new Error('offline');
+        return fakeSegmenter((x, y) => Math.hypot(x - 32, y - 32) < 16);
+      },
+      onReset: () => undefined,
+      minScanMs: 0,
+    });
+    await flush();
+    const retry = [...stage.querySelectorAll<HTMLButtonElement>('.status button')].find((b) => b.textContent === 'Try again')!;
+    retry.click();
+    await flush();
+    expect(calls).toBe(2);
+    expect(stage.querySelector<HTMLElement>('.panel')!.hidden).toBe(false);
+  });
+
+  it('moves between energy types with arrow keys', async () => {
+    const view = showResult(stage, photo(), {
+      getSegmenter: async () => fakeSegmenter((x, y) => Math.hypot(x - 32, y - 32) < 16),
+      onReset: () => undefined,
+      minScanMs: 0,
+    });
+    await flush();
+    stage.querySelector<HTMLButtonElement>('[data-energy="radiant"]')!.click();
+    stage.querySelector('.chips')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(stage.querySelector('.energy-name')!.textContent).toBe('Passion');
+    stage.querySelector('.chips')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    stage.querySelector('.chips')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(stage.querySelector('.energy-name')!.textContent).toBe('Spectrum');
+    view.destroy();
+  });
+
   it('calls onReset from New photo', () => {
     const onReset = vi.fn();
     showResult(stage, photo(), { getSegmenter: () => new Promise(() => undefined), onReset, minScanMs: 0 });

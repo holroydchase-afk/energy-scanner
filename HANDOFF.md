@@ -12,12 +12,14 @@
 
 - M5 Portfolio pack (branch `m5-portfolio`, draft): recruiter README (what, try it, why, how it works with a diagram, privacy), CASE-STUDY.md (constraints, decision table, what's next), `npm run screenshots -- photo.jpg` script, start-screen screenshots committed. Result screenshots wait on a publishable photo.
 
+- Hardening (branch `m6-harden`): Content Security Policy in the production build (page can only talk to its own origin; e2e proves a cross-origin POST is blocked and the model still runs), tiny photos scaled up to 480px, clear HEIC message on browsers that can't decode it, "Try again" when the scanner fails to load, arrow-key navigation for energy types, multi-person field test. Checked visually on a grayscale, side-on, full-height photo (Spectrum).
+
 ## In progress
-- Hardening (branch `m6-harden`, stacked on `m5-portfolio`).
+- Nothing. Waiting on a publishable photo for M5 screenshots.
 
 ## Exact next step
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR M5 ready.
-- Meanwhile harden: multiple people, tiny/huge/dark images, HEIC on non-Safari, model load failure retry, mobile layout, accessibility.
+- Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
 ## Testing note
 - No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.

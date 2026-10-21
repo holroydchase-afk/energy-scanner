@@ -84,8 +84,19 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       console.error(e);
       if (destroyed) return;
       frame.classList.remove('scanning');
-      status.textContent = 'The energy scanner could not start on this device. Try another browser.';
+      status.textContent = 'The energy scanner could not start. Check your connection and try again, or try another browser. ';
       status.classList.add('warn');
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'btn';
+      retry.textContent = 'Try again';
+      retry.addEventListener('click', () => {
+        status.textContent = 'Scanning energy…';
+        status.classList.remove('warn');
+        frame.classList.add('scanning');
+        void run();
+      });
+      status.append(retry);
       return;
     }
     const wait = (options.minScanMs ?? 1200) - (performance.now() - started);
@@ -135,6 +146,18 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       setEnergy(energyTypeById(id));
       renderer?.canvas.setAttribute('aria-label', `Photo with a glowing ${energyTypeById(id).name} energy aura around the person`);
     }
+  });
+  // Arrow keys move between energy types, as in any radio group.
+  stage.querySelector('.chips')!.addEventListener('keydown', (e) => {
+    const key = (e as KeyboardEvent).key;
+    const step = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const chips = [...stage.querySelectorAll<HTMLButtonElement>('.chip')];
+    const current = Math.max(0, chips.findIndex((c) => c.getAttribute('aria-checked') === 'true'));
+    const next = chips[(current + step + chips.length) % chips.length]!;
+    next.focus();
+    next.click();
   });
   stage.querySelector<HTMLInputElement>('[data-input="intensity"]')!.addEventListener('input', (e) => {
     renderer?.setIntensity(Number((e.target as HTMLInputElement).value) / 100);
