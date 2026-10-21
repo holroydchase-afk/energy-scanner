@@ -6,11 +6,16 @@
 
 - M2 Photo in (branch `m2-photo-in`): upload, drag/drop, in-page camera (getUserMedia, front/back flip, mirrored selfie), native `capture="user"` fallback, downscale to 1280px, friendly errors. Unit tests + Playwright tests (fake camera via Chromium flags).
 
+- M3 Aura render (branch `m3-aura`): MediaPipe selfie segmenter on-device (wasm copied from node_modules to `public/mediapipe` by `scripts/copy-mediapipe-wasm.mjs`, model committed in `public/models`), signed distance field around the person (`src/aura/field.ts`), WebGL2 aura shader (rising flame tongues, halo, waves, sparks, rim light, dimmed background) with a Canvas 2D fallback, 6 energy types auto-picked from the person's average color, intensity slider, scan animation, "no person found" and "scanner could not start" states. ~30fps even on SwiftShader (software GL).
+
 ## In progress
-- M3 Aura render (branch `m3-aura`, stacked on `m2-photo-in`).
+- M4 Save and share (branch `m4-export`, stacked on `m3-aura`).
 
 ## Exact next step
-- Add MediaPipe Image Segmenter behind a `Segmenter` interface (wasm + model self-hosted in `public/`), then the aura renderer.
+- Add Save image (PNG), Save video (WebM loop via MediaRecorder on the aura canvas) and Share (Web Share API with files, when supported) to the result actions.
+
+## Testing note
+- No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
 
 ## How to run
 - `npm install`, then `npm run dev`. Checks: `npm run check`. Browser test: `npm run build && npm run test:e2e` (uses the preinstalled Chromium; Playwright pinned to 1.56.1 to match it).
@@ -21,6 +26,9 @@
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
 - Selfie camera photos are mirrored to match the preview, like most phone camera apps.
+
+- Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
+- Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.
 
 ## Blockers
 - None.

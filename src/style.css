@@ -40,3 +40,25 @@ body { margin: 0; background: var(--bg); color: var(--fg); min-height: 100vh; }
 .camera-video.mirrored { transform: scaleX(-1); }
 .camera-bar { display: flex; align-items: center; justify-content: space-around; padding: 16px 16px max(16px, env(safe-area-inset-bottom)); }
 .shutter { width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; background: radial-gradient(circle, #fff 55%, transparent 58%); cursor: pointer; }
+
+.frame { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; }
+.scan { display: none; position: absolute; inset: 0; border-radius: 16px; overflow: hidden; pointer-events: none; }
+.scanning .scan { display: block; background: rgba(20, 10, 50, 0.25); }
+.scanline { position: absolute; left: 0; right: 0; height: 22%; background: linear-gradient(180deg, transparent, rgba(183, 139, 255, 0.55) 80%, #fff 100%); mix-blend-mode: screen; animation: scan 1.4s ease-in-out infinite alternate; }
+@keyframes scan { from { top: -22%; } to { top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .scanline { animation-duration: 4s; } }
+.status { margin: 0; min-height: 1.4em; color: var(--muted); text-align: center; }
+.status.warn { color: #ffc2e2; }
+.panel { width: 100%; max-width: 560px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.panel[hidden] { display: none; }
+.reading { text-align: center; }
+.reading .label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.energy-name { margin: 2px 0 4px; font-size: 1.8rem; }
+.energy-reading { margin: 0; color: #d9d2f5; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.chip { font: inherit; font-size: 0.9rem; padding: 8px 14px; min-height: 40px; border-radius: 999px; border: 1px solid #3a3360; background: var(--panel); color: var(--fg); cursor: pointer; }
+.chip::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--c1), var(--c2)); vertical-align: middle; }
+.chip[aria-checked='true'] { border-color: var(--c1); box-shadow: 0 0 0 1px var(--c1), 0 0 18px -4px var(--c1); }
+.chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.slider { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 360px; color: var(--muted); }
+.slider input { flex: 1; accent-color: var(--accent); min-height: 32px; }

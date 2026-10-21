@@ -65,7 +65,7 @@ void main() {
   float sd = texture(uSdf, uv).r;
 
   float k = uIntensity * uReveal;
-  float radius = mix(0.07, 0.32, uIntensity) * (0.35 + 0.65 * uReveal);
+  float radius = mix(0.05, 0.22, uIntensity) * (0.4 + 0.6 * uReveal);
 
   // Flowing energy that rises off the body: domain-warped noise scrolling upward.
   vec2 q = p * 3.2;
@@ -74,21 +74,23 @@ void main() {
   float n2 = fbm(q * 2.4 + vec2(-t * 0.25, t * 1.3));
 
   float outside = max(sd, 0.0);
-  // Flame tongues: noise pulls the outline outward in licks.
-  float dd = max(outside - (n - 0.42) * radius * 1.1 - n2 * radius * 0.18, 0.0);
-  float glow = exp(-dd / (radius * 0.42));
-  float halo = exp(-outside / (radius * 1.3));
+  // Flame tongues: high-contrast noise pulls the bright band outward in licks.
+  float flame = smoothstep(0.3, 0.75, n);
+  float dd = max(outside - flame * radius * 0.65 - n2 * radius * 0.15, 0.0);
+  float glow = exp(-dd / (radius * 0.22)) * (0.55 + 0.45 * flame);
+  float halo = exp(-outside / radius);
   float waves = pow(0.5 + 0.5 * sin(outside * 55.0 / (0.45 + uIntensity) - t * 2.4), 8.0) * halo;
   float breathe = 0.9 + 0.1 * sin(t * 1.3);
-  float aura = (glow * 0.9 + halo * 0.32 + waves * 0.22) * breathe;
+  float aura = (glow + halo * 0.35 + waves * 0.2) * breathe;
 
-  float cd = clamp(dd / radius, 0.0, 1.0);
-  vec3 col = mix(uC0, uC1, smoothstep(0.0, 0.3, cd));
-  col = mix(col, uC2, smoothstep(0.3, 1.0, cd));
+  // Main color near the body fading to the outer color; the pale core color only where hottest.
+  float cd = clamp(outside / radius, 0.0, 1.0);
+  vec3 col = mix(uC1, uC2, smoothstep(0.05, 0.9, cd));
   if (uSpectrum > 0.5) {
     float hue = fract(outside * 2.2 + n * 0.7 - t * 0.07 + p.y * 0.25);
-    col = mix(uC0, hsv2rgb(vec3(hue, 0.8, 1.0)), smoothstep(0.0, 0.22, cd));
+    col = hsv2rgb(vec3(hue, 0.85, 1.0));
   }
+  vec3 core = uC0 * pow(glow, 3.0) * 0.5;
 
   // Sparks drifting up through the aura.
   vec2 sp = p * 70.0 + vec2(0.0, t * 7.0);
@@ -96,19 +98,19 @@ void main() {
   float h = hash(cell);
   float spark = step(0.988, h) * (1.0 - smoothstep(0.0, 0.45, length(fract(sp) - 0.5)));
   spark *= 0.5 + 0.5 * sin(t * 5.0 + h * 40.0);
-  aura += spark * halo * 1.4;
+  aura += spark * halo * 1.2;
 
-  // Background: dimmed and slightly desaturated so the energy reads.
+  // Background: dimmed and desaturated, like a dark room, so the energy reads on any photo.
   float lum = dot(photo, vec3(0.299, 0.587, 0.114));
-  vec3 bg = mix(photo, vec3(lum), 0.35 * k) * (1.0 - 0.5 * k);
-  vec3 energy = clamp(col * aura * k * 1.3, 0.0, 1.0);
-  vec3 lit = 1.0 - (1.0 - bg) * (1.0 - energy);
-  lit += col * glow * glow * k * 0.22;
+  vec3 bg = mix(photo, vec3(lum), 0.6 * k) * (1.0 - 0.72 * k);
+  vec3 energy = (col * aura + core) * k * 1.8;
+  // Soft clip so bright energy keeps its color instead of blowing out to white.
+  vec3 lit = bg + (1.0 - exp(-energy)) * (1.0 - 0.6 * bg);
 
   // The person stays true to the photo, with energy glowing along their outline.
-  float rim = exp(min(sd, 0.0) / 0.012) * (1.0 - smoothstep(0.0, 0.02, sd));
+  float rim = exp(min(sd, 0.0) / 0.01) * (1.0 - smoothstep(0.0, 0.02, sd));
   vec3 rimColor = uSpectrum > 0.5 ? hsv2rgb(vec3(fract(p.y * 0.5 - t * 0.07), 0.6, 1.0)) : mix(uC0, uC1, 0.6);
-  vec3 subject = photo + rimColor * rim * 0.5 * k;
+  vec3 subject = photo * (1.0 - 0.12 * k) + rimColor * rim * 0.6 * k;
   float alpha = smoothstep(0.3, 0.75, person);
   outColor = vec4(mix(lit, subject, alpha), 1.0);
 }`;
