@@ -14,6 +14,8 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Done
+- 2026-10-21 evening: Chase asked to merge everything. PRs #2-#6 merged down the stack, then #1 into the default branch; all v1 work is now on `claude/project-thread-xq47vx` and `main`.
+- 2026-10-21: studio session rules installed: `.claude/settings.json` SessionStart hook prints this file into every Claude Code session, `.github/workflows/handoff-check.yml` fails a PR that changes files without updating this file, and CLAUDE.md has a "Session rules" section.
 - 2026-10-21: plan and hard rules written (PLAN.md, CLAUDE.md). Role-Radar checked: no energy scanner files exist there, so the app starts from scratch.
 - M1.1 Scaffold (was M1) (branch `m1-scaffold`): Vite 8 + TypeScript 5.9, ESLint 10 + typescript-eslint, Vitest (jsdom), Playwright smoke test against `vite preview`. `npm run check`, `npm run build`, `npm run test:e2e` all green.
 
@@ -55,6 +57,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 - Exports carry a small caption (energy type + app name) so shared images explain themselves.
 
 - README "Why I built it" and CASE-STUDY.md are written in Chase's first-person voice as a draft; he should edit them to sound like him.
+- Shared studio agents (`.claude/agents/`, six generic agents) were merged into the base branch (PR #7).
 
 ## Blockers
 - Portfolio screenshots need a photo of a person that is OK to publish. The repo rule forbids real identifiable people, and image sites are blocked from this sandbox. Best option: Chase adds a photo of himself (his portfolio, his face).
