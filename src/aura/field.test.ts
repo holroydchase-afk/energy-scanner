@@ -67,6 +67,16 @@ describe('buildAuraField', () => {
     expect(buildAuraField(circle, 0.5, 100)).toMatchObject({ width: 50, height: 100 });
   });
 
+  it('wraps several people in one field', () => {
+    const two = maskFrom(200, 100, (x, y) => Math.hypot(x - 40, y - 50) < 20 || Math.hypot(x - 160, y - 50) < 20);
+    const field = buildAuraField(two, 2, 100);
+    const at = (x: number, y: number) => field.sdf[y * field.width + x]!;
+    expect(at(20, 25)).toBeLessThan(0);
+    expect(at(80, 25)).toBeLessThan(0);
+    expect(at(50, 25)).toBeGreaterThan(0);
+    expect(field.box!.width).toBeGreaterThan(0.7);
+  });
+
   it('finds nobody in an empty mask', () => {
     const field = buildAuraField(maskFrom(50, 50, () => false), 1, 50);
     expect(field.coverage).toBe(0);

@@ -7,3 +7,18 @@ test('app loads', async ({ page }) => {
   await expect(page.locator('h1')).toHaveText('Energy Scanner');
   expect(errors).toEqual([]);
 });
+
+test('the production build ships a Content Security Policy that blocks other origins', async ({ page }) => {
+  await page.goto('/');
+  const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+  expect(csp).toContain("connect-src 'self'");
+  const blocked = await page.evaluate(async () => {
+    try {
+      await fetch('https://example.com/upload', { method: 'POST', body: 'photo' });
+      return false;
+    } catch {
+      return true;
+    }
+  });
+  expect(blocked).toBe(true);
+});
