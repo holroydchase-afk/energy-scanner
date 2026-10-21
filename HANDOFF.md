@@ -16,7 +16,8 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 ## Portfolio / public presence
 _Updated 2026-10-21._
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
-- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). It still links the portfolio's older snapshot of the bedtime artifact at /demo/energy-scanner/. Pointing it at the live app is ES-M2.3, done in the portfolio repo.
+- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, draft, Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed. Live once Chase merges PR #8.
+- **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
 - **Demo data:** no photos stored or uploaded; everything runs in the visitor's browser.
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
@@ -44,7 +45,7 @@ _Updated 2026-10-21._
 - Nothing. Waiting on a publishable photo for M1.5 screenshots.
 
 ## Exact next step
-- ES-M2.3: update the portfolio's Energy Scanner page to link chaseholroyd.com/energy-scanner/ (portfolio repo). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
+- ES-M2.3: in review as portfolio PR #8 (Chase merges). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
 - Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
