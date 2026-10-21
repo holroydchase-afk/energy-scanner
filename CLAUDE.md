@@ -11,3 +11,9 @@ Take or upload a photo of a person and render their energy/aura coming off them.
 - Fakes (e.g. a fake segmenter) are for tests only and labeled as such; never present them as the real thing in the app.
 - Keep `HANDOFF.md` current in every push: done, in progress, exact next step, decisions to review, blockers.
 - Run `npm run lint`, `npm run typecheck` and `npm test` before every push.
+
+## Session rules (studio-wide)
+
+- Before starting: read this file and `HANDOFF.md` (a SessionStart hook prints it), then the doc this file points to for the task. Check open PRs and branches and resume, never redo.
+- Every commit or PR that makes progress updates `HANDOFF.md` in the same commit or PR: done, in progress, exact next step, decisions to review, blockers. The `handoff-check` PR workflow enforces it; use `[skip handoff]` in the PR title only for changes that do not move the work.
+- Full rules: `docs/session-rules.md` in holroydchase-afk/studio-agents.
