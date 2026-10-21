@@ -1,5 +1,7 @@
 /** Longest side, in pixels, that photos are scaled down to before processing. */
 export const MAX_PHOTO_SIDE = 1280;
+/** Tiny photos are scaled up to this longest side so the aura has room to show. */
+export const MIN_PHOTO_SIDE = 480;
 
 export const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'image/heic', 'image/heif'];
 
@@ -8,15 +10,23 @@ export interface Size {
   height: number;
 }
 
-/** Scale a size down (never up) so its longest side is at most maxSide. */
-export function fitWithin(size: Size, maxSide: number = MAX_PHOTO_SIDE): Size {
+/**
+ * Scale a size so its longest side is at most maxSide, and at least minSide for tiny images.
+ * Aspect ratio is kept.
+ */
+export function fitWithin(size: Size, maxSide: number = MAX_PHOTO_SIDE, minSide: number = Math.min(MIN_PHOTO_SIDE, maxSide)): Size {
   const { width, height } = size;
   if (width <= 0 || height <= 0) throw new Error('Image has no pixels');
-  const scale = Math.min(1, maxSide / Math.max(width, height));
+  const longest = Math.max(width, height);
+  const scale = longest > maxSide ? maxSide / longest : longest < minSide ? minSide / longest : 1;
   return {
     width: Math.max(1, Math.round(width * scale)),
     height: Math.max(1, Math.round(height * scale)),
   };
+}
+
+export function isHeic(file: Pick<File, 'type' | 'name'>): boolean {
+  return /image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
 }
 
 export function isAcceptedImage(file: Pick<File, 'type' | 'name'>): boolean {
@@ -72,7 +82,10 @@ export async function fileToCanvas(file: File, maxSide: number = MAX_PHOTO_SIDE)
       // Fall through to <img> decoding, which supports more formats on some browsers (e.g. HEIC on Safari).
     }
   }
-  const img = await loadImageElement(file);
+  const img = await loadImageElement(file).catch((e: unknown) => {
+    if (isHeic(file)) throw new Error('This browser cannot open HEIC photos. Try Safari, or export the photo as a JPEG.');
+    throw e;
+  });
   return sourceToCanvas(img, { width: img.naturalWidth, height: img.naturalHeight }, { maxSide });
 }
 

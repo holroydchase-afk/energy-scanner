@@ -1,7 +1,27 @@
 import { captureFromCamera, cameraErrorMessage, cameraSupported } from './photo/camera';
 import { fileToCanvas } from './photo/image';
+import type { Segmenter } from './segment/types';
+import { showResult, type ResultView } from './ui/result';
 
-export function mountApp(root: HTMLElement): void {
+export interface AppOptions {
+  /** Defaults to the on-device MediaPipe segmenter, loaded on first use. */
+  getSegmenter?: () => Promise<Segmenter>;
+  minScanMs?: number;
+}
+
+let defaultSegmenter: Promise<Segmenter> | null = null;
+function loadDefaultSegmenter(): Promise<Segmenter> {
+  defaultSegmenter ??= import('./segment/mediapipe').then((m) => m.createMediaPipeSegmenter());
+  // Let a failed load be retried next time instead of caching the failure.
+  defaultSegmenter.catch(() => {
+    defaultSegmenter = null;
+  });
+  return defaultSegmenter;
+}
+
+export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
+  const getSegmenter = options.getSegmenter ?? loadDefaultSegmenter;
+  let view: ResultView | null = null;
   root.innerHTML = `
     <header class="top">
       <h1 class="logo">Energy Scanner</h1>
@@ -27,7 +47,8 @@ export function mountApp(root: HTMLElement): void {
 
   const usePhoto = (photo: HTMLCanvasElement) => {
     showError(null);
-    showPhoto(stage, photo, showStart);
+    view?.destroy();
+    view = showResult(stage, photo, { getSegmenter, onReset: showStart, minScanMs: options.minScanMs });
   };
 
   const useFile = async (file: File | undefined) => {
@@ -40,6 +61,8 @@ export function mountApp(root: HTMLElement): void {
   };
 
   const showStart = () => {
+    view?.destroy();
+    view = null;
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
@@ -55,6 +78,8 @@ export function mountApp(root: HTMLElement): void {
 
   stage.addEventListener('click', async (e) => {
     const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
+    // Start loading the scanner while the person picks or takes a photo.
+    if (action === 'upload' || action === 'camera') getSegmenter().catch(() => undefined);
     if (action === 'upload') uploadInput.click();
     if (action === 'camera') {
       if (!cameraSupported()) {
@@ -91,18 +116,4 @@ export function mountApp(root: HTMLElement): void {
   });
 
   showStart();
-}
-
-function showPhoto(stage: HTMLElement, photo: HTMLCanvasElement, onReset: () => void): void {
-  stage.innerHTML = `
-    <div class="viewer">
-      <div class="frame" data-testid="photo"></div>
-      <div class="actions">
-        <button type="button" class="btn" data-action="reset">New photo</button>
-      </div>
-    </div>
-  `;
-  photo.classList.add('photo');
-  stage.querySelector('.frame')!.append(photo);
-  stage.querySelector('[data-action="reset"]')!.addEventListener('click', onReset);
 }
