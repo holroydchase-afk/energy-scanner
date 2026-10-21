@@ -13,7 +13,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run lint && npm run typecheck && npm test"
+    "check": "npm run lint && npm run typecheck && npm test",
+    "predev": "node scripts/copy-mediapipe-wasm.mjs",
+    "prebuild": "node scripts/copy-mediapipe-wasm.mjs",
+    "postinstall": "node scripts/copy-mediapipe-wasm.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
