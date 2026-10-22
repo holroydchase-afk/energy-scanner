@@ -284,7 +284,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   const setMode = (next: Mode) => {
     mode = next;
     store.set('mode', mode);
-    for (const b of root.querySelectorAll<HTMLElement>('[data-mode]')) b.setAttribute('aria-checked', String(b.dataset.mode === mode));
+    for (const b of root.querySelectorAll<HTMLElement>('[data-mode]')) {
+      b.setAttribute('aria-checked', String(b.dataset.mode === mode));
+      // One tab stop for the group; arrow keys move between the choices.
+      b.tabIndex = b.dataset.mode === mode ? 0 : -1;
+    }
     showMode();
   };
 
@@ -301,6 +305,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   $('.mode').addEventListener('click', (e) => {
     const m = (e.target as HTMLElement).closest<HTMLElement>('[data-mode]')?.dataset.mode as Mode | undefined;
     if (m && m !== mode) setMode(m);
+  });
+  $('.mode').addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    e.preventDefault();
+    setMode(mode === 'palm' ? 'photo' : 'palm');
+    root.querySelector<HTMLElement>(`[data-mode="${mode}"]`)?.focus();
   });
 
   stage.addEventListener('click', (e) => {
