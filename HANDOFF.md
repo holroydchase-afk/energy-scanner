@@ -15,6 +15,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 
 ## Portfolio / public presence
 _Updated 2026-10-22._
+- **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. In draft PRs #16 to #24; live after Chase merges.
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
 - **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, merged Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed.
 - **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
@@ -22,6 +23,9 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22 overnight, round 3 + ES-R19, R20 (branch `m2.13-a11y`): accessibility pass (320px reflow, contrast, tab order, focus, reduced motion); the Palm/Photo switch now works with arrow keys as one tab stop, and its labels stay on one line at 320px.
+- 2026-10-22, round 2 re-review + ES-R17, R18 (branch `m2.12-fit`): picking a photo or the sample scrolls it into view; "No person found" offers Try the sample.
+- 2026-10-22, ES-R9 (branch `m2.11-ci`): `.github/workflows/ci.yml` runs check, build and the Playwright e2e on every pull request.
 - 2026-10-22, ES-R2, R3, R16 (branch `m2.10-story`): README screenshots regenerated from the current app with the illustrated sample (`npm run screenshots`, no photo needed); CASE-STUDY.md rewritten around the bedtime story (draft in Chase's voice); Open Graph tags plus a 1200x630 `public/og.png` preview.
 - 2026-10-22, ES-R6, R10, R14, R15 (branch `m2.9-copy`): reading card notes when Always Grey is on; "Still to do: …" replaces "To drain the battery: …"; the not-an-image error says what to choose; Grey texts no longer repeat the heading.
 - 2026-10-22, ES-R4, R5, R11, R12, R13 (branch `m2.8-ui-polish`): tagline under the title; footer links back to the portfolio page and the GitHub repo; Grown-ups controls are 44px targets; no text under 14px; bedtime line no longer wraps; Clear button uses the app font. Measured with Playwright at 390 and 1280.
@@ -52,9 +56,11 @@ _Updated 2026-10-22._
 - Recruiter-Ready Sprint v2 fix loop (Chase approved 2026-10-22): stacked draft PRs from `m2.5-agents-sync`. Each round: fix top open items in the review doc, re-screenshot, re-run suites, update the doc and this file.
 
 ## Exact next step
-- Fix loop: take the top `open` row in `docs/reviews/2026-10-22-recruiter-ready.md` (P0 first), failing test first, one stacked draft PR per fix or tight batch. Never merge or deploy.
-- ES-M2.4: Chase tests "Take a photo" on his iPhone after this merges (Pages redeploys). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
-- Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
+- Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 20 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
+- Next round (if run): re-review the top of the stack (`m2.13-a11y`): `npm run build`, screenshot every screen at 390x844 and 1280x800, light and dark, open each; run all suites 3x; log new findings as ES-R21+ and fix them stacked on `m2.13-a11y`.
+- After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
+- CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
+- Later ideas: handle WebGL context loss, live aura on the camera feed.
 
 ## Testing note
 - No photos of real people are committed. The e2e happy path runs on the illustrated sample; `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e` adds a check on a real local photo. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
@@ -67,6 +73,9 @@ _Updated 2026-10-22._
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
+- Always Grey stays on by default (the parent feature); the reading card now says how to see other colors. Alternative: default it off on the public demo.
+- The app is dark-only on purpose (night theme); light mode renders the same.
+- Try the sample uses an illustrated child drawn in code, labeled "Illustrated sample, not a real person", so no real person is ever shown.
 - Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.

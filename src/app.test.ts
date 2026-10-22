@@ -52,6 +52,20 @@ describe('bedtime app', () => {
     expect(mount().querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
   });
 
+  it('the scan choice works like radio buttons from the keyboard', () => {
+    const root = mount();
+    const palm = root.querySelector<HTMLElement>('[data-mode="palm"]')!;
+    const photo = root.querySelector<HTMLElement>('[data-mode="photo"]')!;
+    expect([palm.tabIndex, photo.tabIndex]).toEqual([0, -1]);
+    palm.focus();
+    palm.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(photo.getAttribute('aria-checked')).toBe('true');
+    expect(document.activeElement).toBe(photo);
+    expect([palm.tabIndex, photo.tabIndex]).toEqual([-1, 0]);
+    photo.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(palm.getAttribute('aria-checked')).toBe('true');
+  });
+
   it('palm scan reads Grey with the grown-up switch on (the default)', async () => {
     const root = mount({ holdMs: 1 });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
@@ -100,6 +114,21 @@ describe('bedtime app', () => {
     expect(root.querySelector('[data-testid="photo"] canvas')).not.toBeNull();
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
     expect(asked).toBe(true);
+  });
+
+  it('offers the sample when a photo has nobody in it, and brings the photo into view', async () => {
+    const scrolled: Element[] = [];
+    HTMLElement.prototype.scrollIntoView = function (this: HTMLElement) {
+      scrolled.push(this);
+    };
+    const empty = { width: 4, height: 4, data: new Float32Array(16) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => empty }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    expect(scrolled).toContain(root.querySelector('[data-testid="stage"]'));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('[role="status"]')!.textContent).toMatch(/No person found/);
+    expect(root.querySelector('.viewer [data-action="sample"]')?.textContent).toBe('Try the sample');
   });
 
   it('opens the phone camera through the native capture input', () => {
