@@ -14,14 +14,15 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Portfolio / public presence
-_Updated 2026-10-21._
+_Updated 2026-10-22._
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
-- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, draft, Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed. Live once Chase merges PR #8.
+- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, merged Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed.
 - **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
 - **Demo data:** no photos stored or uploaded; everything runs in the visitor's browser.
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22, Recruiter-Ready Sprint v2 review (branch `m2.6-recruiter-review`): UX, QA and triage in `docs/reviews/2026-10-22-recruiter-ready.md`: 16 findings (4 P0, 5 P1, 7 P2). Suites run 3x, no flakes. ES-R7 (stale portfolio status here) fixed.
 - 2026-10-22, ES-M2.5 agents sync (branch `m2.5-agents-sync`): synced the six existing `.claude/agents` from studio-agents branch `claude/project-thread-wvkxmq` (its PR #6, not yet merged) to get the upgraded ux-reviewer (visual pass, heuristic sweep, showcase review mode, iterate loop). focus-coach and orchestrator left out, matching the existing set.
 - 2026-10-22, ES-M2.4 (branch `m2.4-native-camera`): "Take a photo" now opens the phone's own camera app through `<input type="file" accept="image/*" capture="environment">` instead of the in-page getUserMedia camera, which Chase hit bugs with on iPhone. Removed `src/photo/camera.ts` and its tests, the camera overlay CSS, and the mirror option. The returned photo goes through the same path as an upload.
 - 2026-10-21 late: Pages turned on and the app deployed to chaseholroyd.com/energy-scanner/ (ES-M2.2).
@@ -44,10 +45,11 @@ _Updated 2026-10-21._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Nothing. Waiting on a publishable photo for M1.5 screenshots.
+- Recruiter-Ready Sprint v2 fix loop (Chase approved 2026-10-22): stacked draft PRs from `m2.5-agents-sync`. Each round: fix top open items in the review doc, re-screenshot, re-run suites, update the doc and this file.
 
 ## Exact next step
-- ES-M2.4: Chase tests "Take a photo" on his iPhone after this merges (Pages redeploys). ES-M2.3: in review as portfolio PR #8 (Chase merges). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
+- Fix loop: take the top `open` row in `docs/reviews/2026-10-22-recruiter-ready.md` (P0 first), failing test first, one stacked draft PR per fix or tight batch. Never merge or deploy.
+- ES-M2.4: Chase tests "Take a photo" on his iPhone after this merges (Pages redeploys). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
 - Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 

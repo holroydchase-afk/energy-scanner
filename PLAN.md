@@ -27,4 +27,5 @@ Chase's call (Oct 21): combine the photo aura with the original bedtime Energy S
 - [x] **M2.1 Bedtime flow + scan choice** (done) (`m2.1-bedtime`): routine steps, palm scan (press and hold), Grey to Rainbow levels, grown-ups panel (bedtime, pretend time, Always Grey, clear steps), ported from the original prototype. Photo scan renders the aura in the level's colors, softer and slower when sleepy. Done when both scans give a reading, with tests for the energy logic and both flows.
 - [x] **M2.2 Publish the demo** (done) (`.github/workflows/pages.yml`): GitHub Pages build at chaseholroyd.com/energy-scanner/. Done when the link loads on a phone.
 - [x] **M2.3 Point the portfolio at it** (done, portfolio PR #8): update the portfolio's Energy Scanner page and demo link (in the portfolio repo, not this one).
-- [ ] **M2.4 Native camera** (in review) (`m2.4-native-camera`): "Take a photo" opens the phone's own camera app (native capture input) instead of an in-page camera. Done when it works on Chase's iPhone.
+- [x] **M2.4 Native camera** (done, PR #15) (`m2.4-native-camera`): "Take a photo" opens the phone's own camera app (native capture input) instead of an in-page camera. Done when it works on Chase's iPhone.
+- [ ] **M2.6 Recruiter-ready** (in progress): fix the findings in `docs/reviews/2026-10-22-recruiter-ready.md` until nothing at P2 or above is left.
