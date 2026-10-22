@@ -41,6 +41,7 @@ body { margin: 0; background: radial-gradient(120% 70% at 50% 0%, #1b2250, var(-
 .orb { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #fff 0%, #ffd36e 18%, #ff6ec7 45%, #8b7bff 70%, transparent 72%); filter: blur(2px); animation: pulse 3s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { transform: scale(0.92); opacity: 0.85; } 50% { transform: scale(1.05); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+.stage { scroll-margin-top: 12px; }
 .viewer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .frame { width: 100%; display: flex; justify-content: center; }
 .photo { display: block; max-width: 100%; max-height: 70vh; height: auto; border-radius: 16px; }

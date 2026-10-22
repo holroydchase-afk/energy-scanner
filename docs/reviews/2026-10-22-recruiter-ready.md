@@ -40,6 +40,8 @@ P0 blocks showing it, P1 hurts the impression, P2 polish. Status: open, fixed (P
 | ES-R14 | P2 | Photo error | "That file is not an image." doesn't say what to do (Nielsen 9). | "That file is not an image. Choose a photo (JPG, PNG or HEIC)." | fixed (m2.9-copy) |
 | ES-R15 | P2 | Reading card | The level text repeats the heading ("Grey Energy" then "Grey energy. The scanner says…"). | Drop the repeated name at the start of each level text. | fixed for Grey (m2.9-copy); the other levels' openers ("Red rocket!", "Blue moon.") are the original playful voice and stay |
 | ES-R16 | P2 | Sharing | No Open Graph image or title, so a shared link shows a bare URL. | Add `og:` tags and a 1200x630 preview image made from the sample aura. | fixed (m2.10-story) |
+| ES-R17 | P2 | Photo result (laptop) | Round 2: at 1280x800 the photo starts 317px down, so the scan status and buttons sit below the fold, and the reading further down. | When a photo or the sample is picked, scroll the stage to the top. AC: unit test; at 1280x800 the photo, status and buttons are in view. | fixed (m2.12-fit) |
+| ES-R18 | P2 | No person found | Round 2: the only way forward is "New photo", which a visitor without a photo can't use (Nielsen 9). | Add a **Try the sample** button next to "New photo" when nobody is found. AC: unit test. | fixed (m2.12-fit) |
 
 ## Decisions to review (Chase)
 - **Always Grey default:** kept on (it's the parent feature). ES-R6 adds a hint instead. Alternative: default it off on the public demo.
@@ -51,3 +53,5 @@ Once ES-R1/ES-R2 land: the portfolio's Energy Scanner page can use `docs/screens
 
 ## Rounds
 - **Round 0 (review):** 16 findings: 4 P0, 5 P1, 7 P2.
+- **Round 1 (fixes):** ES-R1 to R16 fixed in stacked draft PRs #17 to #22 (ES-R15 partly, by design).
+- **Round 2 (re-review on the m2.11 build):** every screen re-shot at 390 and 1280, light and dark, and opened. No horizontal scroll, no console errors, no failed requests, no target under 44px (the 24px checkbox sits in a 44px label), no text under 14px. Unit 87/87 and e2e 10/10 three times each, no flakes. Two new P2s (ES-R17, R18), fixed in m2.12-fit.

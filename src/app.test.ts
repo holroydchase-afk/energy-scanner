@@ -102,6 +102,21 @@ describe('bedtime app', () => {
     expect(asked).toBe(true);
   });
 
+  it('offers the sample when a photo has nobody in it, and brings the photo into view', async () => {
+    const scrolled: Element[] = [];
+    HTMLElement.prototype.scrollIntoView = function (this: HTMLElement) {
+      scrolled.push(this);
+    };
+    const empty = { width: 4, height: 4, data: new Float32Array(16) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => empty }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    expect(scrolled).toContain(root.querySelector('[data-testid="stage"]'));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('[role="status"]')!.textContent).toMatch(/No person found/);
+    expect(root.querySelector('.viewer [data-action="sample"]')?.textContent).toBe('Try the sample');
+  });
+
   it('opens the phone camera through the native capture input', () => {
     const root = mount();
     click(root, '[data-mode="photo"]');

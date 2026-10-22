@@ -247,7 +247,17 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       caption,
       onReset: showMode,
       onReady: () => showReading(energy, level),
+      onNoPerson: () => {
+        const sample = document.createElement('button');
+        sample.type = 'button';
+        sample.className = 'btn';
+        sample.dataset.action = 'sample';
+        sample.textContent = 'Try the sample';
+        stage.querySelector('.actions')?.append(sample);
+      },
     });
+    // Bring the photo to the top so the scan, and then the reading, are in view.
+    stage.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
   const useFile = async (file: File | undefined) => {
