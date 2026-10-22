@@ -25,8 +25,8 @@ P0 blocks showing it, P1 hurts the impression, P2 polish. Status: open, fixed (P
 | ID | P | Screen | Problem | Fix and acceptance criteria | Status |
 |---|---|---|---|---|---|
 | ES-R1 | P0 | Photo scan | A recruiter has no photo of a person handy (and won't upload their own), so they can never see the aura, the product's best moment. Nielsen 6 (recognition), 7 (flexibility). | Add **Try the sample** on the photo start screen: an illustrated person drawn in code (not a photo, no real person) goes through the real on-device scan. AC: one tap shows the aura and a reading; the photo is labeled "Illustrated sample, not a real person"; e2e covers it. | fixed (m2.7-sample-photo) |
-| ES-R2 | P0 | README | The only screenshot is the pre-bedtime v1 start screen (no steps, no palm scan, no aura). Stale and contradicts the copy. | Regenerate screenshots of the current app: home, palm reading and photo aura (sample), phone and laptop. AC: README shows the aura; the stale image is gone; images are under 400 KB each. | open |
-| ES-R3 | P0 | CASE-STUDY.md | Tells the old story (a friend's photo, an energy type auto-picked from colors, an in-page camera, "five milestones"). Contradicts the README, the app and the portfolio page. | Rewrite around the bedtime story: problem, constraints, decisions (routine first, privacy before camera, on-device segmentation, native camera, Always Grey), how it was built, what's next. AC: no feature or claim that the app doesn't have. | open |
+| ES-R2 | P0 | README | The only screenshot is the pre-bedtime v1 start screen (no steps, no palm scan, no aura). Stale and contradicts the copy. | Regenerate screenshots of the current app: home, palm reading and photo aura (sample), phone and laptop. AC: README shows the aura; the stale image is gone; images are under 400 KB each. | fixed (m2.10-story): start, palm reading, Rainbow and Grey aura from `npm run screenshots`; the phone screenshots are 420-580 KB at 2x, accepted for legibility |
+| ES-R3 | P0 | CASE-STUDY.md | Tells the old story (a friend's photo, an energy type auto-picked from colors, an in-page camera, "five milestones"). Contradicts the README, the app and the portfolio page. | Rewrite around the bedtime story: problem, constraints, decisions (routine first, privacy before camera, on-device segmentation, native camera, Always Grey), how it was built, what's next. AC: no feature or claim that the app doesn't have. | fixed (m2.10-story), draft in Chase's voice |
 | ES-R4 | P0 | Every screen | No way back to chaseholroyd.com, and nothing says what this is or who it's for. Showcase rule: "a way back to the portfolio". | Under the title, a one-line tagline "A bedtime helper for kids: finish the steps, then scan." In the footer, "A portfolio project by Chase Holroyd" linking to the Energy Scanner page, plus "Code on GitHub". AC: both links resolve; 44px targets; visible on phone without scrolling the header. | fixed (m2.8-ui-polish) |
 | ES-R5 | P1 | Grown-ups | Targets too small: the Grown-ups toggle is 14px tall, the checkbox 13px, the range 16px, time input 35px, Clear 36px (WCAG 2.2 2.5.8; studio rule 44-48px). | Make each at least 44px tall (the checkbox row is the target). AC: measured at 390 and 1280. | fixed (m2.8-ui-polish) |
 | ES-R6 | P1 | Reading card | Always Grey is on by default, so every scan reads Grey. A recruiter tries twice, sees the same result, and never learns the other colors exist. | Keep the default (it is the parent feature). When Always Grey is on, the card adds "Always Grey is on. Turn it off under Grown-ups to see every color." AC: shown only when the switch is on; unit test. | fixed (m2.9-copy) |
@@ -39,7 +39,7 @@ P0 blocks showing it, P1 hurts the impression, P2 polish. Status: open, fixed (P
 | ES-R13 | P2 | Grown-ups | "Clear tonight's steps" renders in the browser's default font. | Inherit the app font. | fixed (m2.8-ui-polish) |
 | ES-R14 | P2 | Photo error | "That file is not an image." doesn't say what to do (Nielsen 9). | "That file is not an image. Choose a photo (JPG, PNG or HEIC)." | fixed (m2.9-copy) |
 | ES-R15 | P2 | Reading card | The level text repeats the heading ("Grey Energy" then "Grey energy. The scanner says…"). | Drop the repeated name at the start of each level text. | fixed for Grey (m2.9-copy); the other levels' openers ("Red rocket!", "Blue moon.") are the original playful voice and stay |
-| ES-R16 | P2 | Sharing | No Open Graph image or title, so a shared link shows a bare URL. | Add `og:` tags and a 1200x630 preview image made from the sample aura. | open |
+| ES-R16 | P2 | Sharing | No Open Graph image or title, so a shared link shows a bare URL. | Add `og:` tags and a 1200x630 preview image made from the sample aura. | fixed (m2.10-story) |
 
 ## Decisions to review (Chase)
 - **Always Grey default:** kept on (it's the parent feature). ES-R6 adds a hint instead. Alternative: default it off on the public demo.
@@ -47,7 +47,7 @@ P0 blocks showing it, P1 hurts the impression, P2 polish. Status: open, fixed (P
 - **Illustrated sample:** a person drawn in code, labeled as illustrated, so no real person is shown. It runs through the real model (checked: the on-device segmenter finds it).
 
 ## For the portfolio (intake for Product Studio)
-Once ES-R1/ES-R2 land: the portfolio's Energy Scanner page can use `docs/screenshots/aura-mobile.png` (the illustrated sample with the aura) for WEB-M4.7.
+Once ES-R1/ES-R2 land: the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (the illustrated sample with the aura, labeled as illustrated) for WEB-M4.7.
 
 ## Rounds
 - **Round 0 (review):** 16 findings: 4 P0, 5 P1, 7 P2.

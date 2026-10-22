@@ -22,6 +22,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22, ES-R2, R3, R16 (branch `m2.10-story`): README screenshots regenerated from the current app with the illustrated sample (`npm run screenshots`, no photo needed); CASE-STUDY.md rewritten around the bedtime story (draft in Chase's voice); Open Graph tags plus a 1200x630 `public/og.png` preview.
 - 2026-10-22, ES-R6, R10, R14, R15 (branch `m2.9-copy`): reading card notes when Always Grey is on; "Still to do: …" replaces "To drain the battery: …"; the not-an-image error says what to choose; Grey texts no longer repeat the heading.
 - 2026-10-22, ES-R4, R5, R11, R12, R13 (branch `m2.8-ui-polish`): tagline under the title; footer links back to the portfolio page and the GitHub repo; Grown-ups controls are 44px targets; no text under 14px; bedtime line no longer wraps; Clear button uses the app font. Measured with Playwright at 390 and 1280.
 - 2026-10-22, ES-R1 + ES-R8 (branch `m2.7-sample-photo`): **Try the sample** on the photo screen scans an illustrated child drawn in code (`src/photo/sample.ts`), captioned "Illustrated sample, not a real person", through the real on-device model. The e2e happy path (aura, Save image, Save video) now runs on it every time.
@@ -53,7 +54,6 @@ _Updated 2026-10-22._
 ## Exact next step
 - Fix loop: take the top `open` row in `docs/reviews/2026-10-22-recruiter-ready.md` (P0 first), failing test first, one stacked draft PR per fix or tight batch. Never merge or deploy.
 - ES-M2.4: Chase tests "Take a photo" on his iPhone after this merges (Pages redeploys). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
-- When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
 - Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
 ## Testing note
@@ -74,8 +74,8 @@ _Updated 2026-10-22._
 
 - Exports carry a small caption (energy type + app name) so shared images explain themselves.
 
-- README "Why I built it" and CASE-STUDY.md are written in Chase's first-person voice as a draft; he should edit them to sound like him.
+- README "Why I built it" and CASE-STUDY.md (rewritten Oct 22 for the bedtime story) are in Chase's first-person voice as a draft; he should edit them to sound like him.
 - Shared studio agents (`.claude/agents/`, six generic agents) were merged into the base branch (PR #7).
 
 ## Blockers
-- Portfolio screenshots need a photo of a person that is OK to publish. The repo rule forbids real identifiable people, and image sites are blocked from this sandbox. Best option: Chase adds a photo of himself (his portfolio, his face).
+- None. (README screenshots no longer need a real photo: they use the illustrated sample.)

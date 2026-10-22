@@ -34,3 +34,12 @@ test('palm scan: hold the pad to get a reading', async ({ page }) => {
   await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
   await expect(page.getByTestId('energy-reading')).toContainText('PJs, Teeth, Potty, Book');
 });
+
+test('shared links get a preview image', async ({ page, request }) => {
+  await page.goto('/');
+  const image = await page.locator('meta[property="og:image"]').getAttribute('content');
+  expect(image).toBe('https://chaseholroyd.com/energy-scanner/og.png');
+  const res = await request.get('/og.png');
+  expect(res.ok()).toBe(true);
+  expect(res.headers()['content-type']).toBe('image/png');
+});
