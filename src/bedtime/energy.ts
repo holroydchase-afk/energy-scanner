@@ -94,8 +94,8 @@ export const LEVELS: readonly Level[] = [
     name: 'Grey Energy',
     color: '#B8BCD6',
     texts: [
-      'Grey. Battery almost empty. Time to plug in to your pillow and recharge.',
-      'Grey energy. The scanner says your body is ready to power down for the night.',
+      'Battery almost empty. Time to plug in to your pillow and recharge.',
+      'The scanner says your body is ready to power down for the night.',
     ],
     aura: aura('grey', 'Grey', '#f2f3fa', '#b8bcd6', '#6b6f8f'),
   },
@@ -140,7 +140,7 @@ export function bedtimeFor(now: Date, bed: string): Date {
 
 export function todoLine(remaining: readonly Step[]): string {
   return remaining.length
-    ? `To drain the battery: ${remaining.map((s) => s.label).join(', ')}. Then scan again.`
+    ? `Still to do: ${remaining.map((s) => s.label).join(', ')}. Then scan again.`
     : 'All steps done. Lights out, recharge all night. ⭐';
 }
 

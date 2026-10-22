@@ -4,13 +4,17 @@
 
 Everything runs in your browser. **Photos never leave your device.** There is no server, no account and no tracking.
 
+**Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **Photo scan**, then **Try the sample**.
+
 <p align="center">
-  <img src="docs/screenshots/start-desktop.png" alt="Energy Scanner start screen with Take a photo and Upload a photo buttons" width="640" />
+  <img src="docs/screenshots/start-mobile.png" alt="Start screen: bedtime steps, a Palm scan and Photo scan switch, and the palm pad" width="200" />
+  <img src="docs/screenshots/palm-mobile.png" alt="A palm scan reading Grey Energy with the steps still to do" width="200" />
+  <img src="docs/screenshots/aura-rainbow.png" alt="The illustrated sample child with a glowing Rainbow aura" width="200" />
+  <img src="docs/screenshots/aura-grey.png" alt="The same sample with a soft Grey aura at bedtime" width="200" />
 </p>
+<p align="center"><sub>The aura screenshots use the app's illustrated sample, not a real person.</sub></p>
 
-<!-- Result screenshots (docs/screenshots/result-*.png, aura-*.png) are added from a photo that is cleared for publishing: npm run screenshots -- photo.jpg -->
-
-## Try it
+## Run it locally
 
 ```bash
 npm install
@@ -18,7 +22,7 @@ npm run dev        # open the printed localhost URL
 ```
 
 1. Tick off the **bedtime steps**: Bath, PJs, Teeth, Potty, Book.
-2. Pick the scan: **Palm scan** (press and hold until the ring fills) or **Photo scan** (take or upload a photo).
+2. Pick the scan: **Palm scan** (press and hold until the ring fills) or **Photo scan** (take or upload a photo, or try the illustrated sample).
 3. The reading shows an energy color, a battery level and what's left to do. In a photo scan the aura glows off the child in that color: softer and slower when sleepy, blazing when it's Rainbow.
 4. Grown-ups set bedtime and the Always Grey switch, and can **Save** or **Share** a photo scan.
 
