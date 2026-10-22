@@ -40,6 +40,10 @@ P0 blocks showing it, P1 hurts the impression, P2 polish. Status: open, fixed (P
 | ES-R14 | P2 | Photo error | "That file is not an image." doesn't say what to do (Nielsen 9). | "That file is not an image. Choose a photo (JPG, PNG or HEIC)." | fixed (m2.9-copy) |
 | ES-R15 | P2 | Reading card | The level text repeats the heading ("Grey Energy" then "Grey energy. The scanner says…"). | Drop the repeated name at the start of each level text. | fixed for Grey (m2.9-copy); the other levels' openers ("Red rocket!", "Blue moon.") are the original playful voice and stay |
 | ES-R16 | P2 | Sharing | No Open Graph image or title, so a shared link shows a bare URL. | Add `og:` tags and a 1200x630 preview image made from the sample aura. | fixed (m2.10-story) |
+| ES-R17 | P2 | Photo result (laptop) | Round 2: at 1280x800 the photo starts 317px down, so the scan status and buttons sit below the fold, and the reading further down. | When a photo or the sample is picked, scroll the stage to the top. AC: unit test; at 1280x800 the photo, status and buttons are in view. | fixed (m2.12-fit) |
+| ES-R18 | P2 | No person found | Round 2: the only way forward is "New photo", which a visitor without a photo can't use (Nielsen 9). | Add a **Try the sample** button next to "New photo" when nobody is found. AC: unit test. | fixed (m2.12-fit) |
+| ES-R19 | P2 | Scan choice | Round 3: the Palm/Photo switch is announced as radio buttons but arrow keys do nothing and both are separate tab stops (ARIA radio group pattern; Nielsen 4). | Arrow keys switch and move focus; one tab stop (roving tabindex). AC: unit test. | fixed (m2.13-a11y) |
+| ES-R20 | P2 | Scan choice (320px) | Round 3: at 320px wide, "Palm scan" and "Photo scan" each wrap onto two lines. | Keep each label on one line; tighter padding under 360px. AC: one line at 320px. | fixed (m2.13-a11y) |
 
 ## Decisions to review (Chase)
 - **Always Grey default:** kept on (it's the parent feature). ES-R6 adds a hint instead. Alternative: default it off on the public demo.
@@ -51,3 +55,6 @@ Once ES-R1/ES-R2 land: the portfolio's Energy Scanner page can use `docs/screens
 
 ## Rounds
 - **Round 0 (review):** 16 findings: 4 P0, 5 P1, 7 P2.
+- **Round 1 (fixes):** ES-R1 to R16 fixed in stacked draft PRs #17 to #22 (ES-R15 partly, by design).
+- **Round 2 (re-review on the m2.11 build):** every screen re-shot at 390 and 1280, light and dark, and opened. No horizontal scroll, no console errors, no failed requests, no target under 44px (the 24px checkbox sits in a 44px label), no text under 14px. Unit 87/87 and e2e 10/10 three times each, no flakes. Two new P2s (ES-R17, R18), fixed in m2.12-fit.
+- **Round 3 (accessibility pass, overnight):** reflow at 320px (no horizontal scroll), contrast measured (muted text 5.8:1 to 7.8:1 on its backgrounds, warning text 13.5:1), keyboard tab order (steps, scan choice, scan actions, Grown-ups, footer links), visible focus on every control, reduced motion already honored (aura at quarter speed, orb and beam still). Full re-shoot at 390 and 1280, light and dark: 0 issues. Unit 89/89 and e2e 10/10 three times, no flakes. Two new P2s (ES-R19, R20), fixed in m2.13-a11y. Noted, not a finding: step-button borders are 1.8:1, but the buttons are identified by their text labels (WCAG 1.4.11 needs 3:1 only for visuals required to identify a control).
