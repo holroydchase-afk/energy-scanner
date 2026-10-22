@@ -72,6 +72,22 @@ describe('bedtime app', () => {
     expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
   });
 
+  it('scans the illustrated sample, labeled as not a real person', () => {
+    let asked = false;
+    const root = mount({
+      getSegmenter: () => {
+        asked = true;
+        return new Promise(() => undefined);
+      },
+    });
+    click(root, '[data-mode="photo"]');
+    expect(root.querySelector('[data-action="sample"]')?.textContent).toBe('Try the sample');
+    click(root, '[data-action="sample"]');
+    expect(root.querySelector('[data-testid="photo"] canvas')).not.toBeNull();
+    expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+    expect(asked).toBe(true);
+  });
+
   it('opens the phone camera through the native capture input', () => {
     const root = mount();
     click(root, '[data-mode="photo"]');

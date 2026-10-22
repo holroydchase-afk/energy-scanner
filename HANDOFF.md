@@ -22,6 +22,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22, ES-R1 + ES-R8 (branch `m2.7-sample-photo`): **Try the sample** on the photo screen scans an illustrated child drawn in code (`src/photo/sample.ts`), captioned "Illustrated sample, not a real person", through the real on-device model. The e2e happy path (aura, Save image, Save video) now runs on it every time.
 - 2026-10-22, Recruiter-Ready Sprint v2 review (branch `m2.6-recruiter-review`): UX, QA and triage in `docs/reviews/2026-10-22-recruiter-ready.md`: 16 findings (4 P0, 5 P1, 7 P2). Suites run 3x, no flakes. ES-R7 (stale portfolio status here) fixed.
 - 2026-10-22, ES-M2.5 agents sync (branch `m2.5-agents-sync`): synced the six existing `.claude/agents` from studio-agents branch `claude/project-thread-wvkxmq` (its PR #6, not yet merged) to get the upgraded ux-reviewer (visual pass, heuristic sweep, showcase review mode, iterate loop). focus-coach and orchestrator left out, matching the existing set.
 - 2026-10-22, ES-M2.4 (branch `m2.4-native-camera`): "Take a photo" now opens the phone's own camera app through `<input type="file" accept="image/*" capture="environment">` instead of the in-page getUserMedia camera, which Chase hit bugs with on iPhone. Removed `src/photo/camera.ts` and its tests, the camera overlay CSS, and the mirror option. The returned photo goes through the same path as an upload.
@@ -54,7 +55,7 @@ _Updated 2026-10-22._
 - Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
 ## Testing note
-- No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
+- No photos of real people are committed. The e2e happy path runs on the illustrated sample; `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e` adds a check on a real local photo. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
 
 ## How to run
 - `npm install`, then `npm run dev`. Checks: `npm run check`. Browser test: `npm run build && npm run test:e2e` (uses the preinstalled Chromium; Playwright pinned to 1.56.1 to match it).

@@ -1,6 +1,7 @@
 import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, todoLine, type Level } from './bedtime/energy';
 import { store } from './bedtime/store';
 import { fileToCanvas } from './photo/image';
+import { drawSamplePerson, SAMPLE_CAPTION } from './photo/sample';
 import type { Segmenter } from './segment/types';
 import { showResult, type ResultView } from './ui/result';
 
@@ -219,11 +220,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
           <button type="button" class="btn" data-action="upload">Upload a photo</button>
         </div>
         <p class="hint">or drop a photo anywhere on this page</p>
+        <p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>
       </div>
     `;
   };
 
-  const usePhoto = (photo: HTMLCanvasElement) => {
+  const usePhoto = (photo: HTMLCanvasElement, caption?: string) => {
     showError(null);
     card.hidden = true;
     setEnergyColor(null);
@@ -236,6 +238,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       energy: { ...level.aura, name: level.name, reading: '' },
       ...auraFeel(energy),
       resetLabel: 'New photo',
+      caption,
       onReset: showMode,
       onReady: () => showReading(energy, level),
     });
@@ -288,6 +291,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
     // Start loading the scanner while the photo is picked or taken.
     if (action === 'upload' || action === 'camera') getSegmenter().catch(() => undefined);
+    if (action === 'sample') usePhoto(drawSamplePerson(), SAMPLE_CAPTION);
     if (action === 'upload') uploadInput.click();
     // The phone's own camera app, not an in-page camera: it handles focus, flash,
     // switching cameras and permissions itself.
