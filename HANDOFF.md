@@ -22,6 +22,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22, ES-R9 (branch `m2.11-ci`): `.github/workflows/ci.yml` runs check, build and the Playwright e2e on every pull request.
 - 2026-10-22, ES-R2, R3, R16 (branch `m2.10-story`): README screenshots regenerated from the current app with the illustrated sample (`npm run screenshots`, no photo needed); CASE-STUDY.md rewritten around the bedtime story (draft in Chase's voice); Open Graph tags plus a 1200x630 `public/og.png` preview.
 - 2026-10-22, ES-R6, R10, R14, R15 (branch `m2.9-copy`): reading card notes when Always Grey is on; "Still to do: …" replaces "To drain the battery: …"; the not-an-image error says what to choose; Grey texts no longer repeat the heading.
 - 2026-10-22, ES-R4, R5, R11, R12, R13 (branch `m2.8-ui-polish`): tagline under the title; footer links back to the portfolio page and the GitHub repo; Grown-ups controls are 44px targets; no text under 14px; bedtime line no longer wraps; Clear button uses the app font. Measured with Playwright at 390 and 1280.
