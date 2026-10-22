@@ -19,6 +19,8 @@ export interface ResultOptions {
   onReady?: () => void;
   /** Called when the photo has nobody in it. */
   onNoPerson?: () => void;
+  /** A line under the photo, e.g. to label an illustrated sample. */
+  caption?: string;
 }
 
 export interface ResultView {
@@ -36,6 +38,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       <div class="frame scanning" data-testid="photo">
         <div class="scan" aria-hidden="true"><div class="scanline"></div></div>
       </div>
+      <p class="caption" hidden></p>
       <p class="status" role="status" aria-live="polite">Scanning energy…</p>
       <div class="panel" hidden>
         <div class="reading" data-testid="reading">
@@ -65,6 +68,9 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
   const frame = stage.querySelector<HTMLElement>('.frame')!;
   const status = stage.querySelector<HTMLElement>('.status')!;
   const panel = stage.querySelector<HTMLElement>('.panel')!;
+  const caption = stage.querySelector<HTMLElement>('.caption')!;
+  caption.hidden = !options.caption;
+  caption.textContent = options.caption ?? '';
   photo.classList.add('photo');
   frame.prepend(photo);
   stage.querySelector('[data-action="reset"]')!.addEventListener('click', options.onReset);

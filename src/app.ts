@@ -1,6 +1,7 @@
 import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, todoLine, type Level } from './bedtime/energy';
 import { store } from './bedtime/store';
 import { fileToCanvas } from './photo/image';
+import { drawSamplePerson, SAMPLE_CAPTION } from './photo/sample';
 import type { Segmenter } from './segment/types';
 import { showResult, type ResultView } from './ui/result';
 
@@ -49,6 +50,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       <h1 class="logo">Energy Scanner</h1>
       <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
     </header>
+    <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
     <section class="steps-wrap" aria-label="Bedtime steps">
       <div class="steplbl"><span>Bedtime steps</span><span data-count></span></div>
       <div class="steps"></div>
@@ -66,6 +68,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       </div>
       <p class="rc-text"></p>
       <p class="rc-todo"></p>
+      <p class="rc-note" hidden>Always Grey is on. Turn it off under Grown-ups to see every color.</p>
       <button type="button" class="btn" data-action="again">Scan again</button>
     </section>
     <details class="grownups">
@@ -80,7 +83,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
         <p>Photo scans run entirely on this device. Photos are never uploaded or saved unless you tap Save.</p>
       </div>
     </details>
-    <footer class="foot"><p>Runs entirely in your browser. Photos never leave your device.</p></footer>
+    <footer class="foot">
+      <p>Runs entirely in your browser. Photos never leave your device.</p>
+      <p class="credit"><span>A portfolio project by <a href="https://chaseholroyd.com/energy-scanner.html">Chase Holroyd</a></span><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+    </footer>
     <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
   `;
@@ -131,6 +137,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
+    $('.rc-note').hidden = !alwaysGrey;
     card.hidden = false;
   };
 
@@ -219,11 +226,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
           <button type="button" class="btn" data-action="upload">Upload a photo</button>
         </div>
         <p class="hint">or drop a photo anywhere on this page</p>
+        <p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>
       </div>
     `;
   };
 
-  const usePhoto = (photo: HTMLCanvasElement) => {
+  const usePhoto = (photo: HTMLCanvasElement, caption?: string) => {
     showError(null);
     card.hidden = true;
     setEnergyColor(null);
@@ -236,9 +244,20 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       energy: { ...level.aura, name: level.name, reading: '' },
       ...auraFeel(energy),
       resetLabel: 'New photo',
+      caption,
       onReset: showMode,
       onReady: () => showReading(energy, level),
+      onNoPerson: () => {
+        const sample = document.createElement('button');
+        sample.type = 'button';
+        sample.className = 'btn';
+        sample.dataset.action = 'sample';
+        sample.textContent = 'Try the sample';
+        stage.querySelector('.actions')?.append(sample);
+      },
     });
+    // Bring the photo to the top so the scan, and then the reading, are in view.
+    stage.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
   const useFile = async (file: File | undefined) => {
@@ -265,7 +284,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   const setMode = (next: Mode) => {
     mode = next;
     store.set('mode', mode);
-    for (const b of root.querySelectorAll<HTMLElement>('[data-mode]')) b.setAttribute('aria-checked', String(b.dataset.mode === mode));
+    for (const b of root.querySelectorAll<HTMLElement>('[data-mode]')) {
+      b.setAttribute('aria-checked', String(b.dataset.mode === mode));
+      // One tab stop for the group; arrow keys move between the choices.
+      b.tabIndex = b.dataset.mode === mode ? 0 : -1;
+    }
     showMode();
   };
 
@@ -283,11 +306,18 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     const m = (e.target as HTMLElement).closest<HTMLElement>('[data-mode]')?.dataset.mode as Mode | undefined;
     if (m && m !== mode) setMode(m);
   });
+  $('.mode').addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    e.preventDefault();
+    setMode(mode === 'palm' ? 'photo' : 'palm');
+    root.querySelector<HTMLElement>(`[data-mode="${mode}"]`)?.focus();
+  });
 
   stage.addEventListener('click', (e) => {
     const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
     // Start loading the scanner while the photo is picked or taken.
     if (action === 'upload' || action === 'camera') getSegmenter().catch(() => undefined);
+    if (action === 'sample') usePhoto(drawSamplePerson(), SAMPLE_CAPTION);
     if (action === 'upload') uploadInput.click();
     // The phone's own camera app, not an in-page camera: it handles focus, flash,
     // switching cameras and permissions itself.
