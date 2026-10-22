@@ -25,6 +25,16 @@ describe('bedtime app', () => {
     expect(root.textContent).toContain('Photos never leave your device');
   });
 
+  it('says what it is and links back to the portfolio and the code', () => {
+    const root = mount();
+    expect(root.querySelector('.tagline')?.textContent).toBe('A bedtime helper for kids: finish the steps, then scan.');
+    const links = [...root.querySelectorAll<HTMLAnchorElement>('.foot a')].map((a) => [a.textContent, a.href]);
+    expect(links).toEqual([
+      ['Chase Holroyd', 'https://chaseholroyd.com/energy-scanner.html'],
+      ['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner'],
+    ]);
+  });
+
   it('ticks off steps and remembers them tonight', () => {
     const root = mount();
     click(root, '[data-step="teeth"]');

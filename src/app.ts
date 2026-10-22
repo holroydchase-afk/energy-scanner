@@ -50,6 +50,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       <h1 class="logo">Energy Scanner</h1>
       <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
     </header>
+    <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
     <section class="steps-wrap" aria-label="Bedtime steps">
       <div class="steplbl"><span>Bedtime steps</span><span data-count></span></div>
       <div class="steps"></div>
@@ -81,7 +82,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
         <p>Photo scans run entirely on this device. Photos are never uploaded or saved unless you tap Save.</p>
       </div>
     </details>
-    <footer class="foot"><p>Runs entirely in your browser. Photos never leave your device.</p></footer>
+    <footer class="foot">
+      <p>Runs entirely in your browser. Photos never leave your device.</p>
+      <p class="credit"><span>A portfolio project by <a href="https://chaseholroyd.com/energy-scanner.html">Chase Holroyd</a></span><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+    </footer>
     <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
   `;
