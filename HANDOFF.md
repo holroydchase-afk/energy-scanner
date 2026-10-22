@@ -56,8 +56,8 @@ _Updated 2026-10-22._
 - Recruiter-Ready Sprint v2 fix loop (Chase approved 2026-10-22): stacked draft PRs from `m2.5-agents-sync`. Each round: fix top open items in the review doc, re-screenshot, re-run suites, update the doc and this file.
 
 ## Exact next step
-- Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 18 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
-- Next round (if run): re-review the top of the stack (`m2.13-a11y`): `npm run build`, screenshot every screen at 390x844 and 1280x800, light and dark, open each; run all suites 3x; log new findings as ES-R19+ and fix them stacked on `m2.13-a11y`.
+- Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 20 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
+- Next round (if run): re-review the top of the stack (`m2.13-a11y`): `npm run build`, screenshot every screen at 390x844 and 1280x800, light and dark, open each; run all suites 3x; log new findings as ES-R21+ and fix them stacked on `m2.13-a11y`.
 - After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: handle WebGL context loss, live aura on the camera feed.
