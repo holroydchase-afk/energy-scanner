@@ -59,7 +59,10 @@ describe('bedtime app', () => {
     const card = root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!;
     expect(card.hidden).toBe(false);
     expect(card.querySelector('.rc-name')!.textContent).toBe('Grey Energy');
-    expect(card.querySelector('.rc-todo')!.textContent).toMatch(/To drain the battery: Bath, PJs, Teeth, Potty, Book/);
+    expect(card.querySelector('.rc-todo')!.textContent).toMatch(/Still to do: Bath, PJs, Teeth, Potty, Book/);
+    const note = card.querySelector<HTMLElement>('.rc-note')!;
+    expect(note.hidden).toBe(false);
+    expect(note.textContent).toBe('Always Grey is on. Turn it off under Grown-ups to see every color.');
   });
 
   it('a palm scan released too early is not counted', () => {
@@ -80,6 +83,7 @@ describe('bedtime app', () => {
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
     await new Promise((r) => setTimeout(r, 60));
     expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
+    expect(root.querySelector<HTMLElement>('.rc-note')!.hidden).toBe(true);
   });
 
   it('scans the illustrated sample, labeled as not a real person', () => {
@@ -119,6 +123,6 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 0));
     const error = root.querySelector<HTMLElement>('.error')!;
     expect(error.hidden).toBe(false);
-    expect(error.textContent).toMatch(/not an image/);
+    expect(error.textContent).toBe('That file is not an image. Choose a photo (JPG, PNG or HEIC).');
   });
 });

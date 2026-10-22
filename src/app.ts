@@ -68,6 +68,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       </div>
       <p class="rc-text"></p>
       <p class="rc-todo"></p>
+      <p class="rc-note" hidden>Always Grey is on. Turn it off under Grown-ups to see every color.</p>
       <button type="button" class="btn" data-action="again">Scan again</button>
     </section>
     <details class="grownups">
@@ -136,6 +137,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
+    $('.rc-note').hidden = !alwaysGrey;
     card.hidden = false;
   };
 

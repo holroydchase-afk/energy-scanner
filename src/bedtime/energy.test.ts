@@ -60,7 +60,7 @@ describe('bedtimeFor', () => {
 
 describe('helpers', () => {
   it('lists the steps left', () => {
-    expect(todoLine(STEPS.slice(3))).toBe('To drain the battery: Potty, Book. Then scan again.');
+    expect(todoLine(STEPS.slice(3))).toBe('Still to do: Potty, Book. Then scan again.');
     expect(todoLine([])).toMatch(/All steps done/);
   });
   it('makes sleepy auras softer and slower', () => {
@@ -71,5 +71,13 @@ describe('helpers', () => {
   });
   it('rolls the night over at 5am', () => {
     expect(nightKey(new Date('2026-10-22T04:00:00Z'))).toBe('steps-2026-10-21');
+  });
+});
+
+describe('level texts', () => {
+  it('do not repeat the level name the card already shows as its heading', () => {
+    for (const level of LEVELS.filter((l) => l.id === 'grey')) {
+      for (const text of level.texts) expect(text.toLowerCase().startsWith('grey')).toBe(false);
+    }
   });
 });
