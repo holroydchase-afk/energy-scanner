@@ -40,13 +40,12 @@ export interface DrawableSource {
 }
 
 /**
- * Draw a decoded image (or video frame) onto a new canvas, scaled to fit MAX_PHOTO_SIDE.
- * `mirror` flips it horizontally, used for selfie camera frames so the photo matches the preview.
+ * Draw a decoded image onto a new canvas, scaled to fit MAX_PHOTO_SIDE.
  */
 export function sourceToCanvas(
   source: CanvasImageSource,
   size: Size,
-  options: { maxSide?: number; mirror?: boolean } = {},
+  options: { maxSide?: number } = {},
 ): HTMLCanvasElement {
   const target = fitWithin(size, options.maxSide);
   const canvas = document.createElement('canvas');
@@ -55,10 +54,6 @@ export function sourceToCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D is not available');
   ctx.imageSmoothingQuality = 'high';
-  if (options.mirror) {
-    ctx.translate(target.width, 0);
-    ctx.scale(-1, 1);
-  }
   ctx.drawImage(source, 0, 0, target.width, target.height);
   return canvas;
 }

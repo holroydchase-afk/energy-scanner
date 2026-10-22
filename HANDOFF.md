@@ -22,6 +22,7 @@ _Updated 2026-10-21._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-22, ES-M2.4 (branch `m2.4-native-camera`): "Take a photo" now opens the phone's own camera app through `<input type="file" accept="image/*" capture="environment">` instead of the in-page getUserMedia camera, which Chase hit bugs with on iPhone. Removed `src/photo/camera.ts` and its tests, the camera overlay CSS, and the mirror option. The returned photo goes through the same path as an upload.
 - 2026-10-21 late: Pages turned on and the app deployed to chaseholroyd.com/energy-scanner/ (ES-M2.2).
 - 2026-10-21 evening, ES-M2.1 (branch `m2.1-bedtime`): Chase chose to combine this build with the original bedtime Energy Scanner (Claude artifact live on chaseholroyd.com) and keep the palm scan as an option. The app is now the bedtime flow (`src/app.ts`, logic in `src/bedtime/energy.ts` ported from the artifact) with a Palm scan / Photo scan switch; the photo scan's aura takes the level's colors and feel (`auraFeel`). Added `.github/workflows/pages.yml` for GitHub Pages; it only runs once Chase turns Pages on.
 - 2026-10-21 evening: Chase asked to merge everything. PRs #2-#6 merged down the stack, then #1 into the default branch; all v1 work is now on `claude/project-thread-xq47vx` and `main`.
@@ -45,9 +46,9 @@ _Updated 2026-10-21._
 - Nothing. Waiting on a publishable photo for M1.5 screenshots.
 
 ## Exact next step
-- ES-M2.3: in review as portfolio PR #8 (Chase merges). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
+- ES-M2.4: Chase tests "Take a photo" on his iPhone after this merges (Pages redeploys). ES-M2.3: in review as portfolio PR #8 (Chase merges). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
-- Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
+- Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
 ## Testing note
 - No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
@@ -60,7 +61,7 @@ _Updated 2026-10-21._
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
-- Selfie camera photos are mirrored to match the preview, like most phone camera apps.
+- Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.

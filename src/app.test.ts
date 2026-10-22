@@ -72,7 +72,7 @@ describe('bedtime app', () => {
     expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
   });
 
-  it('falls back to the native capture input when there is no camera API', () => {
+  it('opens the phone camera through the native capture input', () => {
     const root = mount();
     click(root, '[data-mode="photo"]');
     const capture = root.querySelector<HTMLInputElement>('[data-input="capture"]')!;
@@ -81,7 +81,7 @@ describe('bedtime app', () => {
       clicked = true;
     };
     click(root, '[data-action="camera"]');
-    expect(capture.getAttribute('capture')).toBe('user');
+    expect(capture.getAttribute('capture')).toBe('environment');
     expect(clicked).toBe(true);
   });
 

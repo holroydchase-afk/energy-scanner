@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { makePng } from './helpers';
 
-test.use({
-  launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] },
-  permissions: ['camera'],
-});
-
 test('uploading a large photo shows it downscaled', async ({ page }) => {
   await page.goto('/');
   const png = await makePng(page, 3000, 2000);
@@ -30,15 +25,16 @@ test('dropping a photo onto the page loads it', async ({ page }) => {
   await expect(page.getByTestId('photo').locator('canvas')).toBeVisible();
 });
 
-test('taking a photo with the camera captures a frame', async ({ page }) => {
+test('take a photo hands off to the native camera and loads the result', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await expect(page.locator('[data-input="capture"]')).toHaveAttribute('capture', 'environment');
+  const png = await makePng(page, 600, 800);
+  const chooser = page.waitForEvent('filechooser');
   await page.getByRole('button', { name: 'Take a photo' }).click();
-  await expect(page.locator('.camera-video')).toBeVisible();
-  await page.waitForFunction(() => (document.querySelector('.camera-video') as HTMLVideoElement).videoWidth > 0);
-  await page.getByRole('button', { name: 'Take photo' }).click();
-  await expect(page.locator('.camera')).toHaveCount(0);
+  await (await chooser).setFiles({ name: 'IMG_0001.png', mimeType: 'image/png', buffer: png });
   await expect(page.getByTestId('photo').locator('canvas')).toBeVisible();
+  await expect(page.locator('video')).toHaveCount(0);
 });
 
 test('a non-image file shows a friendly error', async ({ page }) => {
