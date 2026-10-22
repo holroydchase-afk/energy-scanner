@@ -52,6 +52,20 @@ describe('bedtime app', () => {
     expect(mount().querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
   });
 
+  it('the scan choice works like radio buttons from the keyboard', () => {
+    const root = mount();
+    const palm = root.querySelector<HTMLElement>('[data-mode="palm"]')!;
+    const photo = root.querySelector<HTMLElement>('[data-mode="photo"]')!;
+    expect([palm.tabIndex, photo.tabIndex]).toEqual([0, -1]);
+    palm.focus();
+    palm.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(photo.getAttribute('aria-checked')).toBe('true');
+    expect(document.activeElement).toBe(photo);
+    expect([palm.tabIndex, photo.tabIndex]).toEqual([-1, 0]);
+    photo.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(palm.getAttribute('aria-checked')).toBe('true');
+  });
+
   it('palm scan reads Grey with the grown-up switch on (the default)', async () => {
     const root = mount({ holdMs: 1 });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
