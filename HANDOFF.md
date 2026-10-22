@@ -13,7 +13,16 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | M6 / Hardening | ES-M1.6 | Harden | #6 |
 | (milestone) | ES-M1 | Demoable v1 | |
 
+## Portfolio / public presence
+_Updated 2026-10-21._
+- **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
+- **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, draft, Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed. Live once Chase merges PR #8.
+- **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
+- **Demo data:** no photos stored or uploaded; everything runs in the visitor's browser.
+- **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
+
 ## Done
+- 2026-10-21 late: Pages turned on and the app deployed to chaseholroyd.com/energy-scanner/ (ES-M2.2).
 - 2026-10-21 evening, ES-M2.1 (branch `m2.1-bedtime`): Chase chose to combine this build with the original bedtime Energy Scanner (Claude artifact live on chaseholroyd.com) and keep the palm scan as an option. The app is now the bedtime flow (`src/app.ts`, logic in `src/bedtime/energy.ts` ported from the artifact) with a Palm scan / Photo scan switch; the photo scan's aura takes the level's colors and feel (`auraFeel`). Added `.github/workflows/pages.yml` for GitHub Pages; it only runs once Chase turns Pages on.
 - 2026-10-21 evening: Chase asked to merge everything. PRs #2-#6 merged down the stack, then #1 into the default branch; all v1 work is now on `claude/project-thread-xq47vx` and `main`.
 - 2026-10-21: studio session rules installed: `.claude/settings.json` SessionStart hook prints this file into every Claude Code session, `.github/workflows/handoff-check.yml` fails a PR that changes files without updating this file, and CLAUDE.md has a "Session rules" section.
@@ -36,7 +45,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 - Nothing. Waiting on a publishable photo for M1.5 screenshots.
 
 ## Exact next step
-- ES-M2.2: Chase turns on Pages (Settings → Pages → Source: GitHub Actions); the next push to the default branch then publishes chaseholroyd.com/energy-scanner/. CLAUDE.md still says never deploy; Chase should update that rule himself. Then ES-M2.3: update the portfolio's Energy Scanner page to link there.
+- ES-M2.3: in review as portfolio PR #8 (Chase merges). CLAUDE.md still says never deploy although Pages now deploys on every push to the default branch; that rule is Chase's to update.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
 - Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
