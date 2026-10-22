@@ -14,6 +14,8 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Done
+- 2026-10-22, ES-M2.4 (branch `m2.4-native-camera`): "Take a photo" now opens the phone's own camera app through `<input type="file" accept="image/*" capture="environment">` instead of the in-page getUserMedia camera, which Chase hit bugs with on iPhone. Removed `src/photo/camera.ts` and its tests, the camera overlay CSS, and the mirror option. The returned photo goes through the same path as an upload.
+- 2026-10-21 night: ES-M2.2 done: Chase turned on Pages and PR #12 deployed; live at chaseholroyd.com/energy-scanner/. ES-M2.3 done by the portfolio repo's PR #8 (awaiting Chase's merge there).
 - 2026-10-21 evening, ES-M2.1 (branch `m2.1-bedtime`): Chase chose to combine this build with the original bedtime Energy Scanner (Claude artifact live on chaseholroyd.com) and keep the palm scan as an option. The app is now the bedtime flow (`src/app.ts`, logic in `src/bedtime/energy.ts` ported from the artifact) with a Palm scan / Photo scan switch; the photo scan's aura takes the level's colors and feel (`auraFeel`). Added `.github/workflows/pages.yml` for GitHub Pages; it only runs once Chase turns Pages on.
 - 2026-10-21 evening: Chase asked to merge everything. PRs #2-#6 merged down the stack, then #1 into the default branch; all v1 work is now on `claude/project-thread-xq47vx` and `main`.
 - 2026-10-21: studio session rules installed: `.claude/settings.json` SessionStart hook prints this file into every Claude Code session, `.github/workflows/handoff-check.yml` fails a PR that changes files without updating this file, and CLAUDE.md has a "Session rules" section.
@@ -36,9 +38,9 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 - Nothing. Waiting on a publishable photo for M1.5 screenshots.
 
 ## Exact next step
-- ES-M2.2: Chase turns on Pages (Settings → Pages → Source: GitHub Actions); the next push to the default branch then publishes chaseholroyd.com/energy-scanner/. CLAUDE.md still says never deploy; Chase should update that rule himself. Then ES-M2.3: update the portfolio's Energy Scanner page to link there.
+- ES-M2.4: Chase tests "Take a photo" on his iPhone from this PR (merging it to the default branch redeploys Pages). CLAUDE.md still says never deploy; Chase should update that rule himself now that Pages publishes on merge.
 - When Chase provides a photo: `npm run screenshots -- that-photo.jpg`, add result + aura grid images to the README, record the photo's consent in samples/SOURCES.md, mark PR #5 (M1.5) ready.
-- Later ideas: live aura on the camera feed, Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
+- Later ideas: Open Graph preview image, handle WebGL context loss, deploy to a static host (Chase's call).
 
 ## Testing note
 - No photos of real people are committed, so the e2e happy path runs only with `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e`. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
@@ -51,7 +53,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
-- Selfie camera photos are mirrored to match the preview, like most phone camera apps.
+- Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.

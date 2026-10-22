@@ -1,6 +1,5 @@
 import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, todoLine, type Level } from './bedtime/energy';
 import { store } from './bedtime/store';
-import { captureFromCamera, cameraErrorMessage, cameraSupported } from './photo/camera';
 import { fileToCanvas } from './photo/image';
 import type { Segmenter } from './segment/types';
 import { showResult, type ResultView } from './ui/result';
@@ -83,7 +82,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     </details>
     <footer class="foot"><p>Runs entirely in your browser. Photos never leave your device.</p></footer>
     <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" />
-    <input type="file" accept="image/*" capture="user" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
+    <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
   `;
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
   const stage = $('.stage');
@@ -285,23 +284,14 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     if (m && m !== mode) setMode(m);
   });
 
-  stage.addEventListener('click', async (e) => {
+  stage.addEventListener('click', (e) => {
     const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
     // Start loading the scanner while the photo is picked or taken.
     if (action === 'upload' || action === 'camera') getSegmenter().catch(() => undefined);
     if (action === 'upload') uploadInput.click();
-    if (action === 'camera') {
-      if (!cameraSupported()) {
-        captureInput.click();
-        return;
-      }
-      try {
-        const photo = await captureFromCamera();
-        if (photo) usePhoto(photo);
-      } catch (err) {
-        showError(cameraErrorMessage(err));
-      }
-    }
+    // The phone's own camera app, not an in-page camera: it handles focus, flash,
+    // switching cameras and permissions itself.
+    if (action === 'camera') captureInput.click();
   });
 
   $('[data-action="again"]').addEventListener('click', () => {
