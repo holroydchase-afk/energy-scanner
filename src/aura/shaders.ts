@@ -16,7 +16,7 @@ uniform sampler2D uPhoto;
 uniform sampler2D uMask;  // person probability
 uniform sampler2D uSdf;   // signed distance to the outline, + outside, in short-side units
 uniform float uTime;
-uniform float uIntensity; // 0..1 from the slider
+uniform float uIntensity; // 0..1, from the reading (sleepier is softer)
 uniform float uReveal;    // 0..1, ramps up when a result first appears
 uniform float uAspect;    // width / height
 uniform float uBoxShort;  // short side of the person's box, in short-side units

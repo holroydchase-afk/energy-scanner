@@ -43,3 +43,16 @@ test('shared links get a preview image', async ({ page, request }) => {
   expect(res.ok()).toBe(true);
   expect(res.headers()['content-type']).toBe('image/png');
 });
+
+test('ES-R46 on a wide screen the palm pad stays put when the reading appears', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+  const pad = page.locator('.pad');
+  const before = await pad.boundingBox();
+  await pad.focus();
+  await page.keyboard.down('Space');
+  await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.up('Space');
+  const after = await pad.boundingBox();
+  expect(Math.abs(after!.x + after!.width / 2 - (before!.x + before!.width / 2))).toBeLessThanOrEqual(2);
+});

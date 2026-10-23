@@ -18,9 +18,10 @@ body { margin: 0; background: transparent; color: var(--fg); min-height: 100vh; 
 body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: radial-gradient(120% 70% at 50% 0%, #1b2250, var(--bg) 70%); }
 #app { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; max-width: 960px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
 .main, .scan-area { flex: 1; display: flex; flex-direction: column; }
-/* On wide screens the reading sits beside the photo or pad, so both fit without scrolling. */
+/* On wide screens the reading sits beside the photo, so both fit without scrolling. The palm pad
+   stays put (a hand may still be on it), with the reading below. */
 @media (min-width: 900px) {
-  .scan-area:has(> .reading-card:not([hidden])) { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: center; }
+  .scan-area:has(.viewer):has(> .reading-card:not([hidden])) { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: center; }
   .scan-area > .error { grid-column: 1 / -1; }
   .scan-area > .reading-card { margin: 0; }
 }
