@@ -108,7 +108,22 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       return;
     }
 
-    renderer = createAuraRenderer({ photo, mask, field });
+    try {
+      renderer = createAuraRenderer({ photo, mask, field });
+    } catch (e) {
+      console.error(e);
+      status.textContent = "This browser couldn't draw the aura. Try another browser, like Safari or Chrome.";
+      status.classList.add('warn');
+      return;
+    }
+    // The phone can drop the GPU picture (e.g. while the app is in the background).
+    renderer.canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      cancelAnimationFrame(raf);
+      for (const a of ['share', 'save-image', 'save-video']) button(a).hidden = true;
+      status.textContent = 'The aura stopped drawing while the phone was busy. Tap New photo to scan again.';
+      status.classList.add('warn');
+    });
     renderer.canvas.classList.add('photo', 'aura');
     renderer.canvas.setAttribute('role', 'img');
     renderer.canvas.dataset.renderer = renderer.kind;
@@ -140,6 +155,8 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     // The share sheet is a phone thing; desktops get the save buttons.
     button('share').hidden = typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function';
   };
+  // Cancels a recording in progress when this view goes away (New photo, another mode).
+  const saving = new AbortController();
   const busy = async (action: string, label: string, work: () => Promise<void>) => {
     const b = button(action);
     const original = b.textContent;
@@ -148,6 +165,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     try {
       await work();
     } catch (e) {
+      if (saving.signal.aborted) return;
       console.error(e);
       status.textContent = 'Saving did not work in this browser. Try a screenshot instead.';
       status.classList.add('warn');
@@ -171,7 +189,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
         const b = button('save-video');
         const file = await exportVideo(canvas, () => energy ?? current, undefined, (f) => {
           b.textContent = `Recording… ${Math.round(f * 100)}%`;
-        });
+        }, saving.signal);
         download(file);
       });
   });
@@ -181,6 +199,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
   return {
     destroy() {
       destroyed = true;
+      saving.abort();
       cancelAnimationFrame(raf);
       renderer?.destroy();
     },

@@ -23,6 +23,11 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-23 night shift, rendering hardening (branch `m2.16-harden-render`, stacked on `m2.15-harden-app`), from `docs/reviews/2026-10-23-hardening.md`:
+  - R37 (P1): when WebGL2 setup fails, the Canvas 2D fallback now gets its own canvas (a canvas that gave out a WebGL context can't give a 2D one), and a drawing failure shows a message instead of hanging on "Scanning energy…".
+  - R42: New photo or a mode switch during Save video cancels the recording; nothing downloads.
+  - R43: a lost WebGL context hides the save buttons and says to tap New photo, instead of a blank aura (needs a real phone to confirm).
+  - R44: the Canvas 2D fallback builds its tinted layers once per energy, not three new canvases every frame.
 - 2026-10-23 night shift, hardening (branch `m2.15-harden-app`, stacked on `m2.14-ui-review`): staff-pm ranked the features people touch; qa-tdd found 10 gaps, ES-R36 to R45, in `docs/reviews/2026-10-23-hardening.md`. Fixed here, each with a failing test first:
   - R36 (P0): a page left open overnight now starts the new night with no steps ticked (it kept last night's ticks and saved them into tonight).
   - R38: a photo that finishes decoding after switching to Palm scan, or after a newer photo, is dropped.

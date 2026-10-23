@@ -81,6 +81,7 @@ export async function exportVideo(
   energy: () => EnergyType,
   seconds: number = VIDEO_SECONDS,
   onProgress?: (fraction: number) => void,
+  signal?: AbortSignal,
 ): Promise<File> {
   const type = pickVideoType((t) => MediaRecorder.isTypeSupported(t));
   if (!type) throw new Error('Video recording is not supported in this browser.');
@@ -102,14 +103,22 @@ export async function exportVideo(
     if (fraction < 1) raf = requestAnimationFrame(frame);
     else recorder.stop();
   };
+  // Cancelled (New photo, another mode): stop now and hand back no file.
+  const cancel = () => {
+    if (recorder.state !== 'inactive') recorder.stop();
+  };
+  signal?.addEventListener('abort', cancel, { once: true });
   recorder.start(250);
+  if (signal?.aborted) cancel();
   let raf = requestAnimationFrame(frame);
   try {
     await stopped;
   } finally {
     cancelAnimationFrame(raf);
+    signal?.removeEventListener('abort', cancel);
     stream.getTracks().forEach((t) => t.stop());
   }
+  if (signal?.aborted) throw new DOMException('Recording cancelled', 'AbortError');
   const blob = new Blob(chunks, { type: type.split(';')[0] });
   return new File([blob], exportFileName(energy(), type), { type: blob.type });
 }

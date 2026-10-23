@@ -11,6 +11,9 @@ Branch `m2.14-ui-review` (top of the unmerged stack), read-only. ES-R1 to R35 ar
 
 ---
 
+## Status
+All 10 fixed, each with a failing test first: R36, R38 to R41 and R45 in `m2.15-harden-app`; R37, R42 to R44 in `m2.16-harden-render`. Scan again in photo mode now re-scans the same photo (logged in HANDOFF Decisions). R37, R39, R43 and R44 still want a real-device check.
+
 ## 1. staff-pm: features ranked by who touches them
 
 1. **Bedtime steps → reading (Rainbow→Grey).** This is the parent's nightly loop. If the steps or the reading are wrong, the product is wrong.

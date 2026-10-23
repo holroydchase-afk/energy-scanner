@@ -5,15 +5,26 @@ import type { PersonMask, Segmenter } from '../segment/types';
 const render = vi.fn();
 const setEnergy = vi.fn();
 const setIntensity = vi.fn();
-vi.mock('../aura/renderer', () => ({
-  createAuraRenderer: () => ({
-    canvas: document.createElement('canvas'),
-    kind: 'webgl',
-    render,
-    setEnergy,
-    setIntensity,
-    destroy: vi.fn(),
-  }),
+const fakeRenderer = () => ({
+  canvas: document.createElement('canvas'),
+  kind: 'webgl',
+  render,
+  setEnergy,
+  setIntensity,
+  destroy: vi.fn(),
+});
+const createAuraRenderer = vi.fn(fakeRenderer);
+vi.mock('../aura/renderer', () => ({ createAuraRenderer: (...args: unknown[]) => createAuraRenderer(...(args as [])) }));
+
+// Test-only video export stand-in that records until it is cancelled.
+let videoSignal: AbortSignal | undefined;
+vi.mock('../export/export', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../export/export')>()),
+  canRecordVideo: () => true,
+  exportVideo: (_c: unknown, _e: unknown, _s: unknown, _p: unknown, signal?: AbortSignal) => {
+    videoSignal = signal;
+    return new Promise((_, reject) => signal?.addEventListener('abort', () => reject(new DOMException('Cancelled', 'AbortError'))));
+  },
 }));
 
 const { showResult } = await import('./result');
@@ -64,8 +75,8 @@ describe('showResult', () => {
     expect(view.energy()).toBe(GREY);
     expect(stage.querySelector('canvas.aura')!.getAttribute('aria-label')).toBe('Photo with a glowing Grey Energy aura around the person');
     expect(stage.querySelector<HTMLElement>('[data-action="save-image"]')!.hidden).toBe(false);
-    // jsdom has neither MediaRecorder nor the Web Share API.
-    expect(stage.querySelector<HTMLElement>('[data-action="save-video"]')!.hidden).toBe(true);
+    // Video recording is stubbed on here; jsdom has no Web Share API.
+    expect(stage.querySelector<HTMLElement>('[data-action="save-video"]')!.hidden).toBe(false);
     expect(stage.querySelector<HTMLElement>('[data-action="share"]')!.hidden).toBe(true);
     view.destroy();
   });
@@ -126,5 +137,38 @@ describe('showResult', () => {
     showResult(stage, photo(), { ...base, getSegmenter: () => new Promise(() => undefined), onReset });
     stage.querySelector<HTMLButtonElement>('[data-action="reset"]')!.click();
     expect(onReset).toHaveBeenCalled();
+  });
+
+  it('ES-R37 shows an error instead of hanging when the aura cannot be drawn', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    createAuraRenderer.mockImplementationOnce(() => {
+      throw new Error('no 2d either');
+    });
+    showResult(stage, photo(), { ...base, getSegmenter: async () => fakeSegmenter(() => true) });
+    await flush();
+    const status = stage.querySelector('.status')!;
+    expect(status.textContent).not.toMatch(/Scanning/);
+    expect(status.textContent).toMatch(/couldn't draw/);
+    expect(status.classList.contains('warn')).toBe(true);
+  });
+
+  it('ES-R43 a lost WebGL context says to scan again instead of leaving a blank aura', async () => {
+    const view = showResult(stage, photo(), { ...base, getSegmenter: async () => fakeSegmenter(() => true) });
+    await flush();
+    stage.querySelector('canvas.aura')!.dispatchEvent(new Event('webglcontextlost', { cancelable: true }));
+    expect(stage.querySelector('.status')!.textContent).toMatch(/New photo/);
+    expect(stage.querySelector<HTMLElement>('[data-action="save-image"]')!.hidden).toBe(true);
+    view.destroy();
+  });
+
+  it('ES-R42 New photo during Save video cancels the recording quietly', async () => {
+    const view = showResult(stage, photo(), { ...base, getSegmenter: async () => fakeSegmenter(() => true) });
+    await flush();
+    stage.querySelector<HTMLButtonElement>('[data-action="save-video"]')!.click();
+    expect(videoSignal?.aborted).toBe(false);
+    view.destroy();
+    expect(videoSignal?.aborted).toBe(true);
+    await flush();
+    expect(stage.querySelector('.status')!.textContent).not.toMatch(/did not work/);
   });
 });
