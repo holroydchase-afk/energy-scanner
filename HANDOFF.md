@@ -23,6 +23,12 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-23, round 4 UI review + ES-R21 to R35 (branch `m2.14-ui-review`, stacked on PR #16): Chase asked for a full UI review (screens and code) with his iPhone shots of real photos. Review in `docs/reviews/2026-10-23-ui-review.md`: 15 findings (1 P0, 5 P1, 9 P2), all fixed:
+  - Real photos: the mask is snapped to edges in the photo (`src/segment/refine.ts`, fast guided filter), Safari uses MediaPipe's CPU path, the edge band is tighter and the glow starts just inside the outline (R21). The glow is sized to the person and toned down; Grey is moonlit blue-grey (R22). Small stray shapes (a fan, a sliver of someone) are dropped (`src/segment/main-person.ts`, R23).
+  - Bedtime logic: tonight's steps are keyed on the local date, not UTC (they reset at 10pm Pacific before, R31); after midnight it's still last night's bedtime until 5am, so a 3am scan reads sleepy (R30).
+  - Screens: "See every color" button in the Always Grey note (R24); the not-an-image error shows under the photo buttons (R25); reading card beside the photo at 900px+ (R26); no empty status gap (R27); safe-area insets, `viewport-fit=cover`, dvh/svh (R28); primary button gradient `#7c3aed → #be185d` passes AA (R29); drop works anywhere on the page (R32).
+  - Code: removed the v1 energy-type chips, intensity slider, horoscope copy and unused CSS; `src/aura/presets.ts` is now `src/aura/types.ts` (R33). Accessibility: focus after New photo, live palm hint, emoji hidden from screen readers, labeled time range, `<main>` covers the scan (R34). Reduced motion respected for scrolling; page gradient is a fixed layer (R35).
+  - README screenshots and `public/og.png` regenerated; the screenshot script now shifts the page clock to noon instead of moving bedtime.
 - 2026-10-22 overnight, round 3 + ES-R19, R20 (branch `m2.13-a11y`): accessibility pass (320px reflow, contrast, tab order, focus, reduced motion); the Palm/Photo switch now works with arrow keys as one tab stop, and its labels stay on one line at 320px.
 - 2026-10-22, round 2 re-review + ES-R17, R18 (branch `m2.12-fit`): picking a photo or the sample scrolls it into view; "No person found" offers Try the sample.
 - 2026-10-22, ES-R9 (branch `m2.11-ci`): `.github/workflows/ci.yml` runs check, build and the Playwright e2e on every pull request.
@@ -53,11 +59,13 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Recruiter-Ready Sprint v2 fix loop (Chase approved 2026-10-22): stacked draft PRs from `m2.5-agents-sync`. Each round: fix top open items in the review doc, re-screenshot, re-run suites, update the doc and this file.
+- Round 4 UI review fixes are in a PR stacked on #16 (branch `m2.14-ui-review`). Not live until Chase merges #16 and this PR.
 
 ## Exact next step
 - Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 20 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
-- Next round (if run): re-review the top of the stack (`m2.13-a11y`): `npm run build`, screenshot every screen at 390x844 and 1280x800, light and dark, open each; run all suites 3x; log new findings as ES-R21+ and fix them stacked on `m2.13-a11y`.
+- The sprint stack is already collapsed into #16 (Power Hour, Oct 22). Merge order: the round 4 PR (`m2.14-ui-review`) into `m2.5-agents-sync`, then #16 into the default branch (that deploys).
+- After it's live: Chase rescans his three real photos on his iPhone (the tiles, fringe and wash-out fixes need a real phone to confirm, AC-R21a/R22b/R23b/R28 in the review doc).
+- Next round (if run): re-review the top of `m2.14-ui-review` the same way (build, screenshot every screen at 390x844, 1280x800 and 320x640, open each; suites 3x); log findings as ES-R36+.
 - After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: handle WebGL context loss, live aura on the camera feed.
@@ -79,7 +87,10 @@ _Updated 2026-10-22._
 - Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
-- Energy type is auto-picked from the person's average color (clothes/hair), as a fun "reading"; the person can change it. Background is dimmed up to ~70% so the aura reads on bright photos.
+- The aura color comes from tonight's reading (the v1 auto-picked energy types were removed Oct 23). Background is dimmed up to 65% so the aura reads on bright photos.
+- "See every color" (Oct 23, recommended, Chase's call pending): one tap from the Always Grey note turns it off and re-scans; the default stays on.
+- Dark-only (no light theme): it's a night-time app; the ux-reviewer recommends keeping it.
+- Safari uses MediaPipe's CPU path: Chase's iPhone exports showed blocky masks, and the GPU path on WebKit is the likely cause (inferred, not confirmed on a device).
 
 - Exports carry a small caption (energy type + app name) so shared images explain themselves.
 

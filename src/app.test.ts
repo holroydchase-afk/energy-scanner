@@ -1,5 +1,17 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountApp, type AppOptions } from './app';
+
+// Test-only stand-in: jsdom has no WebGL or canvas pixels.
+vi.mock('./aura/renderer', () => ({
+  createAuraRenderer: () => ({
+    canvas: document.createElement('canvas'),
+    kind: 'webgl',
+    render: () => undefined,
+    setEnergy: () => undefined,
+    setIntensity: () => undefined,
+    destroy: () => undefined,
+  }),
+}));
 
 function mount(options: AppOptions = {}) {
   const root = document.createElement('div');
@@ -76,7 +88,37 @@ describe('bedtime app', () => {
     expect(card.querySelector('.rc-todo')!.textContent).toMatch(/Still to do: Bath, PJs, Teeth, Potty, Book/);
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
-    expect(note.textContent).toBe('Always Grey is on. Turn it off under Grown-ups to see every color.');
+    expect(note.textContent).toBe('Always Grey is on, so every scan reads Grey. See every color');
+  });
+
+  it('See every color turns Always Grey off and scans again in color', async () => {
+    // Noon with an 8pm bedtime and nothing done: Rainbow once Always Grey is off.
+    const root = mount({ holdMs: 1, now: () => new Date(2026, 9, 21, 12, 0) });
+    root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
+    await new Promise((r) => setTimeout(r, 60));
+    const see = root.querySelector<HTMLButtonElement>('[data-action="see-colors"]')!;
+    expect(see.textContent).toBe('See every color');
+    see.click();
+    expect(root.querySelector<HTMLInputElement>('[data-input="always"]')!.checked).toBe(false);
+    expect(localStorage.getItem('alwaysGrey')).toBe('false');
+    expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
+    expect(root.querySelector<HTMLElement>('.rc-note')!.hidden).toBe(true);
+  });
+
+  it('See every color re-scans the same photo', async () => {
+    let scans = 0;
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({
+      minScanMs: 0,
+      getSegmenter: async () => ({ segment: async () => (scans++, person) }) as never,
+    });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    click(root, '[data-action="see-colors"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(scans).toBe(2);
+    expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
   });
 
   it('a palm scan released too early is not counted', () => {
@@ -153,5 +195,40 @@ describe('bedtime app', () => {
     const error = root.querySelector<HTMLElement>('.error')!;
     expect(error.hidden).toBe(false);
     expect(error.textContent).toBe('That file is not an image. Choose a photo (JPG, PNG or HEIC).');
+    // Right under the buttons, where the person is looking, not below the fold.
+    expect(error.previousElementSibling?.classList.contains('actions')).toBe(true);
+  });
+
+  it('takes a photo dropped anywhere on the page, even outside the app column', async () => {
+    const root = mount();
+    const drop = new Event('drop', { bubbles: true, cancelable: true });
+    Object.defineProperty(drop, 'dataTransfer', { value: { files: [new File(['x'], 'notes.txt', { type: 'text/plain' })] } });
+    document.body.dispatchEvent(drop);
+    expect(drop.defaultPrevented).toBe(true);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(root.querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector<HTMLElement>('.error')!.hidden).toBe(false);
+  });
+
+  it('keeps focus on Take a photo after New photo', async () => {
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    click(root, '[data-action="reset"]');
+    expect(document.activeElement).toBe(root.querySelector('[data-action="camera"]'));
+  });
+
+  it('is labeled for screen readers', () => {
+    const root = mount();
+    expect(root.querySelector('[data-hint]')!.getAttribute('aria-live')).toBe('polite');
+    for (const b of root.querySelectorAll('[data-mode]')) expect(b.querySelector('[aria-hidden="true"]')).not.toBeNull();
+    const range = root.querySelector<HTMLInputElement>('[data-input="fake"]')!;
+    expect(range.labels?.[0]?.textContent).toContain('Try a different time');
+    expect(range.getAttribute('aria-valuetext')).toBe('real time');
+    const main = root.querySelector('main')!;
+    expect(main.contains(root.querySelector('.steps'))).toBe(true);
+    expect(main.contains(root.querySelector('.reading-card'))).toBe(true);
   });
 });

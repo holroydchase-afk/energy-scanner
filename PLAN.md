@@ -29,3 +29,4 @@ Chase's call (Oct 21): combine the photo aura with the original bedtime Energy S
 - [x] **M2.3 Point the portfolio at it** (done, portfolio PR #8): update the portfolio's Energy Scanner page and demo link (in the portfolio repo, not this one).
 - [x] **M2.4 Native camera** (done, PR #15) (`m2.4-native-camera`): "Take a photo" opens the phone's own camera app (native capture input) instead of an in-page camera. Done when it works on Chase's iPhone.
 - [ ] **M2.6 Recruiter-ready** (in progress): fix the findings in `docs/reviews/2026-10-22-recruiter-ready.md` until nothing at P2 or above is left.
+- [ ] **M2.14 UI review, round 4** (in review, `m2.14-ui-review`): fix ES-R21 to R35 from `docs/reviews/2026-10-23-ui-review.md`, including real-photo edge quality. Done when the suites pass and Chase's iPhone rescans show clean edges.

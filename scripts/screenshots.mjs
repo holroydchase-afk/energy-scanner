@@ -27,21 +27,28 @@ const MOBILE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, is
 
 /**
  * A fresh page. `alwaysGrey` is the grown-up switch. `evening` fixes the clock at 7:00pm for the
- * start screens; the aura pages keep the real clock (a fixed clock stalls headless screenshots
- * of the live canvas) and set bedtime 8 hours away instead, so the reading is Rainbow.
+ * start screens. The aura pages keep a running clock (a fixed clock stalls headless screenshots of
+ * the live canvas) but shifted to noon, with the default 8pm bedtime, so the reading is Rainbow.
  */
 async function open(device, { alwaysGrey = true, evening = false } = {}) {
   const page = await browser.newPage(device);
   if (evening) await page.clock.setFixedTime(new Date('2026-10-22T19:00:00'));
-  const later = new Date(Date.now() + 8 * 3600e3);
-  const bed = `${String(later.getHours()).padStart(2, '0')}:${String(later.getMinutes()).padStart(2, '0')}`;
-  await page.addInitScript(
-    ([grey, bedtime]) => {
-      localStorage.setItem('alwaysGrey', JSON.stringify(grey));
-      if (!grey) localStorage.setItem('bed', JSON.stringify(bedtime));
-    },
-    [alwaysGrey, bed],
-  );
+  else {
+    const noon = new Date();
+    noon.setHours(12, 0, 0, 0);
+    await page.addInitScript((offset) => {
+      const RealDate = Date;
+      globalThis.Date = class extends RealDate {
+        constructor(...args) {
+          super(...(args.length ? args : [RealDate.now() + offset]));
+        }
+        static now() {
+          return RealDate.now() + offset;
+        }
+      };
+    }, noon.getTime() - Date.now());
+  }
+  await page.addInitScript((grey) => localStorage.setItem('alwaysGrey', JSON.stringify(grey)), alwaysGrey);
   await page.goto(url);
   return page;
 }

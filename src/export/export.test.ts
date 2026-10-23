@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { energyTypeById } from '../aura/presets';
+import type { EnergyType } from '../aura/types';
+
+const mystic: EnergyType = { id: 'mystic', name: 'Mystic', colors: [[1, 1, 1], [0.6, 0.4, 1], [0.2, 0.1, 0.7]] };
 import { canShareFiles, captionFor, exportFileName, extensionFor, pickVideoType } from './export';
 
 describe('pickVideoType', () => {
@@ -21,7 +23,7 @@ describe('file names', () => {
     expect(extensionFor('image/png')).toBe('png');
   });
   it('names exports after the energy type', () => {
-    expect(exportFileName(energyTypeById('mystic'), 'image/png')).toBe('energy-scanner-mystic.png');
+    expect(exportFileName(mystic, 'image/png')).toBe('energy-scanner-mystic.png');
   });
 });
 
@@ -38,7 +40,7 @@ describe('canShareFiles', () => {
 
 describe('captionFor', () => {
   it('adds "energy" only when missing', () => {
-    expect(captionFor(energyTypeById('mystic'))).toBe('Mystic energy');
-    expect(captionFor({ ...energyTypeById('calm'), name: 'Grey Energy' })).toBe('Grey Energy');
+    expect(captionFor(mystic)).toBe('Mystic energy');
+    expect(captionFor({ ...mystic, id: 'grey', name: 'Grey Energy' })).toBe('Grey Energy');
   });
 });

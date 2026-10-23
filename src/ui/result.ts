@@ -1,6 +1,6 @@
 import { buildAuraField } from '../aura/field';
-import { averagePersonColor, ENERGY_TYPES, energyTypeById, pickEnergyType, type EnergyType } from '../aura/presets';
 import { createAuraRenderer, type AuraRenderer } from '../aura/renderer';
+import type { EnergyType } from '../aura/types';
 import type { PersonMask, Segmenter } from '../segment/types';
 import { keepMainPerson } from '../segment/main-person';
 import { luminance, refineMask } from '../segment/refine';
@@ -11,8 +11,8 @@ export interface ResultOptions {
   onReset: () => void;
   /** Shortest time the scan animation shows, so the reveal lands. */
   minScanMs?: number;
-  /** A fixed energy type (bedtime mode): skips the color pick and hides the type chips and slider. */
-  energy?: EnergyType;
+  /** The aura palette, from tonight's reading. */
+  energy: EnergyType;
   intensity?: number;
   /** Animation speed multiplier; sleepy energy moves slower. */
   speed?: number;
@@ -42,23 +42,6 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       </div>
       <p class="caption" hidden></p>
       <p class="status" role="status" aria-live="polite">Scanning energy…</p>
-      <div class="panel" hidden>
-        <div class="reading" data-testid="reading">
-          <span class="label">Energy type</span>
-          <h2 class="energy-name"></h2>
-          <p class="energy-reading"></p>
-        </div>
-        <div class="chips" role="radiogroup" aria-label="Energy type">
-          ${ENERGY_TYPES.map(
-            (t) =>
-              `<button type="button" role="radio" class="chip" data-energy="${t.id}" aria-checked="false" style="--c1: ${css(t.colors[1])}; --c2: ${css(t.colors[2])}">${t.name}</button>`,
-          ).join('')}
-        </div>
-        <label class="slider">
-          <span>Intensity</span>
-          <input type="range" min="0" max="100" value="${DEFAULT_INTENSITY * 100}" data-input="intensity" />
-        </label>
-      </div>
       <div class="actions" data-slot="actions">
         <button type="button" class="btn primary" data-action="share" hidden>Share</button>
         <button type="button" class="btn" data-action="save-image" hidden>Save image</button>
@@ -69,7 +52,6 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
   `;
   const frame = stage.querySelector<HTMLElement>('.frame')!;
   const status = stage.querySelector<HTMLElement>('.status')!;
-  const panel = stage.querySelector<HTMLElement>('.panel')!;
   const caption = stage.querySelector<HTMLElement>('.caption')!;
   caption.hidden = !options.caption;
   caption.textContent = options.caption ?? '';
@@ -81,16 +63,6 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
   let raf = 0;
   let renderer: AuraRenderer | null = null;
   let energy: EnergyType | null = null;
-
-  const setEnergy = (type: EnergyType) => {
-    energy = type;
-    renderer?.setEnergy(type);
-    stage.querySelector('.energy-name')!.textContent = type.name;
-    stage.querySelector('.energy-reading')!.textContent = type.reading;
-    for (const chip of stage.querySelectorAll<HTMLElement>('.chip')) {
-      chip.setAttribute('aria-checked', String(chip.dataset.energy === type.id));
-    }
-  };
 
   const run = async () => {
     const started = performance.now();
@@ -142,14 +114,11 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     renderer.canvas.dataset.renderer = renderer.kind;
     photo.replaceWith(renderer.canvas);
 
-    const personAt = (u: number, v: number) =>
-      mask.data[Math.min(mask.height - 1, Math.floor(v * mask.height)) * mask.width + Math.min(mask.width - 1, Math.floor(u * mask.width))] ?? 0;
-    const picked = options.energy ?? pickEnergyType(averagePersonColor(pixels ?? new Uint8ClampedArray(4), photo.width, photo.height, personAt));
-    setEnergy(picked);
+    energy = options.energy;
+    renderer.setEnergy(energy);
     renderer.setIntensity(options.intensity ?? DEFAULT_INTENSITY);
-    renderer.canvas.setAttribute('aria-label', `Photo with a glowing ${picked.name} energy aura around the person`);
+    renderer.canvas.setAttribute('aria-label', `Photo with a glowing ${energy.name} aura around the person`);
     status.textContent = '';
-    panel.hidden = Boolean(options.energy);
     showExportButtons();
     options.onReady?.();
 
@@ -163,29 +132,6 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     };
     raf = requestAnimationFrame(tick);
   };
-
-  stage.querySelector('.chips')!.addEventListener('click', (e) => {
-    const id = (e.target as HTMLElement).closest<HTMLElement>('[data-energy]')?.dataset.energy;
-    if (id) {
-      setEnergy(energyTypeById(id));
-      renderer?.canvas.setAttribute('aria-label', `Photo with a glowing ${energyTypeById(id).name} energy aura around the person`);
-    }
-  });
-  // Arrow keys move between energy types, as in any radio group.
-  stage.querySelector('.chips')!.addEventListener('keydown', (e) => {
-    const key = (e as KeyboardEvent).key;
-    const step = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 0;
-    if (!step) return;
-    e.preventDefault();
-    const chips = [...stage.querySelectorAll<HTMLButtonElement>('.chip')];
-    const current = Math.max(0, chips.findIndex((c) => c.getAttribute('aria-checked') === 'true'));
-    const next = chips[(current + step + chips.length) % chips.length]!;
-    next.focus();
-    next.click();
-  });
-  stage.querySelector<HTMLInputElement>('[data-input="intensity"]')!.addEventListener('input', (e) => {
-    renderer?.setIntensity(Number((e.target as HTMLInputElement).value) / 100);
-  });
 
   const button = (action: string) => stage.querySelector<HTMLButtonElement>(`[data-action="${action}"]`)!;
   const showExportButtons = () => {
@@ -243,6 +189,3 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
   };
 }
 
-function css(rgb: readonly number[]): string {
-  return `rgb(${rgb.map((v) => Math.round(v * 255)).join(' ')})`;
-}

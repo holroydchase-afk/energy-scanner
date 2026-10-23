@@ -40,6 +40,27 @@ test('the illustrated sample gets an animated aura, and saves as image and video
   expect(statSync(path).size).toBeGreaterThan(10_000);
 });
 
+test('See every color re-scans the sample in color, and the layout fits', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.clock.setFixedTime(new Date('2026-10-22T12:00:00')); // noon, bedtime far off
+  await page.goto('/');
+  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('button', { name: 'Try the sample' }).click();
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  // No empty status line between the caption and the buttons.
+  const caption = await page.locator('.caption').boundingBox();
+  const actions = await page.locator('.viewer .actions').boundingBox();
+  expect(actions!.y - (caption!.y + caption!.height)).toBeLessThanOrEqual(16);
+  // On a laptop the reading sits beside the photo: both in view together.
+  await expect(page.getByTestId('energy-reading')).toBeInViewport({ ratio: 1 });
+  await expect(page.locator('canvas.aura')).toBeInViewport({ ratio: 1 });
+
+  await page.getByRole('button', { name: 'See every color' }).click();
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByTestId('energy-reading')).not.toContainText('Grey Energy');
+  await expect(page.locator('[data-input="always"]')).not.toBeChecked();
+});
+
 // Optional: the same flow on a local photo of a real person, never committed.
 const samplePhoto = process.env.SAMPLE_PHOTO;
 test('a local photo of a person gets an animated aura', async ({ page }) => {

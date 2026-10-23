@@ -1,4 +1,4 @@
-import type { EnergyType } from '../aura/presets';
+import type { EnergyType } from '../aura/types';
 
 export const VIDEO_SECONDS = 4;
 export const VIDEO_FPS = 30;

@@ -1,6 +1,6 @@
 import type { PersonMask } from '../segment/types';
 import type { AuraField } from './field';
-import type { EnergyType } from './presets';
+import type { EnergyType } from './types';
 import { FRAGMENT_SHADER, VERTEX_SHADER } from './shaders';
 
 /** Seconds the aura takes to bloom when a result first appears. */
