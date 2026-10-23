@@ -97,7 +97,7 @@ export const LEVELS: readonly Level[] = [
       'Battery almost empty. Time to plug in to your pillow and recharge.',
       'The scanner says your body is ready to power down for the night.',
     ],
-    aura: aura('grey', 'Grey', '#f2f3fa', '#b8bcd6', '#6b6f8f'),
+    aura: aura('grey', 'Grey', '#dfe4ff', '#8f98d1', '#454b7a'),
   },
 ];
 

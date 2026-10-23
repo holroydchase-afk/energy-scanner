@@ -2,6 +2,8 @@ import { buildAuraField } from '../aura/field';
 import { averagePersonColor, ENERGY_TYPES, energyTypeById, pickEnergyType, type EnergyType } from '../aura/presets';
 import { createAuraRenderer, type AuraRenderer } from '../aura/renderer';
 import type { PersonMask, Segmenter } from '../segment/types';
+import { keepMainPerson } from '../segment/main-person';
+import { luminance, refineMask } from '../segment/refine';
 import { canRecordVideo, download, exportImage, exportVideo, shareOrDownload } from '../export/export';
 
 export interface ResultOptions {
@@ -119,6 +121,12 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
     if (destroyed) return;
 
+    const ctx = photo.getContext('2d');
+    const pixels = ctx ? ctx.getImageData(0, 0, photo.width, photo.height).data : null;
+    // Snap the outline to edges in the photo; some phones return blocky, misaligned masks.
+    if (pixels) mask = refineMask(mask, luminance(pixels), photo.width, photo.height);
+    // Only the main person (and anyone about as big) glows; drop stray shapes like a fan.
+    mask = keepMainPerson(mask);
     const field = buildAuraField(mask, photo.width / photo.height);
     frame.classList.remove('scanning');
     if (!field.box) {
@@ -134,11 +142,9 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     renderer.canvas.dataset.renderer = renderer.kind;
     photo.replaceWith(renderer.canvas);
 
-    const ctx = photo.getContext('2d');
-    const pixels = ctx ? ctx.getImageData(0, 0, photo.width, photo.height).data : new Uint8ClampedArray(4);
     const personAt = (u: number, v: number) =>
       mask.data[Math.min(mask.height - 1, Math.floor(v * mask.height)) * mask.width + Math.min(mask.width - 1, Math.floor(u * mask.width))] ?? 0;
-    const picked = options.energy ?? pickEnergyType(averagePersonColor(pixels, photo.width, photo.height, personAt));
+    const picked = options.energy ?? pickEnergyType(averagePersonColor(pixels ?? new Uint8ClampedArray(4), photo.width, photo.height, personAt));
     setEnergy(picked);
     renderer.setIntensity(options.intensity ?? DEFAULT_INTENSITY);
     renderer.canvas.setAttribute('aria-label', `Photo with a glowing ${picked.name} energy aura around the person`);

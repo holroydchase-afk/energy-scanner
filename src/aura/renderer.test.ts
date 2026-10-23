@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { REVEAL_SECONDS, revealAt } from './renderer';
+import { boxShortSide, REVEAL_SECONDS, revealAt } from './renderer';
 
 describe('revealAt', () => {
   it('starts at 0 and settles at 1', () => {
@@ -15,5 +15,14 @@ describe('revealAt', () => {
       expect(v).toBeGreaterThanOrEqual(last);
       last = v;
     }
+  });
+});
+
+describe('boxShortSide', () => {
+  it('measures the person box against the image short side', () => {
+    const field = { width: 4, height: 3, sdf: new Float32Array(12), coverage: 0.1, box: { x: 0, y: 0, width: 0.25, height: 0.5 } };
+    // Box is 200 x 300 in an 800 x 600 image: short side 200 / 600.
+    expect(boxShortSide(field, 800, 600)).toBeCloseTo(200 / 600);
+    expect(boxShortSide({ ...field, box: null }, 800, 600)).toBe(1);
   });
 });

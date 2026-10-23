@@ -22,9 +22,11 @@ export async function createMediaPipeSegmenter(): Promise<Segmenter> {
       outputCategoryMask: false,
     });
 
+  // Real iPhone photos came back with blocky masks, so Safari skips WebKit's GPU path and uses
+  // the CPU, which is fast enough for this small model.
   let segmenter;
   try {
-    segmenter = await create('GPU');
+    segmenter = await create(isSafari(navigator.userAgent) ? 'CPU' : 'GPU');
   } catch {
     segmenter = await create('CPU');
   }
@@ -43,4 +45,9 @@ export async function createMediaPipeSegmenter(): Promise<Segmenter> {
       }
     },
   };
+}
+
+/** Safari, including every iPhone browser (they all run WebKit). */
+export function isSafari(userAgent: string): boolean {
+  return /AppleWebKit/.test(userAgent) && (!/Chrome|Chromium|Edg|OPR/.test(userAgent) || /iPhone|iPad|iPod/.test(userAgent));
 }
