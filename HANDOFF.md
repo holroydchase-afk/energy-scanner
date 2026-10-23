@@ -23,6 +23,13 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-23 night shift, hardening (branch `m2.15-harden-app`, stacked on `m2.14-ui-review`): staff-pm ranked the features people touch; qa-tdd found 10 gaps, ES-R36 to R45, in `docs/reviews/2026-10-23-hardening.md`. Fixed here, each with a failing test first:
+  - R36 (P0): a page left open overnight now starts the new night with no steps ticked (it kept last night's ticks and saved them into tonight).
+  - R38: a photo that finishes decoding after switching to Palm scan, or after a newer photo, is dropped.
+  - R39: the palm scan keeps going while any finger is on the pad; R40: switching mode mid-hold cancels it.
+  - R41: corrupt saved settings (bedtime, steps, mode) fall back to defaults instead of breaking the app.
+  - R45: `mountApp` returns `destroy()`; unit tests tear their apps down.
+  - Scan again in photo mode re-scans the same photo (decision below).
 - 2026-10-23, round 4 UI review + ES-R21 to R35 (branch `m2.14-ui-review`, stacked on PR #16): Chase asked for a full UI review (screens and code) with his iPhone shots of real photos. Review in `docs/reviews/2026-10-23-ui-review.md`: 15 findings (1 P0, 5 P1, 9 P2), all fixed:
   - Real photos: the mask is snapped to edges in the photo (`src/segment/refine.ts`, fast guided filter), Safari uses MediaPipe's CPU path, the edge band is tighter and the glow starts just inside the outline (R21). The glow is sized to the person and toned down; Grey is moonlit blue-grey (R22). Small stray shapes (a fan, a sliver of someone) are dropped (`src/segment/main-person.ts`, R23).
   - Bedtime logic: tonight's steps are keyed on the local date, not UTC (they reset at 10pm Pacific before, R31); after midnight it's still last night's bedtime until 5am, so a 3am scan reads sleepy (R30).
@@ -59,7 +66,7 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Round 4 UI review fixes are in a PR stacked on #16 (branch `m2.14-ui-review`). Not live until Chase merges #16 and this PR.
+- Round 4 UI review fixes are in PR #25 (branch `m2.14-ui-review`), stacked on #16. Night-shift hardening is stacked on top (`m2.15-harden-app`, then `m2.16-harden-render`). Nothing is live until Chase merges the stack.
 
 ## Exact next step
 - Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 20 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
@@ -89,6 +96,8 @@ _Updated 2026-10-22._
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - The aura color comes from tonight's reading (the v1 auto-picked energy types were removed Oct 23). Background is dimmed up to 65% so the aura reads on bright photos.
 - "See every color" (Oct 23, recommended, Chase's call pending): one tap from the Always Grey note turns it off and re-scans; the default stays on.
+- Scan again in photo mode re-scans the same photo instead of going back to Take a photo, so ticking a step and scanning again just works (qa-tdd's recommendation; New photo still picks a new one).
+- Saved-settings keys stay unprefixed (`bed`, `mode`, `alwaysGrey`, `steps-…`) on the shared chaseholroyd.com origin; values are validated instead. Prefixing would reset everyone's settings unless migrated; no collision is known.
 - Dark-only (no light theme): it's a night-time app; the ux-reviewer recommends keeping it.
 - Safari uses MediaPipe's CPU path: Chase's iPhone exports showed blocky masks, and the GPU path on WebKit is the likely cause (inferred, not confirmed on a device).
 

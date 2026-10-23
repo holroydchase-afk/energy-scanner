@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mountApp, type AppOptions } from './app';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mountApp, type AppOptions, type AppHandle } from './app';
+import { nightKey } from './bedtime/energy';
 
 // Test-only stand-in: jsdom has no WebGL or canvas pixels.
 vi.mock('./aura/renderer', () => ({
@@ -13,10 +14,12 @@ vi.mock('./aura/renderer', () => ({
   }),
 }));
 
+const mounted: AppHandle[] = [];
+
 function mount(options: AppOptions = {}) {
   const root = document.createElement('div');
   document.body.append(root);
-  mountApp(root, { random: () => 0.5, ...options });
+  mounted.push(mountApp(root, { random: () => 0.5, ...options }));
   return root;
 }
 
@@ -26,6 +29,10 @@ describe('bedtime app', () => {
   beforeEach(() => {
     localStorage.clear();
     document.body.innerHTML = '';
+  });
+  afterEach(() => {
+    for (const app of mounted.splice(0)) app.destroy();
+    vi.useRealTimers();
   });
 
   it('renders the routine, scan choice and privacy promise', () => {
@@ -230,5 +237,124 @@ describe('bedtime app', () => {
     const main = root.querySelector('main')!;
     expect(main.contains(root.querySelector('.steps'))).toBe(true);
     expect(main.contains(root.querySelector('.reading-card'))).toBe(true);
+  });
+
+  it('ES-R45 unmount removes page-wide listeners and the clock', () => {
+    vi.useFakeTimers();
+    const root = document.createElement('div');
+    document.body.append(root);
+    const app = mountApp(root);
+    app.destroy();
+    expect(vi.getTimerCount()).toBe(0);
+    const drop = new Event('drop', { bubbles: true, cancelable: true });
+    Object.defineProperty(drop, 'dataTransfer', { value: { files: [new File(['x'], 'notes.txt', { type: 'text/plain' })] } });
+    document.body.dispatchEvent(drop);
+    expect(drop.defaultPrevented).toBe(false);
+  });
+
+  it('ES-R36 starts a fresh night when the page stays open past 5am', () => {
+    vi.useFakeTimers();
+    let t = new Date(2026, 9, 22, 19, 0);
+    const root = mount({ now: () => t });
+    for (const id of ['bath', 'pjs', 'teeth', 'potty', 'book']) click(root, `[data-step="${id}"]`);
+    expect(root.querySelector('[data-count]')!.textContent).toBe('5 of 5');
+    t = new Date(2026, 9, 23, 19, 0);
+    vi.advanceTimersByTime(15_000);
+    expect(root.querySelector('[data-count]')!.textContent).toBe('0 of 5');
+    for (const b of root.querySelectorAll('.step')) expect(b.getAttribute('aria-pressed')).toBe('false');
+    click(root, '[data-step="bath"]');
+    expect(JSON.parse(localStorage.getItem('steps-2026-10-23')!)).toEqual(['bath']);
+  });
+
+  it('ES-R41 mounts with defaults when saved settings are corrupt', () => {
+    const now = new Date(2026, 9, 22, 19, 0);
+    for (const bad of ['2000', 'null', '"abc"']) {
+      localStorage.clear();
+      localStorage.setItem('bed', bad);
+      localStorage.setItem(nightKey(now), '{"a":1}');
+      localStorage.setItem('mode', '42');
+      const root = mount({ now: () => now });
+      expect(root.querySelector('.pad')).not.toBeNull();
+      expect(root.querySelector('[data-bed]')!.textContent).toMatch(/^8:00\s?PM$/);
+      expect(root.querySelector('[data-count]')!.textContent).toBe('0 of 5');
+    }
+    localStorage.setItem(nightKey(now), '"bathbook"');
+    expect(mount({ now: () => now }).querySelector('[data-count]')!.textContent).toBe('0 of 5');
+    localStorage.setItem(nightKey(now), '["bath","bath","nope"]');
+    expect(mount({ now: () => now }).querySelector('[data-count]')!.textContent).toBe('1 of 5');
+  });
+
+  it('ES-R39 palm scan keeps going while any finger is still on the pad', () => {
+    const root = mount({ holdMs: 10_000 });
+    const pad = root.querySelector('.pad')!;
+    const ev = (type: string, pointerId: number) => Object.assign(new Event(type), { pointerId });
+    pad.dispatchEvent(ev('pointerdown', 1));
+    pad.dispatchEvent(ev('pointerdown', 2));
+    pad.dispatchEvent(ev('pointerup', 1));
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scanning… keep holding');
+    pad.dispatchEvent(ev('pointerup', 2));
+    expect(root.querySelector('[data-hint]')!.textContent).toMatch(/Too fast/);
+  });
+
+  it('ES-R40 switching to Photo scan mid-hold cancels the palm scan', async () => {
+    const root = mount({ holdMs: 30 });
+    root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
+    click(root, '[data-mode="photo"]');
+    await new Promise((r) => setTimeout(r, 120));
+    expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(true);
+  });
+
+  it('ES-R38 a photo that finishes decoding after switching to Palm scan is dropped', async () => {
+    let finish: (c: HTMLCanvasElement) => void = () => undefined;
+    const decode = vi.spyOn(await import('./photo/image'), 'fileToCanvas').mockImplementation(
+      () => new Promise((r) => (finish = r)),
+    );
+    const root = mount({ getSegmenter: () => new Promise(() => undefined) });
+    click(root, '[data-mode="photo"]');
+    const upload = root.querySelector<HTMLInputElement>('[data-input="upload"]')!;
+    Object.defineProperty(upload, 'files', { value: [new File(['x'], 'a.png', { type: 'image/png' })], configurable: true });
+    upload.dispatchEvent(new Event('change'));
+    click(root, '[data-mode="palm"]');
+    finish(document.createElement('canvas'));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(root.querySelector('.pad')).not.toBeNull();
+    expect(root.querySelector('[data-testid="photo"]')).toBeNull();
+    decode.mockRestore();
+  });
+
+  it('ES-R38 the last photo picked wins', async () => {
+    const pending: ((c: HTMLCanvasElement) => void)[] = [];
+    const decode = vi.spyOn(await import('./photo/image'), 'fileToCanvas').mockImplementation(
+      () => new Promise((r) => pending.push(r)),
+    );
+    const root = mount({ getSegmenter: () => new Promise(() => undefined) });
+    click(root, '[data-mode="photo"]');
+    const upload = root.querySelector<HTMLInputElement>('[data-input="upload"]')!;
+    for (const name of ['a.png', 'b.png']) {
+      Object.defineProperty(upload, 'files', { value: [new File(['x'], name, { type: 'image/png' })], configurable: true });
+      upload.dispatchEvent(new Event('change'));
+    }
+    const [a, b] = [document.createElement('canvas'), document.createElement('canvas')];
+    pending[1]!(b);
+    await new Promise((r) => setTimeout(r, 0));
+    pending[0]!(a);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(root.querySelector('[data-testid="photo"] canvas')).toBe(b);
+    decode.mockRestore();
+  });
+
+  it('Scan again in photo mode re-scans the same photo', async () => {
+    let scans = 0;
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => (scans++, person) }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    click(root, '[data-step="teeth"]');
+    click(root, '[data-action="again"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(scans).toBe(2);
+    expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+    expect(root.querySelector('.rc-todo')!.textContent).not.toContain('Teeth');
   });
 });

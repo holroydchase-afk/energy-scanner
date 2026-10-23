@@ -15,6 +15,13 @@ export interface AppOptions {
   now?: () => Date;
 }
 
+export interface AppHandle {
+  /** Remove the app's page-wide listeners and clock (used by tests). */
+  destroy(): void;
+}
+
+const BED_PATTERN = /^\d{2}:\d{2}$/;
+
 type Mode = 'palm' | 'photo';
 
 let defaultSegmenter: Promise<Segmenter> | null = null;
@@ -34,13 +41,20 @@ const RING = 295.3;
  * The bedtime Energy Scanner: kids work through their routine, then scan. The scan is either the
  * palm pad (press and hold) or a photo, where their energy glows off them as an animated aura.
  */
-export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
+export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle {
   const getSegmenter = options.getSegmenter ?? loadDefaultSegmenter;
   const random = options.random ?? Math.random;
   let offsetMin = 0;
   const now = () => new Date((options.now?.() ?? new Date()).getTime() + offsetMin * 60e3);
-  let done = new Set<string>(store.get<string[]>(nightKey(now()), []));
-  let bed = store.get('bed', '20:00');
+  // Saved values are checked, so a bad one falls back to the default instead of breaking the app.
+  const loadSteps = (key: string) => {
+    const saved = store.get<unknown>(key, []);
+    return new Set(Array.isArray(saved) ? STEPS.map((s) => s.id).filter((id) => saved.includes(id)) : []);
+  };
+  let night = nightKey(now());
+  let done = loadSteps(night);
+  const savedBed = store.get<unknown>('bed', '20:00');
+  let bed = typeof savedBed === 'string' && BED_PATTERN.test(savedBed) ? savedBed : '20:00';
   let alwaysGrey = store.get('alwaysGrey', true);
   let mode: Mode = store.get<Mode>('mode', 'palm') === 'photo' ? 'photo' : 'palm';
   let view: ResultView | null = null;
@@ -115,7 +129,16 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     errorBox.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
   };
 
+  // A page left open overnight starts the new night with no steps ticked.
+  const syncNight = () => {
+    if (nightKey(now()) === night) return;
+    night = nightKey(now());
+    done = loadSteps(night);
+    renderSteps();
+  };
+
   const tick = () => {
+    syncNight();
     $('[data-clock]').textContent = fmt(now());
     $('[data-bed]').textContent = fmt(bedtimeFor(now(), bed));
   };
@@ -175,6 +198,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     let t0 = 0;
     let raf = 0;
     let holding = false;
+    // Every finger (or the key) on the pad; the scan stops only when the last one lifts.
+    const touching = new Set<number | string>();
     const loop = () => {
       const p = Math.min(1, (performance.now() - t0) / hold);
       prog.style.strokeDashoffset = String(RING * (1 - p));
@@ -216,15 +241,31 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
       hint.textContent = `${level.name} detected`;
       showReading(energy, level);
     };
-    pad.addEventListener('pointerdown', start);
-    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) pad.addEventListener(ev, stop);
+    const press = (id: number | string, e?: Event) => {
+      touching.add(id);
+      start(e);
+    };
+    const lift = (id: number | string) => {
+      touching.delete(id);
+      if (!touching.size) stop();
+    };
+    const pointerId = (e: Event) => (e as PointerEvent).pointerId ?? 0;
+    pad.addEventListener('pointerdown', (e) => press(pointerId(e), e));
+    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) pad.addEventListener(ev, (e) => lift(pointerId(e)));
     pad.addEventListener('contextmenu', (e) => e.preventDefault());
     pad.addEventListener('keydown', (e) => {
-      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) start(e);
+      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) press('key', e);
     });
     pad.addEventListener('keyup', (e) => {
-      if (e.key === ' ' || e.key === 'Enter') stop();
+      if (e.key === ' ' || e.key === 'Enter') lift('key');
     });
+    pad.addEventListener('blur', () => lift('key'));
+    // Called when the stage changes, so a hold in progress can't finish on another screen.
+    return () => {
+      holding = false;
+      touching.clear();
+      cancelAnimationFrame(raf);
+    };
   };
 
   // ---- Photo scan ----
@@ -278,25 +319,33 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     stage.scrollIntoView?.({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
+  // Bumped whenever the stage changes, so a photo that finishes decoding late is dropped.
+  let request = 0;
   const useFile = async (file: File | undefined) => {
     if (!file) return;
     if (mode !== 'photo') setMode('photo');
+    const mine = ++request;
     try {
-      usePhoto(await fileToCanvas(file));
+      const photo = await fileToCanvas(file);
+      if (mine === request && mode === 'photo') usePhoto(photo);
     } catch (e) {
-      showError(e instanceof Error ? e.message : 'This photo could not be opened.');
+      if (mine === request && mode === 'photo') showError(e instanceof Error ? e.message : 'This photo could not be opened.');
     }
   };
 
   // ---- Mode switching ----
+  let stopPalm: (() => void) | null = null;
   const showMode = () => {
+    request++;
+    stopPalm?.();
+    stopPalm = null;
     view?.destroy();
     view = null;
     lastPhoto = null;
     card.hidden = true;
     showError(null);
     setEnergyColor(null);
-    if (mode === 'palm') showPalm();
+    if (mode === 'palm') stopPalm = showPalm();
     else showPhotoStart();
   };
 
@@ -315,9 +364,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   $('.steps').addEventListener('click', (e) => {
     const id = (e.target as HTMLElement).closest<HTMLElement>('[data-step]')?.dataset.step;
     if (!id) return;
+    syncNight();
     if (done.has(id)) done.delete(id);
     else done.add(id);
-    store.set(nightKey(now()), [...done]);
+    store.set(night, [...done]);
     renderSteps();
   });
 
@@ -344,6 +394,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   });
 
   $('[data-action="again"]').addEventListener('click', () => {
+    // In photo mode, scan the same photo again (after ticking a step, say).
+    if (lastPhoto) {
+      usePhoto(lastPhoto.photo, lastPhoto.caption);
+      return;
+    }
     showMode();
     root.querySelector<HTMLElement>(mode === 'palm' ? '.pad' : '[data-action="camera"]')?.focus();
   });
@@ -356,18 +411,21 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
   }
 
   // Anywhere on the page, not just the app column, so a missed drop doesn't open the file instead.
-  document.addEventListener('dragover', (e) => {
+  const onDragOver = (e: DragEvent) => {
     e.preventDefault();
     root.classList.add('dragging');
-  });
-  document.addEventListener('dragleave', (e) => {
+  };
+  const onDragLeave = (e: DragEvent) => {
     if (!e.relatedTarget) root.classList.remove('dragging');
-  });
-  document.addEventListener('drop', (e) => {
+  };
+  const onDrop = (e: DragEvent) => {
     e.preventDefault();
     root.classList.remove('dragging');
     void useFile(e.dataTransfer?.files?.[0]);
-  });
+  };
+  document.addEventListener('dragover', onDragOver);
+  document.addEventListener('dragleave', onDragLeave);
+  document.addEventListener('drop', onDrop);
 
   // Grown-ups
   const bedInput = $<HTMLInputElement>('[data-input="bed"]');
@@ -407,13 +465,25 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): void {
     }
   });
   $('[data-action="clear"]').addEventListener('click', () => {
+    syncNight();
     done = new Set();
-    store.set(nightKey(now()), []);
+    store.set(night, []);
     renderSteps();
   });
 
   renderSteps();
   tick();
-  setInterval(tick, 15_000);
+  const clock = setInterval(tick, 15_000);
   setMode(mode);
+
+  return {
+    destroy() {
+      clearInterval(clock);
+      document.removeEventListener('dragover', onDragOver);
+      document.removeEventListener('dragleave', onDragLeave);
+      document.removeEventListener('drop', onDrop);
+      stopPalm?.();
+      view?.destroy();
+    },
+  };
 }
