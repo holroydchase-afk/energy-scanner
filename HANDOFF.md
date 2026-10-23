@@ -72,16 +72,14 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Round 4 UI review fixes are in PR #25 (branch `m2.14-ui-review`), stacked on #16. Night-shift hardening is stacked on top: #26 (`m2.15-harden-app`), #27 (`m2.16-harden-render`), then `m2.17-palm-layout`. Nothing is live until Chase merges the stack.
+- Power Hour 2 (Oct 23): the stack is collapsed. #25 to #28 were fast-forwarded down into `m2.5-agents-sync`, so PR #16 now holds everything: the recruiter-ready sprint, round 4 UI fixes (ES-R21 to R35), night-shift hardening (ES-R36 to R45) and ES-R46. Nothing since PR #15 is live yet.
 
 ## Exact next step
-- Recruiter-ready stack (draft PRs, merge top-down after Chase reviews): #16 agents sync, #17 review doc, #18 sample, #19 link/targets/text, #20 copy, #21 screenshots/case study/preview, #22 PR CI, #23 fit, #24 a11y. All 20 findings in `docs/reviews/2026-10-22-recruiter-ready.md` are fixed (ES-R15 partly, by design); nothing open at P2 or above after round 3.
-- Merge order, top down: `m2.17-palm-layout` PR → #27 → #26 → #25 (each into the branch below), then #16 into the default branch (that one deploys). All draft, CI green.
-- After it's live: Chase rescans his three real photos on his iPhone (the tiles, fringe and wash-out fixes need a real phone to confirm, AC-R21a/R22b/R23b/R28 in the review doc).
-- Next round (if run): re-review the top of `m2.14-ui-review` the same way (build, screenshot every screen at 390x844, 1280x800 and 320x640, open each; suites 3x); log findings as ES-R36+.
+- Chase merges PR #16 into the default branch (that deploys to chaseholroyd.com/energy-scanner/). CI green.
+- After it's live: Chase rescans his three real photos on his iPhone (the tiles, fringe and wash-out fixes need a real phone to confirm, AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`).
 - After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
-- Later ideas: handle WebGL context loss, live aura on the camera feed.
+- Later ideas: live aura on the camera feed.
 
 ## Testing note
 - No photos of real people are committed. The e2e happy path runs on the illustrated sample; `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e` adds a check on a real local photo. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
