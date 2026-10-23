@@ -42,3 +42,15 @@ test('a non-image file shows a friendly error', async ({ page }) => {
   await page.locator('[data-input="upload"]').setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hi') });
   await expect(page.getByRole('alert')).toContainText('not an image');
 });
+
+test('on a phone, the not-an-image error shows on screen under the buttons', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 320, height: 640 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    await page.getByRole('radio', { name: /Photo scan/ }).click();
+    await page.locator('[data-input="upload"]').setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hi') });
+    const alert = page.getByRole('alert');
+    await expect(alert).toContainText('not an image');
+    await expect(alert).toBeInViewport({ ratio: 1 });
+  }
+});

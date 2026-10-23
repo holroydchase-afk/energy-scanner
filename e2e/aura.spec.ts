@@ -15,13 +15,13 @@ test('the scanner loads on-device and reports when nobody is in the photo', asyn
   expect(requests.filter((u) => !u.startsWith(origin) && !u.startsWith('blob:') && !u.startsWith('data:'))).toEqual([]);
 });
 
-// Repo rule: no photos of real people are committed, so the full happy path runs only when a
-// local photo is provided: SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e
-const samplePhoto = process.env.SAMPLE_PHOTO;
-test('a photo of a person gets an animated aura', async ({ page }) => {
-  test.skip(!samplePhoto, 'set SAMPLE_PHOTO to a local photo of a person');
+// Repo rule: no photos of real people are committed. The happy path runs on the app's own
+// illustrated sample, which goes through the same on-device model as a photo.
+test('the illustrated sample gets an animated aura, and saves as image and video', async ({ page }) => {
   await page.goto('/');
-  await page.locator('[data-input="upload"]').setInputFiles(samplePhoto!);
+  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('button', { name: 'Try the sample' }).click();
+  await expect(page.getByText('Illustrated sample, not a real person')).toBeVisible();
   const aura = page.locator('canvas.aura');
   await expect(aura).toBeVisible({ timeout: 45_000 });
   // Always Grey is on by default, so the bedtime reading is Grey.
@@ -38,4 +38,35 @@ test('a photo of a person gets an animated aura', async ({ page }) => {
   const path = await saved.path();
   const { statSync } = await import('node:fs');
   expect(statSync(path).size).toBeGreaterThan(10_000);
+});
+
+test('See every color re-scans the sample in color, and the layout fits', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.clock.setFixedTime(new Date('2026-10-22T12:00:00')); // noon, bedtime far off
+  await page.goto('/');
+  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('button', { name: 'Try the sample' }).click();
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  // No empty status line between the caption and the buttons.
+  const caption = await page.locator('.caption').boundingBox();
+  const actions = await page.locator('.viewer .actions').boundingBox();
+  expect(actions!.y - (caption!.y + caption!.height)).toBeLessThanOrEqual(16);
+  // On a laptop the reading sits beside the photo: both in view together.
+  await expect(page.getByTestId('energy-reading')).toBeInViewport({ ratio: 1 });
+  await expect(page.locator('canvas.aura')).toBeInViewport({ ratio: 1 });
+
+  await page.getByRole('button', { name: 'See every color' }).click();
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByTestId('energy-reading')).not.toContainText('Grey Energy');
+  await expect(page.locator('[data-input="always"]')).not.toBeChecked();
+});
+
+// Optional: the same flow on a local photo of a real person, never committed.
+const samplePhoto = process.env.SAMPLE_PHOTO;
+test('a local photo of a person gets an animated aura', async ({ page }) => {
+  test.skip(!samplePhoto, 'set SAMPLE_PHOTO to a local photo of a person');
+  await page.goto('/');
+  await page.locator('[data-input="upload"]').setInputFiles(samplePhoto!);
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
 });

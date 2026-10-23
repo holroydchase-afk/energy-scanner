@@ -16,9 +16,10 @@ uniform sampler2D uPhoto;
 uniform sampler2D uMask;  // person probability
 uniform sampler2D uSdf;   // signed distance to the outline, + outside, in short-side units
 uniform float uTime;
-uniform float uIntensity; // 0..1 from the slider
+uniform float uIntensity; // 0..1, from the reading (sleepier is softer)
 uniform float uReveal;    // 0..1, ramps up when a result first appears
 uniform float uAspect;    // width / height
+uniform float uBoxShort;  // short side of the person's box, in short-side units
 uniform float uSpectrum;  // 1 = cycle hues
 uniform vec3 uC0;         // core color
 uniform vec3 uC1;         // middle color
@@ -65,7 +66,8 @@ void main() {
   float sd = texture(uSdf, uv).r;
 
   float k = uIntensity * uReveal;
-  float radius = mix(0.05, 0.22, uIntensity) * (0.4 + 0.6 * uReveal);
+  // Sized to the person, so a close-up hand doesn't flood the whole frame.
+  float radius = min(mix(0.05, 0.18, uIntensity), 0.6 * uBoxShort) * (0.4 + 0.6 * uReveal);
 
   // Flowing energy that rises off the body: domain-warped noise scrolling upward.
   vec2 q = p * 3.2;
@@ -73,7 +75,8 @@ void main() {
   float n = fbm(q + vec2(warp * 1.6, t * 0.85 + warp));
   float n2 = fbm(q * 2.4 + vec2(-t * 0.25, t * 1.3));
 
-  float outside = max(sd, 0.0);
+  // Start the glow just inside the outline so no dimmed gap shows between skin and glow.
+  float outside = max(sd + 0.006, 0.0);
   // Flame tongues: high-contrast noise pulls the bright band outward in licks.
   float flame = smoothstep(0.3, 0.75, n);
   float dd = max(outside - flame * radius * 0.65 - n2 * radius * 0.15, 0.0);
@@ -102,8 +105,8 @@ void main() {
 
   // Background: dimmed and desaturated, like a dark room, so the energy reads on any photo.
   float lum = dot(photo, vec3(0.299, 0.587, 0.114));
-  vec3 bg = mix(photo, vec3(lum), 0.6 * k) * (1.0 - 0.72 * k);
-  vec3 energy = (col * aura + core) * k * 1.8;
+  vec3 bg = mix(photo, vec3(lum), 0.6 * k) * (1.0 - 0.65 * k);
+  vec3 energy = (col * aura + core) * k * 1.4;
   // Soft clip so bright energy keeps its color instead of blowing out to white.
   vec3 lit = bg + (1.0 - exp(-energy)) * (1.0 - 0.6 * bg);
 
@@ -111,6 +114,6 @@ void main() {
   float rim = exp(min(sd, 0.0) / 0.01) * (1.0 - smoothstep(0.0, 0.02, sd));
   vec3 rimColor = uSpectrum > 0.5 ? hsv2rgb(vec3(fract(p.y * 0.5 - t * 0.07), 0.6, 1.0)) : mix(uC0, uC1, 0.6);
   vec3 subject = photo * (1.0 - 0.12 * k) + rimColor * rim * 0.6 * k;
-  float alpha = smoothstep(0.3, 0.75, person);
+  float alpha = smoothstep(0.42, 0.58, person);
   outColor = vec4(mix(lit, subject, alpha), 1.0);
 }`;

@@ -1,41 +1,39 @@
 # Case study: Energy Scanner
 
-## The idea
+## The problem
 
-A friend shows you a photo; you tap once and their energy visibly radiates off them. That's the whole product. The bet was that one strong, shareable visual moment beats a feature list.
+Bedtime at our house was a nightly negotiation. "Five more minutes" works better on a parent than on a machine. So the idea: kids work through their bedtime routine, then step up for an energy scan, and a neutral scanner says it's time to sleep instead of me.
 
 ## Constraints I set
 
-- **Demoable in one tap, on a phone.** No sign-up, no install, no waiting on a server.
-- **Private by design.** Photos of people are sensitive. Instead of writing a privacy policy, remove the reason for one: never upload the photo.
-- **Shippable in days, not weeks.** A static site, so it can live on a portfolio link with no hosting costs or backend to maintain.
+- **Routine first.** A fake scan on its own wears off in a week. The scan is the reward at the end of real steps (bath, PJs, teeth, potty, book).
+- **Kids' faces never go to a cloud model.** If there's a camera, the photo stays on the phone. No server, no account, no tracking.
+- **Demoable in one tap, on a phone.** A static site on my portfolio, no sign-up, no install.
+
+## How it evolved
+
+1. **Palm scan prototype.** Press and hold a pad until the ring fills, and the scanner reads a color from Rainbow (way too much sparkle for sleeping) down to Grey (battery empty). My kids tested it at bedtime. The camera waited until it could run privately.
+2. **Photo scan.** Take or upload a photo and the child's energy glows off them as an animated aura, in the color of the reading: softer and slower when sleepy, blazing at Rainbow. It runs entirely on the phone.
+3. **One app.** The palm scan stays as an option next to the photo scan, so it still works without a camera.
 
 ## Key product decisions
 
 | Decision | Why | Trade-off |
 | --- | --- | --- |
-| Run segmentation on-device (MediaPipe in WebAssembly) | Privacy and zero server cost; works offline after load | First scan downloads ~13 MB of runtime; slower on old phones |
-| Small selfie model (250 KB) over a 16 MB multiclass model | 4x faster, sharper edges, light enough for phones | Less detail on fine hair |
-| Self-host the model and runtime | "Photos never leave your device" is literally true, and checked by a test | Bigger deploy than pulling from a CDN |
-| Auto-pick an "energy type" from the photo's colors | Makes the scan feel like a reading, not a filter; gives a reason to share ("I'm Mystic") | Arbitrary by design; framed as fun, user can change it |
-| Dim the background behind the aura | The aura has to read on bright, busy photos | The photo looks moodier than the original |
-| Captioned exports + native share sheet | A shared image should explain itself and bring people back | A small brand mark on every export |
-| Cut: accounts, galleries, filters, AR live video | None of them serve the core moment for v1 | Live video aura is the obvious v2 |
+| The reading follows the clock and the routine | The closer to bedtime and the more steps done, the sleepier the color; it never says Rainbow once every step is done | A little randomness keeps it from feeling canned, so it isn't perfectly predictable |
+| An "Always Grey" grown-up switch, on by default | Some nights the answer is just "bed", and the machine backs the parent up | First-time visitors see Grey every time, so the card says how to see the other colors |
+| On-device person segmentation (MediaPipe in WebAssembly, a 250 KB model) | "Photos never leave the device" is literally true, and a test checks every request stays on the app's own origin | The first photo scan downloads the runtime; slower on old phones |
+| The phone's own camera app instead of an in-page camera | The in-page camera was buggy on iPhone; the native camera handles focus, flash and switching cameras | Less control over the capture screen |
+| An illustrated sample person | Anyone can see the aura without a photo, and no real person's photo is ever published | It's a drawing, so it shows the effect, not how it looks on a real child |
+| Save and share | A captioned image or short video, shared from the phone, explains itself when it reaches family | A small app name on every export |
+| Cut: accounts, history, streaks, live video | None of them serve the bedtime moment | Live video aura is the obvious next step |
 
 ## How it was built
 
-Five milestones, each one shippable on its own and reviewed as a pull request:
-
-1. Scaffold with lint, typecheck, unit and real-browser tests from day one.
-2. Photo in: camera (with a fallback for older browsers), upload, drag and drop.
-3. The aura: segmentation, a distance field around the person, and a GPU shader for the animated energy.
-4. Save and share: image, short video, phone share sheet.
-5. This write-up, the README and screenshots.
-
-The work was planned and specified by me and built with an AI coding agent working overnight against written milestones, done-criteria and hard rules (tests before every push, never merge, never commit photos of real people). I reviewed each milestone as a pull request in the morning.
+I planned and specified it, and an AI coding agent built it against written milestones, done-criteria and hard rules: tests before every push, never merge, never commit photos of real people, photos never leave the device. Each milestone was a pull request I reviewed: scaffold with lint, typecheck, unit and real-browser tests; photo in; the aura (segmentation, a distance field around the person, a WebGL shader); save and share; the bedtime flow; the native camera; and a recruiter-ready review with fixes.
 
 ## What I'd do next
 
-- **Live aura on the camera feed** (segmentation runs fast enough for video on recent phones).
-- **Shareable link previews** (Open Graph image) so a shared post shows the aura.
-- **Measure the funnel**: photo taken, aura shown, saved, shared. Privately, without tracking photos.
+- **Watch real bedtimes.** Does the novelty hold past two weeks, and does the scan end the negotiation?
+- **Live aura on the camera feed** (segmentation is fast enough for video on recent phones).
+- **Measure privately:** scans per night and steps completed, kept on the device.

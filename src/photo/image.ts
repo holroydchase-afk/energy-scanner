@@ -64,7 +64,7 @@ export function sourceToCanvas(
  * so phone photos come out upright without parsing EXIF here.
  */
 export async function fileToCanvas(file: File, maxSide: number = MAX_PHOTO_SIDE): Promise<HTMLCanvasElement> {
-  if (!isAcceptedImage(file)) throw new Error('That file is not an image.');
+  if (!isAcceptedImage(file)) throw new Error('That file is not an image. Choose a photo (JPG, PNG or HEIC).');
   if (typeof createImageBitmap === 'function') {
     try {
       const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });

@@ -1,4 +1,4 @@
-import type { EnergyType, Rgb } from '../aura/presets';
+import type { EnergyType, Rgb } from '../aura/types';
 
 // Ported from the original bedtime Energy Scanner prototype (a Claude artifact on chaseholroyd.com).
 
@@ -38,7 +38,6 @@ const hex = (h: string): Rgb => {
 const aura = (id: string, name: string, c0: string, c1: string, c2: string, spectrum = false): EnergyType => ({
   id,
   name,
-  reading: '',
   colors: [hex(c0), hex(c1), hex(c2)],
   spectrum,
 });
@@ -94,10 +93,10 @@ export const LEVELS: readonly Level[] = [
     name: 'Grey Energy',
     color: '#B8BCD6',
     texts: [
-      'Grey. Battery almost empty. Time to plug in to your pillow and recharge.',
-      'Grey energy. The scanner says your body is ready to power down for the night.',
+      'Battery almost empty. Time to plug in to your pillow and recharge.',
+      'The scanner says your body is ready to power down for the night.',
     ],
-    aura: aura('grey', 'Grey', '#f2f3fa', '#b8bcd6', '#6b6f8f'),
+    aura: aura('grey', 'Grey', '#dfe4ff', '#8f98d1', '#454b7a'),
   },
 ];
 
@@ -129,18 +128,29 @@ export function computeEnergy({ alwaysGrey, minutesToBed, stepsDone, stepsTotal,
   return Math.round(Math.max(3, Math.min(99, e)));
 }
 
-/** Bedtime ("20:00") as a date: today's, or tomorrow's once it's more than 8 hours past. */
+/** Hour the night rolls over: until 5am it's still last night. */
+const ROLLOVER_HOUR = 5;
+
+/** The local calendar day this night started on. */
+function nightOf(now: Date): Date {
+  const d = new Date(now);
+  if (d.getHours() < ROLLOVER_HOUR) d.setDate(d.getDate() - 1);
+  d.setHours(12, 0, 0, 0);
+  return d;
+}
+
+/** Bedtime ("20:00") for tonight. After midnight it's still last night's, until 5am. */
 export function bedtimeFor(now: Date, bed: string): Date {
-  const [h, m] = bed.split(':').map(Number);
-  const b = new Date(now);
-  b.setHours(h ?? 20, m ?? 0, 0, 0);
-  if (now.getTime() - b.getTime() > 8 * 3600e3) b.setDate(b.getDate() + 1);
+  const [h = 20, m = 0] = bed.split(':').map(Number);
+  const b = nightOf(now);
+  b.setHours(h, m, 0, 0);
+  if (h < ROLLOVER_HOUR) b.setDate(b.getDate() + 1); // a bedtime after midnight
   return b;
 }
 
 export function todoLine(remaining: readonly Step[]): string {
   return remaining.length
-    ? `To drain the battery: ${remaining.map((s) => s.label).join(', ')}. Then scan again.`
+    ? `Still to do: ${remaining.map((s) => s.label).join(', ')}. Then scan again.`
     : 'All steps done. Lights out, recharge all night. ⭐';
 }
 
@@ -150,7 +160,8 @@ export function auraFeel(energy: number): { intensity: number; speed: number } {
   return { intensity: 0.5 + 0.45 * e, speed: 0.35 + 1.1 * e };
 }
 
-/** Tonight's key: the day rolls over at 5am so a late bedtime still counts as tonight. */
+/** Tonight's key, from the local date: the day rolls over at 5am so a late bedtime still counts. */
 export function nightKey(now: Date): string {
-  return 'steps-' + new Date(now.getTime() - 5 * 3600e3).toISOString().slice(0, 10);
+  const d = nightOf(now);
+  return `steps-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }

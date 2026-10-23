@@ -1,6 +1,6 @@
 import type { PersonMask } from '../segment/types';
 import type { AuraField } from './field';
-import type { EnergyType } from './presets';
+import type { EnergyType } from './types';
 import { FRAGMENT_SHADER, VERTEX_SHADER } from './shaders';
 
 /** Seconds the aura takes to bloom when a result first appears. */
@@ -37,6 +37,12 @@ export function createAuraRenderer(scene: AuraScene, canvas: HTMLCanvasElement =
       return new WebGLAuraRenderer(canvas, gl, scene);
     } catch (e) {
       console.warn('WebGL aura failed, using the simple renderer', e);
+      gl.getExtension?.('WEBGL_lose_context')?.loseContext();
+      // A canvas that has handed out a WebGL context can't give a 2D one, so start fresh.
+      const fresh = document.createElement('canvas');
+      fresh.width = canvas.width;
+      fresh.height = canvas.height;
+      return new Canvas2DAuraRenderer(fresh, scene);
     }
   }
   return new Canvas2DAuraRenderer(canvas, scene);
@@ -66,7 +72,7 @@ class WebGLAuraRenderer implements AuraRenderer {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-    for (const name of ['uPhoto', 'uMask', 'uSdf', 'uTime', 'uIntensity', 'uReveal', 'uAspect', 'uSpectrum', 'uC0', 'uC1', 'uC2']) {
+    for (const name of ['uPhoto', 'uMask', 'uSdf', 'uTime', 'uIntensity', 'uReveal', 'uAspect', 'uBoxShort', 'uSpectrum', 'uC0', 'uC1', 'uC2']) {
       this.uniforms[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -88,6 +94,7 @@ class WebGLAuraRenderer implements AuraRenderer {
     gl.uniform1i(this.uniforms.uMask!, 1);
     gl.uniform1i(this.uniforms.uSdf!, 2);
     gl.uniform1f(this.uniforms.uAspect!, canvas.width / canvas.height);
+    gl.uniform1f(this.uniforms.uBoxShort!, boxShortSide(scene.field, canvas.width, canvas.height));
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     const err = gl.getError();
@@ -139,6 +146,12 @@ class WebGLAuraRenderer implements AuraRenderer {
   }
 }
 
+/** Short side of the person's box, in units of the image's short side (1 when unknown). */
+export function boxShortSide(field: AuraField, width: number, height: number): number {
+  if (!field.box) return 1;
+  return Math.min(field.box.width * width, field.box.height * height) / Math.min(width, height);
+}
+
 function compile(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
   const shader = gl.createShader(type);
   if (!shader) throw new Error('Could not create a shader');
@@ -171,6 +184,8 @@ class Canvas2DAuraRenderer implements AuraRenderer {
   private ctx: CanvasRenderingContext2D;
   private cutout: HTMLCanvasElement;
   private silhouette: HTMLCanvasElement;
+  /** The silhouette tinted in each of the energy's colors, rebuilt only when the energy changes. */
+  private tinted: HTMLCanvasElement[] = [];
   private energy: EnergyType | null = null;
   private intensity = 0.7;
 
@@ -193,6 +208,15 @@ class Canvas2DAuraRenderer implements AuraRenderer {
 
   setEnergy(type: EnergyType): void {
     this.energy = type;
+    const { width, height } = this.canvas;
+    this.tinted = type.colors.map((rgb) =>
+      layer(width, height, (c) => {
+        c.drawImage(this.silhouette, 0, 0);
+        c.globalCompositeOperation = 'source-in';
+        c.fillStyle = `rgb(${rgb.map((v) => Math.round(v * 255)).join(',')})`;
+        c.fillRect(0, 0, width, height);
+      }),
+    );
   }
 
   setIntensity(value: number): void {
@@ -200,8 +224,7 @@ class Canvas2DAuraRenderer implements AuraRenderer {
   }
 
   render(time: number): void {
-    const e = this.energy;
-    if (!e) return;
+    if (!this.energy) return;
     const { ctx, canvas } = this;
     const { width, height } = canvas;
     const k = this.intensity * revealAt(time);
@@ -213,15 +236,9 @@ class Canvas2DAuraRenderer implements AuraRenderer {
     ctx.fillStyle = `rgba(0,0,0,${0.5 * k})`;
     ctx.fillRect(0, 0, width, height);
     ctx.globalCompositeOperation = 'lighter';
-    e.colors.forEach((rgb, i) => {
+    this.tinted.forEach((tinted, i) => {
       const pulse = 1 + 0.08 * Math.sin(time * 1.6 + i);
       const blur = short * (0.015 + 0.05 * (i + 1) * this.intensity) * pulse;
-      const tinted = layer(width, height, (c) => {
-        c.drawImage(this.silhouette, 0, 0);
-        c.globalCompositeOperation = 'source-in';
-        c.fillStyle = `rgb(${rgb.map((v) => Math.round(v * 255)).join(',')})`;
-        c.fillRect(0, 0, width, height);
-      });
       ctx.globalAlpha = Math.min(1, k * (1.1 - i * 0.25));
       ctx.filter = `blur(${blur}px)`;
       ctx.drawImage(tinted, 0, -blur * 0.3);
