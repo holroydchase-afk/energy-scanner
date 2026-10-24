@@ -81,3 +81,27 @@ test('ES-R48 the first phone screen pitches the on-device aura, and the demo but
   await page.getByRole('button', { name: 'See the aura demo' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
 });
+
+test('ES-R62 after a palm scan the whole reading is in view, and the pad stays put', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    const pad = page.locator('.pad');
+    const before = (await pad.boundingBox())!;
+    await pad.focus();
+    await page.keyboard.down('Space');
+    const card = page.getByTestId('energy-reading');
+    await expect(card).toBeVisible({ timeout: 10_000 });
+    await page.keyboard.up('Space');
+    // Whole card in view (allowing for sub-pixel rounding at the edge).
+    await expect(card).toBeInViewport({ ratio: 0.99 });
+    const after = (await pad.boundingBox())!;
+    expect(Math.abs(after.x - before.x)).toBeLessThanOrEqual(2);
+  }
+});
+
+test('ES-R65 the link preview text pitches the on-device aura', async ({ page }) => {
+  await page.goto('/');
+  const content = await page.locator('meta[property="og:description"]').getAttribute('content');
+  expect(content).toContain('Nothing is uploaded');
+});

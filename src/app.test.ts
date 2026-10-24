@@ -218,6 +218,31 @@ describe('bedtime app', () => {
     expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('primary')).toBe(true);
   });
 
+  it('ES-R63, R64 on a laptop the words say click, and upload or try the sample', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;
+    try {
+      const root = mount();
+      expect(root.querySelector('[data-hint]')!.textContent).toBe('Click and hold the scanner until the circle fills');
+      click(root, '[data-mode="photo"]');
+      expect(root.querySelector('.dropzone .lead')!.textContent).toBe('Upload a photo or try the sample, and the scanner shows the energy glowing off the person.');
+    } finally {
+      window.matchMedia = original;
+    }
+    // A phone keeps its words.
+    localStorage.clear();
+    expect(mount().querySelector('[data-hint]')!.textContent).toBe('Put your hand on the scanner and hold');
+  });
+
+  it('ES-R67 when nobody is in the photo, Try the sample comes first', async () => {
+    const empty = { width: 4, height: 4, data: new Float32Array(16) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => empty }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('.viewer .actions .btn:not([hidden])')!.textContent).toBe('Try the sample');
+  });
+
   it('ES-R49 on a laptop (fine pointer) the sample is the main button and there is no camera button', () => {
     const original = window.matchMedia;
     window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;

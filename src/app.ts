@@ -123,6 +123,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   const fmt = (d: Date) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
   const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  // A mouse or trackpad means a laptop or desktop: no camera to open, and you click rather than touch.
+  const finePointer = () => window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
+  /** Bring the reading into view once it's ready (only the page scrolls, up or down). */
+  const revealCard = () => card.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
 
   const showError = (message: string | null) => {
     errorBox.hidden = !message;
@@ -197,7 +201,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <div class="beam"></div>
           <div class="hand" aria-hidden="true">✋</div>
         </button>
-        <p class="hint" data-hint aria-live="polite">Put your hand on the scanner and hold</p>
+        <p class="hint" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
       </div>
     `;
     const pad = $('.pad');
@@ -249,6 +253,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const level = levelFor(energy);
       hint.textContent = 'Scan complete';
       showReading(energy, level);
+      revealCard();
     };
     const press = (id: number | string, e?: Event) => {
       touching.add(id);
@@ -278,9 +283,6 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   };
 
   // ---- Photo scan ----
-  // A mouse or trackpad means a laptop or desktop: no camera to open, so the sample leads.
-  const finePointer = () => window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
-
   const showPhotoStart = () => {
     const actions = finePointer()
       ? `<button type="button" class="btn primary" data-action="sample">Try the sample</button>
@@ -290,7 +292,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
-        <p class="lead">Take a photo and the scanner shows the energy glowing off you.</p>
+        <p class="lead">${finePointer() ? 'Upload a photo or try the sample, and the scanner shows the energy glowing off the person.' : 'Take a photo and the scanner shows the energy glowing off you.'}</p>
         <div class="actions">
           ${actions}
         </div>
@@ -331,7 +333,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         sample.className = 'btn primary';
         sample.dataset.action = 'sample';
         sample.textContent = 'Try the sample';
-        stage.querySelector('.actions')?.append(sample);
+        stage.querySelector('.actions')?.prepend(sample);
       },
     });
     // Bring the photo to the top so the scan, and then the reading, are in view. On a wide screen
@@ -488,6 +490,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const hint = root.querySelector('[data-hint]');
       if (hint) hint.textContent = 'Scan complete';
       showReading(energy, level);
+      revealCard();
       $('[data-action="again"]').focus();
     }
   });

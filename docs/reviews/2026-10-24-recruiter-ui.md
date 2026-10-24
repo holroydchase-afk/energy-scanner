@@ -39,3 +39,18 @@ Biggest risk: a recruiter's first scan reads Grey and they leave.
 
 ## Status
 Fixed in this round: see HANDOFF.md "Done" (PR per batch, tests named with the IDs).
+
+## Round 7 re-review (same night)
+ux-reviewer re-checked every screen on the top of the stack (`m2.22-screenshots`). All 15 round-6 fixes verified, no regressions. New:
+
+| ID | Pri | Where | Problem | Fix |
+|---|---|---|---|---|
+| ES-R62 | P1 | Palm reading, phone and laptop | After a palm scan nothing scrolls, so the reading card sits below the fold ("Scan complete" with the answer hidden). | Scroll the card into view (`block: 'nearest'`, vertical only) after the scan and after See every color. |
+| ES-R63 | P2 | Palm start, laptop | "Put your hand on the scanner" on a mouse device. | "Click and hold the scanner until the circle fills" on a fine pointer. |
+| ES-R64 | P3 | Photo start, laptop | Lead says "Take a photo" but there's no camera button. | "Upload a photo or try the sample, and the scanner shows the energy glowing off the person." |
+| ES-R65 | P3 | Link preview | og:description and og.png say "Runs on the phone" and miss the R48 pitch. | "A live AI aura that runs on your device. Nothing is uploaded." |
+| ES-R66 | P3 | README | Still says tap Photo scan, then Try the sample. | "No photo handy? Tap See the aura demo." |
+| ES-R67 | P3 | No person found | Primary button sits second. | Try the sample first. |
+| ES-R68 | P3 | README aura shots | Rounded corners filled with page color; dark corners on GitHub light theme. | Square, cropped canvas shots. |
+
+All seven fixed in `m2.23-round7`. Verdict after the fixes: share-ready; still needs Chase's iPhone for R51 (photo fit) and Save video / Share.

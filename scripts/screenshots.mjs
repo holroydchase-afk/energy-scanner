@@ -58,6 +58,17 @@ async function sample(page) {
   await page.getByRole('button', { name: 'Try the sample' }).click({ force: true });
   await page.waitForSelector('canvas.aura', { timeout: 60_000 });
   await page.waitForTimeout(2500);
+  // Square corners, so the README image has no page color in its corners (GitHub's light theme).
+  await page.locator('canvas.aura').evaluate((c) => (c.style.borderRadius = '0'));
+}
+
+/** Just the aura canvas, cropped inside its edges so no page color shows at a fractional border. */
+async function auraShot(page, path) {
+  const box = await page.locator('canvas.aura').boundingBox();
+  const x = Math.ceil(box.x);
+  const y = Math.ceil(box.y);
+  const clip = { x, y, width: Math.floor(box.x + box.width) - x, height: Math.floor(box.y + box.height) - y };
+  await page.screenshot({ path, clip });
 }
 
 try {
@@ -77,13 +88,13 @@ try {
   // Photo scan of the sample: Grey (the grown-up switch on) and Rainbow (bedtime far off, nothing done).
   const grey = await open(MOBILE);
   await sample(grey);
-  await grey.locator('canvas.aura').screenshot({ path: `${out}/aura-grey.png` });
+  await auraShot(grey, `${out}/aura-grey.png`);
   // One scanner at a time: software GL in headless Chromium struggles with several.
   await grey.close();
 
   const rainbow = await open(MOBILE, { alwaysGrey: false });
   await sample(rainbow);
-  await rainbow.locator('canvas.aura').screenshot({ path: `${out}/aura-rainbow.png` });
+  await auraShot(rainbow, `${out}/aura-rainbow.png`);
   await rainbow.close();
 
   // Link preview (1200x630): the Rainbow aura beside the name and promise.
@@ -96,7 +107,7 @@ try {
       <div>
         <div style="font-size:72px;font-weight:800;line-height:1;background:linear-gradient(90deg,#ffd36e,#ff6ec7,#8b7bff,#4fe3ff);-webkit-background-clip:text;color:transparent">Energy Scanner</div>
         <p style="font-size:34px;line-height:1.3;margin:28px 0 0">A bedtime helper for kids: finish the steps, then scan.</p>
-        <p style="font-size:26px;color:#b9b3d9;margin:24px 0 0">Runs on the phone. Photos never leave the device.</p>
+        <p style="font-size:26px;color:#b9b3d9;margin:24px 0 0">A live AI aura that runs on your device. Nothing is uploaded.</p>
       </div>
     </body>`);
   await card.screenshot({ path: 'public/og.png' });

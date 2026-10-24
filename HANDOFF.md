@@ -23,7 +23,8 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
-- 2026-10-24 night shift, screenshots (branch `m2.22-screenshots`, stacked on `m2.21-ui-polish`): README screenshots and `public/og.png` regenerated from the new UI with `npm run screenshots`; the start and palm shots now show a first visit (Always Grey off, 7pm). Round 7 re-review running.
+- 2026-10-24 night shift, round 7 (branch `m2.23-round7`, stacked on `m2.22-screenshots`): ux-reviewer verified all 15 round-6 fixes and found 7 more, all fixed here with tests first: R62 (P1) the palm reading scrolls into view when it's ready; R63 laptops say "Click and hold"; R64 laptop photo lead matches its buttons; R65 link preview text and og.png pitch the on-device aura; R66 README points to See the aura demo; R67 Try the sample first when nobody's in the photo; R68 README aura shots have square, clean corners. Nothing at P2 or above is left.
+- 2026-10-24 night shift, screenshots (branch `m2.22-screenshots`, stacked on `m2.21-ui-polish`): README screenshots and `public/og.png` regenerated from the new UI with `npm run screenshots`; the start and palm shots now show a first visit (Always Grey off, 7pm). 
 - 2026-10-24 night shift, UI polish (branch `m2.21-ui-polish`, stacked on `m2.20-photo-polish`), failing tests first:
   - R53: with Always Grey on, See every color is the main button beside Scan again; the note says it's a grown-up setting.
   - R55: "By Chase Holroyd · Case study" under the title; the footer link reads "Read the case study".
@@ -35,7 +36,7 @@ _Updated 2026-10-22._
   - R49: on a laptop (mouse or trackpad) the photo screen leads with Try the sample and drops Take a photo, which only opened the same file picker there. Phones are unchanged.
   - R51: on phones the photo is capped at 58% of the screen so the caption and buttons fit under it (confirm on an iPhone).
   - R52: one main button on the result (Save image when there's no share sheet); the card says "Scan this photo again" in photo mode.
-  - R54: on wide screens the scan keeps the switch in view instead of scrolling the header away; the reading card sits at the top of a 400px column.
+  - R54: on wide screens the scan keeps the Palm/Photo switch in view (the title scrolls off; title plus photo can't both fit in 800px); the reading card sits at the top of a 400px column.
   - R59: a photo with nobody in it is dimmed and Try the sample is the main button.
 - 2026-10-24 night shift, recruiter-first (branch `m2.19-recruiter-first`, stacked on #29): staff-pm and ux-reviewer round 6 in `docs/reviews/2026-10-24-recruiter-ui.md` (ES-R47 to R61, no P0). Fixed here, failing tests first:
   - R61: Always Grey is off for a first visit, so the demo reads in color; anyone who turned it on keeps it (decision below).
@@ -92,10 +93,10 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- 2026-10-24 night shift: recruiter-share readiness with a UI focus (Chase's steer: "Prioritize sharing with a recruiter readiness. Move past blockers. Improve the ui"). Stacked draft PRs on the default branch, starting with this HANDOFF sync (`m2.18-handoff-sync`).
+- Nothing. The 2026-10-24 night shift (recruiter-share readiness, UI focus) is done: round 6 and 7 reviews in `docs/reviews/2026-10-24-recruiter-ui.md`, ES-R47 to R68 all fixed in stacked draft PRs #29 to #34, CI green. Nothing is live until Chase merges.
 
 ## Exact next step
-- Night shift: re-review the top of the stack (round 7) and regenerate README screenshots and og.png. Done so far: all of R47 to R61. Originally: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
+- Chase: review and merge the stack top-down, #34 → #33 → #32 → #31 → #30 → #29 (each into the branch below; #29 into the default branch deploys). Then a 60-second phone check of the live site: link preview, first screen, See the aura demo, palm scan, Save/Share.
 - Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: live aura on the camera feed.

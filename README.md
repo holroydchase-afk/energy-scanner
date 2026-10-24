@@ -4,7 +4,7 @@
 
 Everything runs in your browser. **Photos never leave your device.** There is no server, no account and no tracking.
 
-**Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **Photo scan**, then **Try the sample**.
+**Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **See the aura demo**.
 
 <p align="center">
   <img src="docs/screenshots/start-mobile.png" alt="Start screen: what it is, a See the aura demo button, bedtime steps, the Palm scan and Photo scan switch, and the palm pad" width="200" />
