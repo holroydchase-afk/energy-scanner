@@ -23,6 +23,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-24 night shift, screenshots (branch `m2.22-screenshots`, stacked on `m2.21-ui-polish`): README screenshots and `public/og.png` regenerated from the new UI with `npm run screenshots`; the start and palm shots now show a first visit (Always Grey off, 7pm). Round 7 re-review running.
 - 2026-10-24 night shift, UI polish (branch `m2.21-ui-polish`, stacked on `m2.20-photo-polish`), failing tests first:
   - R53: with Always Grey on, See every color is the main button beside Scan again; the note says it's a grown-up setting.
   - R55: "By Chase Holroyd · Case study" under the title; the footer link reads "Read the case study".

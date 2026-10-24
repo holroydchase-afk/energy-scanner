@@ -61,8 +61,8 @@ async function sample(page) {
 }
 
 try {
-  // Start screen and a palm scan reading (Always Grey on, the default).
-  const start = await open(MOBILE, { evening: true });
+  // Start screen and a palm scan reading at 7pm, as a first visit sees it (Always Grey off).
+  const start = await open(MOBILE, { evening: true, alwaysGrey: false });
   await start.waitForTimeout(300);
   await start.screenshot({ path: `${out}/start-mobile.png` });
   await start.locator('.pad').focus();
@@ -74,7 +74,7 @@ try {
   await start.screenshot({ path: `${out}/palm-mobile.png`, fullPage: true });
   await start.close();
 
-  // Photo scan of the sample: Grey (the default) and Rainbow (bedtime far off, nothing done).
+  // Photo scan of the sample: Grey (the grown-up switch on) and Rainbow (bedtime far off, nothing done).
   const grey = await open(MOBILE);
   await sample(grey);
   await grey.locator('canvas.aura').screenshot({ path: `${out}/aura-grey.png` });
