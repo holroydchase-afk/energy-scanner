@@ -72,7 +72,7 @@ describe('bedtimeFor', () => {
 
 describe('helpers', () => {
   it('lists the steps left', () => {
-    expect(todoLine(STEPS.slice(3))).toBe('Still to do: Potty, Book. Then scan again.');
+    expect(todoLine(STEPS.slice(3))).toBe('Steps left tonight: Potty, Book.'); // ES-R50
     expect(todoLine([])).toMatch(/All steps done/);
   });
   it('makes sleepy auras softer and slower', () => {

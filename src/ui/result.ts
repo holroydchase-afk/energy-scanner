@@ -102,6 +102,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     const field = buildAuraField(mask, photo.width / photo.height);
     frame.classList.remove('scanning');
     if (!field.box) {
+      frame.classList.add('noperson');
       status.textContent = 'No person found in this photo. Try one where someone is clearly visible.';
       status.classList.add('warn');
       options.onNoPerson?.();
@@ -154,6 +155,8 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     button('save-video').hidden = !canRecordVideo();
     // The share sheet is a phone thing; desktops get the save buttons.
     button('share').hidden = typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function';
+    // One main button: Share where there's a share sheet, otherwise Save image.
+    button('save-image').classList.toggle('primary', button('share').hidden);
   };
   // Cancels a recording in progress when this view goes away (New photo, another mode).
   const saving = new AbortController();

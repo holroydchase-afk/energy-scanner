@@ -15,7 +15,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 
 ## Portfolio / public presence
 _Updated 2026-10-22._
-- **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. In draft PRs #16 to #24; live after Chase merges.
+- **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. Merged as PR #16 and live since Oct 23.
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
 - **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, merged Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed.
 - **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
@@ -23,6 +23,27 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-24 night shift, round 7 (branch `m2.23-round7`, stacked on `m2.22-screenshots`): ux-reviewer verified all 15 round-6 fixes and found 7 more, all fixed here with tests first: R62 (P1) the palm reading scrolls into view when it's ready; R63 laptops say "Click and hold"; R64 laptop photo lead matches its buttons; R65 link preview text and og.png pitch the on-device aura; R66 README points to See the aura demo; R67 Try the sample first when nobody's in the photo; R68 README aura shots have square, clean corners, and the palm README shot no longer shows a background seam. Nothing at P2 or above is left.
+- 2026-10-24 night shift, screenshots (branch `m2.22-screenshots`, stacked on `m2.21-ui-polish`): README screenshots and `public/og.png` regenerated from the new UI with `npm run screenshots`; the start and palm shots now show a first visit (Always Grey off, 7pm). 
+- 2026-10-24 night shift, UI polish (branch `m2.21-ui-polish`, stacked on `m2.20-photo-polish`), failing tests first:
+  - R53: with Always Grey on, See every color is the main button beside Scan again; the note says it's a grown-up setting.
+  - R55: "By Chase Holroyd · Case study" under the title; the footer link reads "Read the case study".
+  - R56: steps look tappable (less grey) and the label says "Tap each step when done".
+  - R57: no repeated privacy line above the footer; the grown-up rules are two short sentences.
+  - R58: the clock is smaller and plain so the title leads.
+  - R60: the palm hint says "Scan complete" instead of repeating the card title.
+- 2026-10-24 night shift, photo screen polish (branch `m2.20-photo-polish`, stacked on `m2.19-recruiter-first`), failing tests first:
+  - R49: on a laptop (mouse or trackpad) the photo screen leads with Try the sample and drops Take a photo, which only opened the same file picker there. Phones are unchanged.
+  - R51: on phones the photo is capped at 58% of the screen so the caption and buttons fit under it (confirm on an iPhone).
+  - R52: one main button on the result (Save image when there's no share sheet); the card says "Scan this photo again" in photo mode.
+  - R54: on wide screens the scan keeps the Palm/Photo switch in view (the title scrolls off; title plus photo can't both fit in 800px); the reading card sits at the top of a 400px column.
+  - R59: a photo with nobody in it is dimmed and Try the sample is the main button.
+- 2026-10-24 night shift, recruiter-first (branch `m2.19-recruiter-first`, stacked on #29): staff-pm and ux-reviewer round 6 in `docs/reviews/2026-10-24-recruiter-ui.md` (ES-R47 to R61, no P0). Fixed here, failing tests first:
+  - R61: Always Grey is off for a first visit, so the demo reads in color; anyone who turned it on keeps it (decision below).
+  - R48: the first screen pitches the on-device AI aura ("Nothing is uploaded") with a See the aura demo button that scans the illustrated sample.
+  - R47: on wide screens the palm reading is centred under the pad again (regression from R46).
+  - R50: the to-do line is a quiet "Steps left tonight: …", moon yellow only when all steps are done.
+- 2026-10-23 Power Hour 2: stack #25 to #28 collapsed into PR #16; Chase merged #16 ("ok 1") and the Pages deploy succeeded at 20:03 UTC (Actions "pages" #4). Live since then: recruiter-ready sprint, round 4 UI fixes, night-shift hardening (ES-R1 to R46). The live site was not checked from the sandbox (chaseholroyd.com is blocked here).
 - 2026-10-23 night shift, ux-reviewer round 5 (`docs/reviews/2026-10-23-ux-round5.md`, branch `m2.17-palm-layout`): all 15 round-4 fixes verified (R21 to R23 and R28 still need Chase's iPhone). One new P2, ES-R46, fixed: on screens 900px and wider the two-column layout now applies only to the photo result, so the palm pad no longer jumps sideways under a hand when the reading appears (e2e test). Nothing left at P2 or above, so the review loop stops here.
 - 2026-10-23 night shift, rendering hardening (branch `m2.16-harden-render`, stacked on `m2.15-harden-app`), from `docs/reviews/2026-10-23-hardening.md`:
   - R37 (P1): when WebGL2 setup fails, the Canvas 2D fallback now gets its own canvas (a canvas that gave out a WebGL context can't give a 2D one), and a drawing failure shows a message instead of hanging on "Scanning energy…".
@@ -72,12 +93,11 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Power Hour 2 (Oct 23): the stack is collapsed. #25 to #28 were fast-forwarded down into `m2.5-agents-sync`, so PR #16 now holds everything: the recruiter-ready sprint, round 4 UI fixes (ES-R21 to R35), night-shift hardening (ES-R36 to R45) and ES-R46. Nothing since PR #15 is live yet.
+- Nothing. The 2026-10-24 night shift (recruiter-share readiness, UI focus) is done: round 6 and 7 reviews in `docs/reviews/2026-10-24-recruiter-ui.md`, ES-R47 to R68 all fixed in stacked draft PRs #29 to #34, CI green. Nothing is live until Chase merges.
 
 ## Exact next step
-- Chase merges PR #16 into the default branch (that deploys to chaseholroyd.com/energy-scanner/). CI green.
-- After it's live: Chase rescans his three real photos on his iPhone (the tiles, fringe and wash-out fixes need a real phone to confirm, AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`).
-- After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
+- Chase: review and merge the stack top-down, #34 → #33 → #32 → #31 → #30 → #29 (each into the branch below; #29 into the default branch deploys). Then a 60-second phone check of the live site: link preview, first screen, See the aura demo, palm scan, Save/Share.
+- Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: live aura on the camera feed.
 
@@ -92,14 +112,14 @@ _Updated 2026-10-22._
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
-- Always Grey stays on by default (the parent feature); the reading card now says how to see other colors. Alternative: default it off on the public demo.
+- Always Grey is off for first visits (Oct 24 night shift, ES-R61, Chase asked to move past blockers): a recruiter's first scan reads in color. A saved choice is kept, so families who turned it on still get Grey. To revert: `store.get('alwaysGrey', true)` in `src/app.ts`.
 - The app is dark-only on purpose (night theme); light mode renders the same.
 - Try the sample uses an illustrated child drawn in code, labeled "Illustrated sample, not a real person", so no real person is ever shown.
 - Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - The aura color comes from tonight's reading (the v1 auto-picked energy types were removed Oct 23). Background is dimmed up to 65% so the aura reads on bright photos.
-- "See every color" (Oct 23, recommended, Chase's call pending): one tap from the Always Grey note turns it off and re-scans; the default stays on.
+- "See every color" (Chase chose "Add the button", Oct 23): one tap from the Always Grey note turns it off and re-scans; the default stays on.
 - Scan again in photo mode re-scans the same photo instead of going back to Take a photo, so ticking a step and scanning again just works (qa-tdd's recommendation; New photo still picks a new one).
 - Saved-settings keys stay unprefixed (`bed`, `mode`, `alwaysGrey`, `steps-…`) on the shared chaseholroyd.com origin; values are validated instead. Prefixing would reset everyone's settings unless migrated; no collision is known.
 - Dark-only (no light theme): it's a night-time app; the ux-reviewer recommends keeping it.

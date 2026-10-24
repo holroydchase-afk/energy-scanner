@@ -81,6 +81,22 @@ describe('showResult', () => {
     view.destroy();
   });
 
+  it('ES-R52 without a share sheet, Save image is the main button', async () => {
+    const view = showResult(stage, photo(), {
+      ...base,
+      getSegmenter: async () => fakeSegmenter((x, y) => Math.hypot(x - 32, y - 32) < 16),
+    });
+    await flush();
+    expect(stage.querySelector('[data-action="save-image"]')!.classList.contains('primary')).toBe(true);
+    view.destroy();
+  });
+
+  it('ES-R59 dims the photo when nobody is in it', async () => {
+    showResult(stage, photo(), { ...base, getSegmenter: async () => fakeSegmenter(() => false) });
+    await flush();
+    expect(stage.querySelector('.frame')!.classList.contains('noperson')).toBe(true);
+  });
+
   it('uses the given intensity and says when it is ready', async () => {
     const onReady = vi.fn();
     const view = showResult(stage, photo(), {

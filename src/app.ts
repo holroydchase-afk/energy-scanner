@@ -55,7 +55,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   let done = loadSteps(night);
   const savedBed = store.get<unknown>('bed', '20:00');
   let bed = typeof savedBed === 'string' && BED_PATTERN.test(savedBed) ? savedBed : '20:00';
-  let alwaysGrey = store.get('alwaysGrey', true);
+  // Off for a first visit, so the demo shows the colors; a grown-up who turned it on keeps it.
+  let alwaysGrey = store.get('alwaysGrey', false);
   let mode: Mode = store.get<Mode>('mode', 'palm') === 'photo' ? 'photo' : 'palm';
   let view: ResultView | null = null;
 
@@ -64,10 +65,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <h1 class="logo">Energy Scanner</h1>
       <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
     </header>
+    <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
     <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
+    <p class="pitch"><span>Photo scan draws a live aura around a person with AI that runs on your device. Nothing is uploaded.</span> <button type="button" class="btn small primary" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
-      <div class="steplbl"><span>Bedtime steps</span><span data-count></span></div>
+      <div class="steplbl"><span>Tap each step when done</span><span data-count></span></div>
       <div class="steps"></div>
     </section>
     <div class="mode" role="radiogroup" aria-label="Scan with">
@@ -84,8 +87,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       </div>
       <p class="rc-text"></p>
       <p class="rc-todo"></p>
-      <p class="rc-note" hidden>Always Grey is on, so every scan reads Grey. <button type="button" class="btn small" data-action="see-colors">See every color</button></p>
-      <button type="button" class="btn" data-action="again">Scan again</button>
+      <p class="rc-note" hidden>Always Grey is on (a grown-up setting), so every scan reads Grey.</p>
+      <div class="rc-actions">
+        <button type="button" class="btn primary" data-action="see-colors" hidden>See every color</button>
+        <button type="button" class="btn" data-action="again">Scan again</button>
+      </div>
     </section>
     </div>
     </main>
@@ -97,13 +103,13 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <label>Always read Grey Energy <input type="checkbox" data-input="always" /></label>
         <div class="row"><button type="button" class="btn small" data-action="clear">Clear tonight's steps</button></div>
-        <p>With Always Grey on, every scan comes back Grey. Turn it off and it reads by the clock: the closer to bedtime and the more steps done, the sleepier the color. A little randomness keeps it from feeling canned, but it never says Rainbow once all five steps are done.</p>
-        <p>Photo scans run entirely on this device. Photos are never uploaded or saved unless you tap Save.</p>
+        <p>With Always Grey on, every scan comes back Grey.</p>
+        <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
       </div>
     </details>
     <footer class="foot">
       <p>Runs entirely in your browser. Photos never leave your device.</p>
-      <p class="credit"><span>A portfolio project by <a href="https://chaseholroyd.com/energy-scanner.html">Chase Holroyd</a></span><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+      <p class="credit"><a href="https://chaseholroyd.com/energy-scanner.html">Read the case study</a><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
     </footer>
     <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
@@ -117,6 +123,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   const fmt = (d: Date) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
   const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  // A mouse or trackpad means a laptop or desktop: no camera to open, and you click rather than touch.
+  const finePointer = () => window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
+  /** Bring the reading into view once it's ready (only the page scrolls, up or down). */
+  const revealCard = () => card.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
 
   const showError = (message: string | null) => {
     errorBox.hidden = !message;
@@ -172,7 +182,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
+    $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
+    $('[data-action="see-colors"]').hidden = !alwaysGrey;
+    $('[data-action="again"]').textContent = lastPhoto ? 'Scan this photo again' : 'Scan again';
     card.hidden = false;
   };
 
@@ -188,7 +201,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <div class="beam"></div>
           <div class="hand" aria-hidden="true">✋</div>
         </button>
-        <p class="hint" data-hint aria-live="polite">Put your hand on the scanner and hold</p>
+        <p class="hint" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
       </div>
     `;
     const pad = $('.pad');
@@ -238,8 +251,9 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       }
       const energy = scanEnergy();
       const level = levelFor(energy);
-      hint.textContent = `${level.name} detected`;
+      hint.textContent = 'Scan complete';
       showReading(energy, level);
+      revealCard();
     };
     const press = (id: number | string, e?: Event) => {
       touching.add(id);
@@ -270,19 +284,26 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
 
   // ---- Photo scan ----
   const showPhotoStart = () => {
+    const actions = finePointer()
+      ? `<button type="button" class="btn primary" data-action="sample">Try the sample</button>
+          <button type="button" class="btn" data-action="upload">Upload a photo</button>`
+      : `<button type="button" class="btn primary" data-action="camera">Take a photo</button>
+          <button type="button" class="btn" data-action="upload">Upload a photo</button>`;
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
-        <p class="lead">Take a photo and the scanner shows the energy glowing off you.</p>
+        <p class="lead">${finePointer() ? 'Upload a photo or try the sample, and the scanner shows the energy glowing off the person.' : 'Take a photo and the scanner shows the energy glowing off you.'}</p>
         <div class="actions">
-          <button type="button" class="btn primary" data-action="camera">Take a photo</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>
+          ${actions}
         </div>
         <p class="hint">or drop a photo anywhere on this page</p>
-        <p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>
+        ${finePointer() ? '' : '<p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>'}
       </div>
     `;
   };
+
+  /** The photo screen's first button (Take a photo, or Try the sample on a laptop). */
+  const focusPhotoStart = () => root.querySelector<HTMLElement>('.dropzone .actions .btn')?.focus();
 
   let lastPhoto: { photo: HTMLCanvasElement; caption?: string } | null = null;
 
@@ -303,20 +324,22 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       caption,
       onReset: () => {
         showMode();
-        root.querySelector<HTMLElement>('[data-action="camera"]')?.focus();
+        focusPhotoStart();
       },
       onReady: () => showReading(energy, level),
       onNoPerson: () => {
         const sample = document.createElement('button');
         sample.type = 'button';
-        sample.className = 'btn';
+        sample.className = 'btn primary';
         sample.dataset.action = 'sample';
         sample.textContent = 'Try the sample';
-        stage.querySelector('.actions')?.append(sample);
+        stage.querySelector('.actions')?.prepend(sample);
       },
     });
-    // Bring the photo to the top so the scan, and then the reading, are in view.
-    stage.scrollIntoView?.({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    // Bring the photo to the top so the scan, and then the reading, are in view. On a wide screen
+    // the photo and reading fit beside each other, so keep the scan switch in view too.
+    const wide = window.matchMedia?.('(min-width: 900px)').matches ?? false;
+    (wide ? $('.mode') : stage).scrollIntoView?.({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
   // Bumped whenever the stage changes, so a photo that finishes decoding late is dropped.
@@ -371,6 +394,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     renderSteps();
   });
 
+  $('[data-action="demo"]').addEventListener('click', () => {
+    if (mode !== 'photo') setMode('photo');
+    usePhoto(drawSamplePerson(), SAMPLE_CAPTION);
+  });
+
   $('.mode').addEventListener('click', (e) => {
     const m = (e.target as HTMLElement).closest<HTMLElement>('[data-mode]')?.dataset.mode as Mode | undefined;
     if (m && m !== mode) setMode(m);
@@ -400,7 +428,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       return;
     }
     showMode();
-    root.querySelector<HTMLElement>(mode === 'palm' ? '.pad' : '[data-action="camera"]')?.focus();
+    if (mode === 'palm') root.querySelector<HTMLElement>('.pad')?.focus();
+    else focusPhotoStart();
   });
 
   for (const input of [uploadInput, captureInput]) {
@@ -459,8 +488,9 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const energy = scanEnergy();
       const level = levelFor(energy);
       const hint = root.querySelector('[data-hint]');
-      if (hint) hint.textContent = `${level.name} detected`;
+      if (hint) hint.textContent = 'Scan complete';
       showReading(energy, level);
+      revealCard();
       $('[data-action="again"]').focus();
     }
   });

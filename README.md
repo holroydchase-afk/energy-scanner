@@ -4,11 +4,11 @@
 
 Everything runs in your browser. **Photos never leave your device.** There is no server, no account and no tracking.
 
-**Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **Photo scan**, then **Try the sample**.
+**Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **See the aura demo**.
 
 <p align="center">
-  <img src="docs/screenshots/start-mobile.png" alt="Start screen: bedtime steps, a Palm scan and Photo scan switch, and the palm pad" width="200" />
-  <img src="docs/screenshots/palm-mobile.png" alt="A palm scan reading Grey Energy with the steps still to do" width="200" />
+  <img src="docs/screenshots/start-mobile.png" alt="Start screen: what it is, a See the aura demo button, bedtime steps, the Palm scan and Photo scan switch, and the palm pad" width="200" />
+  <img src="docs/screenshots/palm-mobile.png" alt="A palm scan an hour before bedtime reading Red Rocket Energy, with the steps left tonight" width="200" />
   <img src="docs/screenshots/aura-rainbow.png" alt="The illustrated sample child with a glowing Rainbow aura" width="200" />
   <img src="docs/screenshots/aura-grey.png" alt="The same sample with a soft Grey aura at bedtime" width="200" />
 </p>

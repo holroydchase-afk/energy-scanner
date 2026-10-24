@@ -49,9 +49,17 @@ describe('bedtime app', () => {
     expect(root.querySelector('.tagline')?.textContent).toBe('A bedtime helper for kids: finish the steps, then scan.');
     const links = [...root.querySelectorAll<HTMLAnchorElement>('.foot a')].map((a) => [a.textContent, a.href]);
     expect(links).toEqual([
-      ['Chase Holroyd', 'https://chaseholroyd.com/energy-scanner.html'],
+      ['Read the case study', 'https://chaseholroyd.com/energy-scanner.html'],
       ['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner'],
     ]);
+    // ES-R55: who made it, near the top.
+    const byline = [...root.querySelectorAll<HTMLAnchorElement>('.byline a')].map((a) => [a.textContent, a.href]);
+    expect(byline).toEqual([
+      ['Chase Holroyd', 'https://chaseholroyd.com/'],
+      ['Case study', 'https://chaseholroyd.com/energy-scanner.html'],
+    ]);
+    // ES-R56: the steps say they can be tapped.
+    expect(root.querySelector('.steplbl span')?.textContent).toBe('Tap each step when done');
   });
 
   it('ticks off steps and remembers them tonight', () => {
@@ -85,21 +93,28 @@ describe('bedtime app', () => {
     expect(palm.getAttribute('aria-checked')).toBe('true');
   });
 
-  it('palm scan reads Grey with the grown-up switch on (the default)', async () => {
+  it('palm scan reads Grey with the grown-up switch on', async () => {
+    localStorage.setItem('alwaysGrey', 'true');
     const root = mount({ holdMs: 1 });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
     await new Promise((r) => setTimeout(r, 60));
     const card = root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!;
     expect(card.hidden).toBe(false);
     expect(card.querySelector('.rc-name')!.textContent).toBe('Grey Energy');
-    expect(card.querySelector('.rc-todo')!.textContent).toMatch(/Still to do: Bath, PJs, Teeth, Potty, Book/);
+    expect(card.querySelector('.rc-todo')!.textContent).toBe('Steps left tonight: Bath, PJs, Teeth, Potty, Book.');
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
-    expect(note.textContent).toBe('Always Grey is on, so every scan reads Grey. See every color');
+    expect(note.textContent).toBe('Always Grey is on (a grown-up setting), so every scan reads Grey.');
+    // ES-R53: the way to the colors is the main button, next to Scan again.
+    const see = card.querySelector<HTMLElement>('.rc-actions [data-action="see-colors"]')!;
+    expect([see.hidden, see.classList.contains('primary')]).toEqual([false, true]);
+    // ES-R60: the hint doesn't repeat the card's title.
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scan complete');
   });
 
   it('See every color turns Always Grey off and scans again in color', async () => {
     // Noon with an 8pm bedtime and nothing done: Rainbow once Always Grey is off.
+    localStorage.setItem('alwaysGrey', 'true');
     const root = mount({ holdMs: 1, now: () => new Date(2026, 9, 21, 12, 0) });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
     await new Promise((r) => setTimeout(r, 60));
@@ -110,9 +125,11 @@ describe('bedtime app', () => {
     expect(localStorage.getItem('alwaysGrey')).toBe('false');
     expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
     expect(root.querySelector<HTMLElement>('.rc-note')!.hidden).toBe(true);
+    expect(see.hidden).toBe(true);
   });
 
   it('See every color re-scans the same photo', async () => {
+    localStorage.setItem('alwaysGrey', 'true');
     let scans = 0;
     const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
     const root = mount({
@@ -126,6 +143,25 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(scans).toBe(2);
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+  });
+
+  it('ES-R61 a first visit reads in color; a saved Always Grey choice is kept', () => {
+    expect(mount().querySelector<HTMLInputElement>('[data-input="always"]')!.checked).toBe(false);
+    localStorage.setItem('alwaysGrey', 'true');
+    expect(mount().querySelector<HTMLInputElement>('[data-input="always"]')!.checked).toBe(true);
+  });
+
+  it('ES-R48 the first screen pitches the on-device aura with a one-tap demo', async () => {
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
+    const pitch = root.querySelector('.pitch')!.textContent!;
+    expect(pitch).toContain('AI that runs on your device');
+    expect(pitch).toContain('Nothing is uploaded');
+    click(root, '[data-action="demo"]');
+    expect(root.querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(false);
   });
 
   it('a palm scan released too early is not counted', () => {
@@ -178,6 +214,57 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(root.querySelector('[role="status"]')!.textContent).toMatch(/No person found/);
     expect(root.querySelector('.viewer [data-action="sample"]')?.textContent).toBe('Try the sample');
+    // ES-R59: the way forward is the main button.
+    expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('primary')).toBe(true);
+  });
+
+  it('ES-R63, R64 on a laptop the words say click, and upload or try the sample', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;
+    try {
+      const root = mount();
+      expect(root.querySelector('[data-hint]')!.textContent).toBe('Click and hold the scanner until the circle fills');
+      click(root, '[data-mode="photo"]');
+      expect(root.querySelector('.dropzone .lead')!.textContent).toBe('Upload a photo or try the sample, and the scanner shows the energy glowing off the person.');
+    } finally {
+      window.matchMedia = original;
+    }
+    // A phone keeps its words.
+    localStorage.clear();
+    expect(mount().querySelector('[data-hint]')!.textContent).toBe('Put your hand on the scanner and hold');
+  });
+
+  it('ES-R67 when nobody is in the photo, Try the sample comes first', async () => {
+    const empty = { width: 4, height: 4, data: new Float32Array(16) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => empty }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('.viewer .actions .btn:not([hidden])')!.textContent).toBe('Try the sample');
+  });
+
+  it('ES-R49 on a laptop (fine pointer) the sample is the main button and there is no camera button', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;
+    try {
+      const root = mount();
+      click(root, '[data-mode="photo"]');
+      expect(root.querySelector('[data-action="camera"]')).toBeNull();
+      const first = root.querySelector('.dropzone .actions .btn')!;
+      expect([first.textContent, first.classList.contains('primary')]).toEqual(['Try the sample', true]);
+      expect(root.querySelector('[data-action="upload"]')).not.toBeNull();
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it('ES-R52 in photo mode the card offers to scan this photo again', async () => {
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('[data-action="again"]')!.textContent).toBe('Scan this photo again');
   });
 
   it('opens the phone camera through the native capture input', () => {
