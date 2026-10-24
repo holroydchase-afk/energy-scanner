@@ -15,7 +15,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 
 ## Portfolio / public presence
 _Updated 2026-10-22._
-- **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. In draft PRs #16 to #24; live after Chase merges.
+- **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. Merged as PR #16 and live since Oct 23.
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
 - **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, merged Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed.
 - **Who does what:** the portfolio thread changes the portfolio repo; this project sends it an intake for anything the page should say, and logs the result here.
@@ -23,6 +23,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-23 Power Hour 2: stack #25 to #28 collapsed into PR #16; Chase merged #16 ("ok 1") and the Pages deploy succeeded at 20:03 UTC (Actions "pages" #4). Live since then: recruiter-ready sprint, round 4 UI fixes, night-shift hardening (ES-R1 to R46). The live site was not checked from the sandbox (chaseholroyd.com is blocked here).
 - 2026-10-23 night shift, ux-reviewer round 5 (`docs/reviews/2026-10-23-ux-round5.md`, branch `m2.17-palm-layout`): all 15 round-4 fixes verified (R21 to R23 and R28 still need Chase's iPhone). One new P2, ES-R46, fixed: on screens 900px and wider the two-column layout now applies only to the photo result, so the palm pad no longer jumps sideways under a hand when the reading appears (e2e test). Nothing left at P2 or above, so the review loop stops here.
 - 2026-10-23 night shift, rendering hardening (branch `m2.16-harden-render`, stacked on `m2.15-harden-app`), from `docs/reviews/2026-10-23-hardening.md`:
   - R37 (P1): when WebGL2 setup fails, the Canvas 2D fallback now gets its own canvas (a canvas that gave out a WebGL context can't give a 2D one), and a drawing failure shows a message instead of hanging on "Scanning energy…".
@@ -72,12 +73,11 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Power Hour 2 (Oct 23): the stack is collapsed. #25 to #28 were fast-forwarded down into `m2.5-agents-sync`, so PR #16 now holds everything: the recruiter-ready sprint, round 4 UI fixes (ES-R21 to R35), night-shift hardening (ES-R36 to R45) and ES-R46. Nothing since PR #15 is live yet.
+- 2026-10-24 night shift: recruiter-share readiness with a UI focus (Chase's steer: "Prioritize sharing with a recruiter readiness. Move past blockers. Improve the ui"). Stacked draft PRs on the default branch, starting with this HANDOFF sync (`m2.18-handoff-sync`).
 
 ## Exact next step
-- Chase merges PR #16 into the default branch (that deploys to chaseholroyd.com/energy-scanner/). CI green.
-- After it's live: Chase rescans his three real photos on his iPhone (the tiles, fringe and wash-out fixes need a real phone to confirm, AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`).
-- After merge, the portfolio's Energy Scanner page can use `docs/screenshots/aura-rainbow.png` (intake for Product Studio, WEB-M4.7).
+- Night shift: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
+- Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: live aura on the camera feed.
 
@@ -99,7 +99,7 @@ _Updated 2026-10-22._
 
 - Selfie segmenter (250 KB) over the multiclass model (16 MB): sharper edges, 4x faster; misses fine hair detail.
 - The aura color comes from tonight's reading (the v1 auto-picked energy types were removed Oct 23). Background is dimmed up to 65% so the aura reads on bright photos.
-- "See every color" (Oct 23, recommended, Chase's call pending): one tap from the Always Grey note turns it off and re-scans; the default stays on.
+- "See every color" (Chase chose "Add the button", Oct 23): one tap from the Always Grey note turns it off and re-scans; the default stays on.
 - Scan again in photo mode re-scans the same photo instead of going back to Take a photo, so ticking a step and scanning again just works (qa-tdd's recommendation; New photo still picks a new one).
 - Saved-settings keys stay unprefixed (`bed`, `mode`, `alwaysGrey`, `steps-…`) on the shared chaseholroyd.com origin; values are validated instead. Prefixing would reset everyone's settings unless migrated; no collision is known.
 - Dark-only (no light theme): it's a night-time app; the ux-reviewer recommends keeping it.
