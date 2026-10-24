@@ -24,6 +24,7 @@ test('the production build ships a Content Security Policy that blocks other ori
 });
 
 test('palm scan: hold the pad to get a reading', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
   await page.getByRole('button', { name: 'Bath' }).click();
   const pad = page.getByRole('button', { name: /Press and hold/ });
@@ -55,4 +56,28 @@ test('ES-R46 on a wide screen the palm pad stays put when the reading appears', 
   await page.keyboard.up('Space');
   const after = await pad.boundingBox();
   expect(Math.abs(after!.x + after!.width / 2 - (before!.x + before!.width / 2))).toBeLessThanOrEqual(2);
+});
+
+test('ES-R47 on a wide screen the palm reading is centred under the pad, and ES-R50 the to-do line is quiet', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+  const pad = page.locator('.pad');
+  await pad.focus();
+  await page.keyboard.down('Space');
+  const card = page.getByTestId('energy-reading');
+  await expect(card).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.up('Space');
+  const p = (await pad.boundingBox())!;
+  const c = (await card.boundingBox())!;
+  expect(Math.abs(c.x + c.width / 2 - (p.x + p.width / 2))).toBeLessThanOrEqual(2);
+  const weight = await page.locator('.rc-todo').evaluate((el) => Number(getComputedStyle(el).fontWeight));
+  expect(weight).toBeLessThanOrEqual(600);
+});
+
+test('ES-R48 the first phone screen pitches the on-device aura, and the demo button shows it', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.pitch')).toBeInViewport({ ratio: 1 });
+  await page.getByRole('button', { name: 'See the aura demo' }).click();
+  await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
 });

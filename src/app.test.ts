@@ -85,14 +85,15 @@ describe('bedtime app', () => {
     expect(palm.getAttribute('aria-checked')).toBe('true');
   });
 
-  it('palm scan reads Grey with the grown-up switch on (the default)', async () => {
+  it('palm scan reads Grey with the grown-up switch on', async () => {
+    localStorage.setItem('alwaysGrey', 'true');
     const root = mount({ holdMs: 1 });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
     await new Promise((r) => setTimeout(r, 60));
     const card = root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!;
     expect(card.hidden).toBe(false);
     expect(card.querySelector('.rc-name')!.textContent).toBe('Grey Energy');
-    expect(card.querySelector('.rc-todo')!.textContent).toMatch(/Still to do: Bath, PJs, Teeth, Potty, Book/);
+    expect(card.querySelector('.rc-todo')!.textContent).toBe('Steps left tonight: Bath, PJs, Teeth, Potty, Book.');
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
     expect(note.textContent).toBe('Always Grey is on, so every scan reads Grey. See every color');
@@ -100,6 +101,7 @@ describe('bedtime app', () => {
 
   it('See every color turns Always Grey off and scans again in color', async () => {
     // Noon with an 8pm bedtime and nothing done: Rainbow once Always Grey is off.
+    localStorage.setItem('alwaysGrey', 'true');
     const root = mount({ holdMs: 1, now: () => new Date(2026, 9, 21, 12, 0) });
     root.querySelector('.pad')!.dispatchEvent(new Event('pointerdown'));
     await new Promise((r) => setTimeout(r, 60));
@@ -113,6 +115,7 @@ describe('bedtime app', () => {
   });
 
   it('See every color re-scans the same photo', async () => {
+    localStorage.setItem('alwaysGrey', 'true');
     let scans = 0;
     const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
     const root = mount({
@@ -126,6 +129,25 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(scans).toBe(2);
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+  });
+
+  it('ES-R61 a first visit reads in color; a saved Always Grey choice is kept', () => {
+    expect(mount().querySelector<HTMLInputElement>('[data-input="always"]')!.checked).toBe(false);
+    localStorage.setItem('alwaysGrey', 'true');
+    expect(mount().querySelector<HTMLInputElement>('[data-input="always"]')!.checked).toBe(true);
+  });
+
+  it('ES-R48 the first screen pitches the on-device aura with a one-tap demo', async () => {
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
+    const pitch = root.querySelector('.pitch')!.textContent!;
+    expect(pitch).toContain('AI that runs on your device');
+    expect(pitch).toContain('Nothing is uploaded');
+    click(root, '[data-action="demo"]');
+    expect(root.querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(false);
   });
 
   it('a palm scan released too early is not counted', () => {

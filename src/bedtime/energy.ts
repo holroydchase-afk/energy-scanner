@@ -150,7 +150,7 @@ export function bedtimeFor(now: Date, bed: string): Date {
 
 export function todoLine(remaining: readonly Step[]): string {
   return remaining.length
-    ? `Still to do: ${remaining.map((s) => s.label).join(', ')}. Then scan again.`
+    ? `Steps left tonight: ${remaining.map((s) => s.label).join(', ')}.`
     : 'All steps done. Lights out, recharge all night. ⭐';
 }
 

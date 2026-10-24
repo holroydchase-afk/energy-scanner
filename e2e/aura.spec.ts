@@ -18,13 +18,14 @@ test('the scanner loads on-device and reports when nobody is in the photo', asyn
 // Repo rule: no photos of real people are committed. The happy path runs on the app's own
 // illustrated sample, which goes through the same on-device model as a photo.
 test('the illustrated sample gets an animated aura, and saves as image and video', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
   await page.getByRole('radio', { name: /Photo scan/ }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click();
   await expect(page.getByText('Illustrated sample, not a real person')).toBeVisible();
   const aura = page.locator('canvas.aura');
   await expect(aura).toBeVisible({ timeout: 45_000 });
-  // Always Grey is on by default, so the bedtime reading is Grey.
+  // With Always Grey on, the bedtime reading is Grey.
   await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
 
   const image = page.waitForEvent('download');
@@ -43,6 +44,7 @@ test('the illustrated sample gets an animated aura, and saves as image and video
 test('See every color re-scans the sample in color, and the layout fits', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.clock.setFixedTime(new Date('2026-10-22T12:00:00')); // noon, bedtime far off
+  await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
   await page.getByRole('radio', { name: /Photo scan/ }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click();
@@ -65,6 +67,7 @@ test('See every color re-scans the sample in color, and the layout fits', async 
 const samplePhoto = process.env.SAMPLE_PHOTO;
 test('a local photo of a person gets an animated aura', async ({ page }) => {
   test.skip(!samplePhoto, 'set SAMPLE_PHOTO to a local photo of a person');
+  await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
   await page.locator('[data-input="upload"]').setInputFiles(samplePhoto!);
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });

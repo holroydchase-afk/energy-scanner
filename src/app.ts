@@ -55,7 +55,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   let done = loadSteps(night);
   const savedBed = store.get<unknown>('bed', '20:00');
   let bed = typeof savedBed === 'string' && BED_PATTERN.test(savedBed) ? savedBed : '20:00';
-  let alwaysGrey = store.get('alwaysGrey', true);
+  // Off for a first visit, so the demo shows the colors; a grown-up who turned it on keeps it.
+  let alwaysGrey = store.get('alwaysGrey', false);
   let mode: Mode = store.get<Mode>('mode', 'palm') === 'photo' ? 'photo' : 'palm';
   let view: ResultView | null = null;
 
@@ -65,6 +66,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
     </header>
     <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
+    <p class="pitch"><span>Photo scan draws a live aura around a person with AI that runs on your device. Nothing is uploaded.</span> <button type="button" class="btn small primary" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
       <div class="steplbl"><span>Bedtime steps</span><span data-count></span></div>
@@ -172,6 +174,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
+    $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
     card.hidden = false;
   };
@@ -369,6 +372,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     else done.add(id);
     store.set(night, [...done]);
     renderSteps();
+  });
+
+  $('[data-action="demo"]').addEventListener('click', () => {
+    if (mode !== 'photo') setMode('photo');
+    usePhoto(drawSamplePerson(), SAMPLE_CAPTION);
   });
 
   $('.mode').addEventListener('click', (e) => {

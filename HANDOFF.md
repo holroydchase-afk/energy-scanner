@@ -23,6 +23,11 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-24 night shift, recruiter-first (branch `m2.19-recruiter-first`, stacked on #29): staff-pm and ux-reviewer round 6 in `docs/reviews/2026-10-24-recruiter-ui.md` (ES-R47 to R61, no P0). Fixed here, failing tests first:
+  - R61: Always Grey is off for a first visit, so the demo reads in color; anyone who turned it on keeps it (decision below).
+  - R48: the first screen pitches the on-device AI aura ("Nothing is uploaded") with a See the aura demo button that scans the illustrated sample.
+  - R47: on wide screens the palm reading is centred under the pad again (regression from R46).
+  - R50: the to-do line is a quiet "Steps left tonight: …", moon yellow only when all steps are done.
 - 2026-10-23 Power Hour 2: stack #25 to #28 collapsed into PR #16; Chase merged #16 ("ok 1") and the Pages deploy succeeded at 20:03 UTC (Actions "pages" #4). Live since then: recruiter-ready sprint, round 4 UI fixes, night-shift hardening (ES-R1 to R46). The live site was not checked from the sandbox (chaseholroyd.com is blocked here).
 - 2026-10-23 night shift, ux-reviewer round 5 (`docs/reviews/2026-10-23-ux-round5.md`, branch `m2.17-palm-layout`): all 15 round-4 fixes verified (R21 to R23 and R28 still need Chase's iPhone). One new P2, ES-R46, fixed: on screens 900px and wider the two-column layout now applies only to the photo result, so the palm pad no longer jumps sideways under a hand when the reading appears (e2e test). Nothing left at P2 or above, so the review loop stops here.
 - 2026-10-23 night shift, rendering hardening (branch `m2.16-harden-render`, stacked on `m2.15-harden-app`), from `docs/reviews/2026-10-23-hardening.md`:
@@ -76,7 +81,7 @@ _Updated 2026-10-22._
 - 2026-10-24 night shift: recruiter-share readiness with a UI focus (Chase's steer: "Prioritize sharing with a recruiter readiness. Move past blockers. Improve the ui"). Stacked draft PRs on the default branch, starting with this HANDOFF sync (`m2.18-handoff-sync`).
 
 ## Exact next step
-- Night shift: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
+- Night shift: continue round 6 fixes (R49, R51 to R60) as stacked PRs, then re-review. Done so far: R47, R48, R50, R61. Originally: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
 - Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: live aura on the camera feed.
@@ -92,7 +97,7 @@ _Updated 2026-10-22._
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
 - EXIF orientation is left to the browser (all current browsers apply it when decoding), instead of parsing EXIF, to avoid double rotation.
-- Always Grey stays on by default (the parent feature); the reading card now says how to see other colors. Alternative: default it off on the public demo.
+- Always Grey is off for first visits (Oct 24 night shift, ES-R61, Chase asked to move past blockers): a recruiter's first scan reads in color. A saved choice is kept, so families who turned it on still get Grey. To revert: `store.get('alwaysGrey', true)` in `src/app.ts`.
 - The app is dark-only on purpose (night theme); light mode renders the same.
 - Try the sample uses an illustrated child drawn in code, labeled "Illustrated sample, not a real person", so no real person is ever shown.
 - Native camera opens on the back camera (`capture="environment"`), since a grown-up usually takes the photo; the iPhone camera's flip button switches to selfie. Selfies are saved the way the Camera app saves them.

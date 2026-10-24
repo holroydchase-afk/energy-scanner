@@ -21,7 +21,7 @@ Bedtime at our house was a nightly negotiation. "Five more minutes" works better
 | Decision | Why | Trade-off |
 | --- | --- | --- |
 | The reading follows the clock and the routine | The closer to bedtime and the more steps done, the sleepier the color; it never says Rainbow once every step is done | A little randomness keeps it from feeling canned, so it isn't perfectly predictable |
-| An "Always Grey" grown-up switch, on by default | Some nights the answer is just "bed", and the machine backs the parent up | First-time visitors see Grey every time, so the card says how to see the other colors |
+| An "Always Grey" grown-up switch, off for a first visit and remembered once a grown-up turns it on | Some nights the answer is just "bed", and the machine backs the parent up | A family has to find and turn on the switch once; in exchange, a first-time visitor sees the full color range |
 | On-device person segmentation (MediaPipe in WebAssembly, a 250 KB model) | "Photos never leave the device" is literally true, and a test checks every request stays on the app's own origin | The first photo scan downloads the runtime; slower on old phones |
 | The phone's own camera app instead of an in-page camera | The in-page camera was buggy on iPhone; the native camera handles focus, flash and switching cameras | Less control over the capture screen |
 | An illustrated sample person | Anyone can see the aura without a photo, and no real person's photo is ever published | It's a drawing, so it shows the effect, not how it looks on a real child |
