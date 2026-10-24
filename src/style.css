@@ -69,22 +69,25 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 /* Bedtime flow */
 .bt-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: calc(24px + env(safe-area-inset-top, 0px)) 0 4px; }
 .bt-head .logo { text-align: left; }
+.byline { margin: 0 0 4px; font-size: 0.9rem; color: var(--muted); }
+.byline a { display: inline-block; padding: 12px 2px; margin: -12px 0; color: var(--fg); text-underline-offset: 3px; }
+.byline a:focus-visible { outline: 3px solid var(--moon); outline-offset: 2px; border-radius: 6px; }
 .tagline { margin: 0 0 6px; color: var(--muted); font-size: 1rem; }
 .pitch { margin: 0 0 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 0.95rem; }
 .pitch span { flex: 1 1 22ch; }
 .clock { font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.clock b { display: block; color: var(--moon); font-size: 1.4rem; font-weight: 400; }
+.clock b { display: block; color: var(--fg); font-size: 1.1rem; font-weight: 400; }
 .steps-wrap { margin-top: 16px; }
 .steplbl { display: flex; justify-content: space-between; font-family: ui-monospace, Menlo, monospace; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.step { background: transparent; border: 2px solid var(--line); border-radius: 14px; color: var(--muted); font: 700 0.875rem system-ui, sans-serif; padding: 10px 2px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; min-width: 0; min-height: 64px; }
-.step .ic { font-size: 1.5rem; line-height: 1; filter: grayscale(1); opacity: 0.55; }
+.step { background: transparent; border: 2px solid var(--line); border-radius: 14px; color: var(--fg); font: 700 0.875rem system-ui, sans-serif; padding: 10px 2px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; min-width: 0; min-height: 64px; }
+.step .ic { font-size: 1.5rem; line-height: 1; filter: grayscale(0.5); opacity: 0.85; }
 .step[aria-pressed='true'] { border-color: var(--glow); color: var(--fg); background: rgba(124, 242, 224, 0.08); }
 .step[aria-pressed='true'] .ic { filter: none; opacity: 1; }
 .step:focus-visible, .pad:focus-visible, .mode button:focus-visible { outline: 3px solid var(--moon); outline-offset: 3px; }
 .mode { display: flex; gap: 6px; padding: 4px; margin: 18px auto 0; scroll-margin-top: 12px; border: 1px solid var(--line); border-radius: 999px; width: fit-content; }
 .mode button { font: 600 0.95rem system-ui, sans-serif; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 10px 18px; min-height: 44px; cursor: pointer; white-space: nowrap; }
-@media (max-width: 359px) { .mode button { padding: 10px 12px; } }
+@media (max-width: 359px) { .mode button { padding: 10px 12px; } .steplbl { letter-spacing: 0.04em; } }
 .mode button[aria-checked='true'] { background: var(--panel); color: var(--fg); box-shadow: 0 0 0 1px var(--glow); }
 .pad-zone { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .pad { position: relative; width: min(72vw, 280px); aspect-ratio: 1; border-radius: 50%; border: none; background: radial-gradient(circle at 50% 45%, #232b63, #141a40 70%); box-shadow: 0 0 0 2px var(--line), 0 0 40px rgba(124, 242, 224, 0.12) inset; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overflow: hidden; color: var(--fg); }
@@ -110,7 +113,8 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 .reading-card .rc-note[hidden] { display: none; }
 .reading-card .rc-todo { font-weight: 600; color: var(--muted); font-size: 0.95rem; }
 .reading-card .rc-todo.all-done { color: var(--moon); }
-.reading-card .btn { align-self: flex-start; }
+.rc-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+.rc-actions .btn[hidden] { display: none; }
 .grownups { border-top: 1px dashed var(--line); padding-top: 12px; margin-top: 8px; color: var(--muted); font-size: 1rem; }
 .grownups summary { cursor: pointer; font-family: ui-monospace, Menlo, monospace; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.875rem; min-height: 44px; display: flex; align-items: center; gap: 8px; }
 .grownups summary:focus-visible { outline: 3px solid var(--moon); outline-offset: 2px; border-radius: 6px; }

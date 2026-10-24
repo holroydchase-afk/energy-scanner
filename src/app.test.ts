@@ -49,9 +49,17 @@ describe('bedtime app', () => {
     expect(root.querySelector('.tagline')?.textContent).toBe('A bedtime helper for kids: finish the steps, then scan.');
     const links = [...root.querySelectorAll<HTMLAnchorElement>('.foot a')].map((a) => [a.textContent, a.href]);
     expect(links).toEqual([
-      ['Chase Holroyd', 'https://chaseholroyd.com/energy-scanner.html'],
+      ['Read the case study', 'https://chaseholroyd.com/energy-scanner.html'],
       ['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner'],
     ]);
+    // ES-R55: who made it, near the top.
+    const byline = [...root.querySelectorAll<HTMLAnchorElement>('.byline a')].map((a) => [a.textContent, a.href]);
+    expect(byline).toEqual([
+      ['Chase Holroyd', 'https://chaseholroyd.com/'],
+      ['Case study', 'https://chaseholroyd.com/energy-scanner.html'],
+    ]);
+    // ES-R56: the steps say they can be tapped.
+    expect(root.querySelector('.steplbl span')?.textContent).toBe('Tap each step when done');
   });
 
   it('ticks off steps and remembers them tonight', () => {
@@ -96,7 +104,12 @@ describe('bedtime app', () => {
     expect(card.querySelector('.rc-todo')!.textContent).toBe('Steps left tonight: Bath, PJs, Teeth, Potty, Book.');
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
-    expect(note.textContent).toBe('Always Grey is on, so every scan reads Grey. See every color');
+    expect(note.textContent).toBe('Always Grey is on (a grown-up setting), so every scan reads Grey.');
+    // ES-R53: the way to the colors is the main button, next to Scan again.
+    const see = card.querySelector<HTMLElement>('.rc-actions [data-action="see-colors"]')!;
+    expect([see.hidden, see.classList.contains('primary')]).toEqual([false, true]);
+    // ES-R60: the hint doesn't repeat the card's title.
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scan complete');
   });
 
   it('See every color turns Always Grey off and scans again in color', async () => {
@@ -112,6 +125,7 @@ describe('bedtime app', () => {
     expect(localStorage.getItem('alwaysGrey')).toBe('false');
     expect(root.querySelector('.rc-name')!.textContent).toBe('Rainbow Energy');
     expect(root.querySelector<HTMLElement>('.rc-note')!.hidden).toBe(true);
+    expect(see.hidden).toBe(true);
   });
 
   it('See every color re-scans the same photo', async () => {

@@ -65,11 +65,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <h1 class="logo">Energy Scanner</h1>
       <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
     </header>
+    <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
     <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
     <p class="pitch"><span>Photo scan draws a live aura around a person with AI that runs on your device. Nothing is uploaded.</span> <button type="button" class="btn small primary" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
-      <div class="steplbl"><span>Bedtime steps</span><span data-count></span></div>
+      <div class="steplbl"><span>Tap each step when done</span><span data-count></span></div>
       <div class="steps"></div>
     </section>
     <div class="mode" role="radiogroup" aria-label="Scan with">
@@ -86,8 +87,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       </div>
       <p class="rc-text"></p>
       <p class="rc-todo"></p>
-      <p class="rc-note" hidden>Always Grey is on, so every scan reads Grey. <button type="button" class="btn small" data-action="see-colors">See every color</button></p>
-      <button type="button" class="btn" data-action="again">Scan again</button>
+      <p class="rc-note" hidden>Always Grey is on (a grown-up setting), so every scan reads Grey.</p>
+      <div class="rc-actions">
+        <button type="button" class="btn primary" data-action="see-colors" hidden>See every color</button>
+        <button type="button" class="btn" data-action="again">Scan again</button>
+      </div>
     </section>
     </div>
     </main>
@@ -99,13 +103,13 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <label>Always read Grey Energy <input type="checkbox" data-input="always" /></label>
         <div class="row"><button type="button" class="btn small" data-action="clear">Clear tonight's steps</button></div>
-        <p>With Always Grey on, every scan comes back Grey. Turn it off and it reads by the clock: the closer to bedtime and the more steps done, the sleepier the color. A little randomness keeps it from feeling canned, but it never says Rainbow once all five steps are done.</p>
-        <p>Photo scans run entirely on this device. Photos are never uploaded or saved unless you tap Save.</p>
+        <p>With Always Grey on, every scan comes back Grey.</p>
+        <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
       </div>
     </details>
     <footer class="foot">
       <p>Runs entirely in your browser. Photos never leave your device.</p>
-      <p class="credit"><span>A portfolio project by <a href="https://chaseholroyd.com/energy-scanner.html">Chase Holroyd</a></span><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+      <p class="credit"><a href="https://chaseholroyd.com/energy-scanner.html">Read the case study</a><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
     </footer>
     <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" />
@@ -176,6 +180,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
     $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
+    $('[data-action="see-colors"]').hidden = !alwaysGrey;
     $('[data-action="again"]').textContent = lastPhoto ? 'Scan this photo again' : 'Scan again';
     card.hidden = false;
   };
@@ -242,7 +247,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       }
       const energy = scanEnergy();
       const level = levelFor(energy);
-      hint.textContent = `${level.name} detected`;
+      hint.textContent = 'Scan complete';
       showReading(energy, level);
     };
     const press = (id: number | string, e?: Event) => {
@@ -481,7 +486,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const energy = scanEnergy();
       const level = levelFor(energy);
       const hint = root.querySelector('[data-hint]');
-      if (hint) hint.textContent = `${level.name} detected`;
+      if (hint) hint.textContent = 'Scan complete';
       showReading(energy, level);
       $('[data-action="again"]').focus();
     }
