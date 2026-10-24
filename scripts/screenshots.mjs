@@ -82,7 +82,11 @@ try {
   await start.keyboard.up('Space');
   await start.waitForTimeout(500);
   await start.locator('.pad').scrollIntoViewIfNeeded();
-  await start.screenshot({ path: `${out}/palm-mobile.png`, fullPage: true });
+  // A tall viewport instead of fullPage, so the fixed background layer covers the whole shot.
+  const height = await start.evaluate(() => document.documentElement.scrollHeight);
+  await start.setViewportSize({ width: MOBILE.viewport.width, height });
+  await start.waitForTimeout(300);
+  await start.screenshot({ path: `${out}/palm-mobile.png` });
   await start.close();
 
   // Photo scan of the sample: Grey (the grown-up switch on) and Rainbow (bedtime far off, nothing done).
