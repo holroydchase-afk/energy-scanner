@@ -23,6 +23,12 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-24 night shift, photo screen polish (branch `m2.20-photo-polish`, stacked on `m2.19-recruiter-first`), failing tests first:
+  - R49: on a laptop (mouse or trackpad) the photo screen leads with Try the sample and drops Take a photo, which only opened the same file picker there. Phones are unchanged.
+  - R51: on phones the photo is capped at 58% of the screen so the caption and buttons fit under it (confirm on an iPhone).
+  - R52: one main button on the result (Save image when there's no share sheet); the card says "Scan this photo again" in photo mode.
+  - R54: on wide screens the scan keeps the switch in view instead of scrolling the header away; the reading card sits at the top of a 400px column.
+  - R59: a photo with nobody in it is dimmed and Try the sample is the main button.
 - 2026-10-24 night shift, recruiter-first (branch `m2.19-recruiter-first`, stacked on #29): staff-pm and ux-reviewer round 6 in `docs/reviews/2026-10-24-recruiter-ui.md` (ES-R47 to R61, no P0). Fixed here, failing tests first:
   - R61: Always Grey is off for a first visit, so the demo reads in color; anyone who turned it on keeps it (decision below).
   - R48: the first screen pitches the on-device AI aura ("Nothing is uploaded") with a See the aura demo button that scans the illustrated sample.
@@ -81,7 +87,7 @@ _Updated 2026-10-22._
 - 2026-10-24 night shift: recruiter-share readiness with a UI focus (Chase's steer: "Prioritize sharing with a recruiter readiness. Move past blockers. Improve the ui"). Stacked draft PRs on the default branch, starting with this HANDOFF sync (`m2.18-handoff-sync`).
 
 ## Exact next step
-- Night shift: continue round 6 fixes (R49, R51 to R60) as stacked PRs, then re-review. Done so far: R47, R48, R50, R61. Originally: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
+- Night shift: continue round 6 fixes (R53, R55 to R58, R60) as stacked PRs, then re-review. Done so far: R47 to R52, R54, R59, R61. Originally: staff-pm ranks what a recruiter sees in 90 seconds on a phone and 5 minutes on a laptop; ux-reviewer sweeps every screen (showcase mode, 390x844, 1280x800, 320x640); fix P0 to P2 as stacked draft PRs on `m2.18-handoff-sync`, log findings as ES-R47+.
 - Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
 - Later ideas: live aura on the camera feed.

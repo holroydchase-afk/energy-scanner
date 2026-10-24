@@ -25,16 +25,26 @@ test('dropping a photo onto the page loads it', async ({ page }) => {
   await expect(page.getByTestId('photo').locator('canvas')).toBeVisible();
 });
 
-test('take a photo hands off to the native camera and loads the result', async ({ page }) => {
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test('take a photo hands off to the native camera and loads the result', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('radio', { name: /Photo scan/ }).click();
+    await expect(page.locator('[data-input="capture"]')).toHaveAttribute('capture', 'environment');
+    const png = await makePng(page, 600, 800);
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Take a photo' }).click();
+    await (await chooser).setFiles({ name: 'IMG_0001.png', mimeType: 'image/png', buffer: png });
+    await expect(page.getByTestId('photo').locator('canvas')).toBeVisible();
+    await expect(page.locator('video')).toHaveCount(0);
+  });
+});
+
+test('ES-R49 on a laptop the sample leads and there is no camera button', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('radio', { name: /Photo scan/ }).click();
-  await expect(page.locator('[data-input="capture"]')).toHaveAttribute('capture', 'environment');
-  const png = await makePng(page, 600, 800);
-  const chooser = page.waitForEvent('filechooser');
-  await page.getByRole('button', { name: 'Take a photo' }).click();
-  await (await chooser).setFiles({ name: 'IMG_0001.png', mimeType: 'image/png', buffer: png });
-  await expect(page.getByTestId('photo').locator('canvas')).toBeVisible();
-  await expect(page.locator('video')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Take a photo' })).toHaveCount(0);
+  await expect(page.locator('.dropzone .actions .btn').first()).toHaveText('Try the sample');
 });
 
 test('a non-image file shows a friendly error', async ({ page }) => {

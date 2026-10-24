@@ -49,6 +49,7 @@ test('See every color re-scans the sample in color, and the layout fits', async 
   await page.getByRole('radio', { name: /Photo scan/ }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
+  await page.waitForTimeout(800);
   // No empty status line between the caption and the buttons.
   const caption = await page.locator('.caption').boundingBox();
   const actions = await page.locator('.viewer .actions').boundingBox();
@@ -56,6 +57,8 @@ test('See every color re-scans the sample in color, and the layout fits', async 
   // On a laptop the reading sits beside the photo: both in view together.
   await expect(page.getByTestId('energy-reading')).toBeInViewport({ ratio: 1 });
   await expect(page.locator('canvas.aura')).toBeInViewport({ ratio: 1 });
+  // ES-R54: the scan switch stays in view (the page doesn't scroll the header away).
+  await expect(page.locator('.mode')).toBeInViewport({ ratio: 1 });
 
   await page.getByRole('button', { name: 'See every color' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });

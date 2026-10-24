@@ -200,6 +200,32 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(root.querySelector('[role="status"]')!.textContent).toMatch(/No person found/);
     expect(root.querySelector('.viewer [data-action="sample"]')?.textContent).toBe('Try the sample');
+    // ES-R59: the way forward is the main button.
+    expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('primary')).toBe(true);
+  });
+
+  it('ES-R49 on a laptop (fine pointer) the sample is the main button and there is no camera button', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;
+    try {
+      const root = mount();
+      click(root, '[data-mode="photo"]');
+      expect(root.querySelector('[data-action="camera"]')).toBeNull();
+      const first = root.querySelector('.dropzone .actions .btn')!;
+      expect([first.textContent, first.classList.contains('primary')]).toEqual(['Try the sample', true]);
+      expect(root.querySelector('[data-action="upload"]')).not.toBeNull();
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it('ES-R52 in photo mode the card offers to scan this photo again', async () => {
+    const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
+    const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
+    click(root, '[data-mode="photo"]');
+    click(root, '[data-action="sample"]');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(root.querySelector('[data-action="again"]')!.textContent).toBe('Scan this photo again');
   });
 
   it('opens the phone camera through the native capture input', () => {

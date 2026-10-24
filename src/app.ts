@@ -176,6 +176,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
     $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
+    $('[data-action="again"]').textContent = lastPhoto ? 'Scan this photo again' : 'Scan again';
     card.hidden = false;
   };
 
@@ -272,20 +273,30 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   };
 
   // ---- Photo scan ----
+  // A mouse or trackpad means a laptop or desktop: no camera to open, so the sample leads.
+  const finePointer = () => window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
+
   const showPhotoStart = () => {
+    const actions = finePointer()
+      ? `<button type="button" class="btn primary" data-action="sample">Try the sample</button>
+          <button type="button" class="btn" data-action="upload">Upload a photo</button>`
+      : `<button type="button" class="btn primary" data-action="camera">Take a photo</button>
+          <button type="button" class="btn" data-action="upload">Upload a photo</button>`;
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
         <p class="lead">Take a photo and the scanner shows the energy glowing off you.</p>
         <div class="actions">
-          <button type="button" class="btn primary" data-action="camera">Take a photo</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>
+          ${actions}
         </div>
         <p class="hint">or drop a photo anywhere on this page</p>
-        <p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>
+        ${finePointer() ? '' : '<p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>'}
       </div>
     `;
   };
+
+  /** The photo screen's first button (Take a photo, or Try the sample on a laptop). */
+  const focusPhotoStart = () => root.querySelector<HTMLElement>('.dropzone .actions .btn')?.focus();
 
   let lastPhoto: { photo: HTMLCanvasElement; caption?: string } | null = null;
 
@@ -306,20 +317,22 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       caption,
       onReset: () => {
         showMode();
-        root.querySelector<HTMLElement>('[data-action="camera"]')?.focus();
+        focusPhotoStart();
       },
       onReady: () => showReading(energy, level),
       onNoPerson: () => {
         const sample = document.createElement('button');
         sample.type = 'button';
-        sample.className = 'btn';
+        sample.className = 'btn primary';
         sample.dataset.action = 'sample';
         sample.textContent = 'Try the sample';
         stage.querySelector('.actions')?.append(sample);
       },
     });
-    // Bring the photo to the top so the scan, and then the reading, are in view.
-    stage.scrollIntoView?.({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    // Bring the photo to the top so the scan, and then the reading, are in view. On a wide screen
+    // the photo and reading fit beside each other, so keep the scan switch in view too.
+    const wide = window.matchMedia?.('(min-width: 900px)').matches ?? false;
+    (wide ? $('.mode') : stage).scrollIntoView?.({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
   // Bumped whenever the stage changes, so a photo that finishes decoding late is dropped.
@@ -408,7 +421,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       return;
     }
     showMode();
-    root.querySelector<HTMLElement>(mode === 'palm' ? '.pad' : '[data-action="camera"]')?.focus();
+    if (mode === 'palm') root.querySelector<HTMLElement>('.pad')?.focus();
+    else focusPhotoStart();
   });
 
   for (const input of [uploadInput, captureInput]) {
