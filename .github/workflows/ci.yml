@@ -13,6 +13,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - run: bash scripts/check-agents.sh
       - run: npm ci
       - run: npm run check
       - run: npm run build

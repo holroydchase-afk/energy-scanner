@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "bash scripts/check-agents.sh && vitest run",
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm test",
     "predev": "node scripts/copy-mediapipe-wasm.mjs",
