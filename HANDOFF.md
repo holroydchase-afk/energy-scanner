@@ -93,19 +93,21 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Nothing. The 2026-10-24 night shift (recruiter-share readiness, UI focus) is done: round 6 and 7 reviews in `docs/reviews/2026-10-24-recruiter-ui.md`, ES-R47 to R68 all fixed in stacked draft PRs #29 to #34, CI green. Nothing is live until Chase merges.
+- 2026-10-28 studio refresh (branch `claude/project-thread-gnr0mk`, PR "studio refresh: agents by default"): agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh` in `npm test` and CI, Studio agents table in CLAUDE.md. Waiting for Chase to review; don't merge.
+- The 2026-10-24 night shift (ES-R47 to R68, PRs #29 to #34) is merged and live at https://chaseholroyd.com/energy-scanner/.
 
 ## Exact next step
-- Chase: review and merge the stack top-down, #34 → #33 → #32 → #31 → #30 → #29 (each into the branch below; #29 into the default branch deploys). Then a 60-second phone check of the live site: link preview, first screen, See the aura demo, palm scan, Save/Share.
-- Chase (when convenient): rescan his three real photos on his iPhone on the live site (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
+- Chase: review and merge the studio refresh PR. From then on every session acts as chief of staff and routes work by the CLAUDE.md agents table; every PR needs an `Agents:` line.
+- Chase: a 60-second phone check of the live site (link preview, first screen, See the aura demo, palm scan, Save/Share), and rescan his three real photos on his iPhone (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
+- Hardening follow-up (Polish Freeze allows it): `scripts/check-logs.mjs` (installed, not wired) flags four `console.*` calls that log whole error objects (`src/ui/result.ts` x3, `src/aura/renderer.ts`). Fix them to log `e.name`, then add `node scripts/check-logs.mjs` to `npm test`.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
-- Later ideas: live aura on the camera feed.
 
 ## Testing note
 - No photos of real people are committed. The e2e happy path runs on the illustrated sample; `SAMPLE_PHOTO=/path/to/person.jpg npm run test:e2e` adds a check on a real local photo. The no-person e2e always runs the real model and checks that every request stays on the app's origin.
 
 ## How to run
 - `npm install`, then `npm run dev`. Checks: `npm run check`. Browser test: `npm run build && npm run test:e2e` (uses the preinstalled Chromium; Playwright pinned to 1.56.1 to match it).
+- In a Claude cloud sandbox the e2e needs `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e` (the preinstalled Chromium build differs from Playwright 1.56.1's default); CI is unaffected.
 
 ## Decisions to review
 - Web app (Vite + TS) with in-browser MediaPipe segmentation instead of a native app: fastest to demo and link from chaseholroyd.com.
@@ -128,7 +130,8 @@ _Updated 2026-10-22._
 - Exports carry a small caption (energy type + app name) so shared images explain themselves.
 
 - README "Why I built it" and CASE-STUDY.md (rewritten Oct 22 for the bedtime story) are in Chase's first-person voice as a draft; he should edit them to sound like him.
-- Shared studio agents (`.claude/agents/`, six generic agents) were merged into the base branch (PR #7).
+- Shared studio agents (`.claude/agents/`) come from holroydchase-afk/studio-agents; re-sync with its `scripts/sync.sh`. Oct 28: seven agents (architect added); orchestrator and focus-coach stay Product Studio's. No project-only agents.
+- Studio refresh (Oct 28): install-rules kept the existing `.claude/settings.json` and `handoff-check.yml`; both are identical to the studio templates, so nothing needed merging by hand.
 
 ## Blockers
 - None. (README screenshots no longer need a real photo: they use the illustrated sample.)
