@@ -23,6 +23,8 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-29, review-rounds skill (branch `claude/project-thread-jtg48o`): `.claude/skills/review-rounds/SKILL.md` writes down the review loop used for ES-R1 to R68 (rounds, P0 to P2, review file format, stop rule), and `ux-reviewer` preloads it with a `skills:` line, since its tool list has no Skill tool. Chase asked for it in the "Find reusable agents and libraries" thread and approved the merge.
+- 2026-10-28 studio refresh merged as PR #35: agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh`, Studio agents table in CLAUDE.md.
 - 2026-10-24 night shift, round 7 (branch `m2.23-round7`, stacked on `m2.22-screenshots`): ux-reviewer verified all 15 round-6 fixes and found 7 more, all fixed here with tests first: R62 (P1) the palm reading scrolls into view when it's ready; R63 laptops say "Click and hold"; R64 laptop photo lead matches its buttons; R65 link preview text and og.png pitch the on-device aura; R66 README points to See the aura demo; R67 Try the sample first when nobody's in the photo; R68 README aura shots have square, clean corners, and the palm README shot no longer shows a background seam. Nothing at P2 or above is left.
 - 2026-10-24 night shift, screenshots (branch `m2.22-screenshots`, stacked on `m2.21-ui-polish`): README screenshots and `public/og.png` regenerated from the new UI with `npm run screenshots`; the start and palm shots now show a first visit (Always Grey off, 7pm). 
 - 2026-10-24 night shift, UI polish (branch `m2.21-ui-polish`, stacked on `m2.20-photo-polish`), failing tests first:
@@ -93,11 +95,10 @@ _Updated 2026-10-22._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- 2026-10-28 studio refresh (branch `claude/project-thread-gnr0mk`, PR "studio refresh: agents by default"): agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh` in `npm test` and CI, Studio agents table in CLAUDE.md. Waiting for Chase to review; don't merge.
-- The 2026-10-24 night shift (ES-R47 to R68, PRs #29 to #34) is merged and live at https://chaseholroyd.com/energy-scanner/.
+- Nothing.
 
 ## Exact next step
-- Chase: review and merge the studio refresh PR. From then on every session acts as chief of staff and routes work by the CLAUDE.md agents table; every PR needs an `Agents:` line.
+- Product Studio: copy the review-rounds skill and the ux-reviewer `skills:` line into studio-agents, so the next `scripts/sync.sh` keeps them (intake in `/mnt/project-files/reuse/intake-review-rounds.md`). Then build the ux-reviewer eval from ES-R1 to R68.
 - Chase: a 60-second phone check of the live site (link preview, first screen, See the aura demo, palm scan, Save/Share), and rescan his three real photos on his iPhone (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - Hardening follow-up (Polish Freeze allows it): `scripts/check-logs.mjs` (installed, not wired) flags four `console.*` calls that log whole error objects (`src/ui/result.ts` x3, `src/aura/renderer.ts`). Fix them to log `e.name`, then add `node scripts/check-logs.mjs` to `npm test`.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
@@ -110,6 +111,7 @@ _Updated 2026-10-22._
 - In a Claude cloud sandbox the e2e needs `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e` (the preinstalled Chromium build differs from Playwright 1.56.1's default); CI is unaffected.
 
 ## Decisions to review
+- The review-rounds skill lives in this repo for now and ux-reviewer was edited locally (Oct 29). A studio-agents re-sync would drop the `skills:` line until Product Studio adds it upstream.
 - Web app (Vite + TS) with in-browser MediaPipe segmentation instead of a native app: fastest to demo and link from chaseholroyd.com.
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
 
