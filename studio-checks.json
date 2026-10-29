@@ -2,5 +2,9 @@
   "logs": {
     "roots": ["src"],
     "banned": []
+  },
+  "agents": {
+    "verify": "[ -d node_modules ] || npm ci; npm run check",
+    "runs": 3
   }
 }
