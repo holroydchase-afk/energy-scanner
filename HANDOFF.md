@@ -7,12 +7,10 @@ milestone: ES-M2 (Polish Freeze: harden and UI polish only)
 now: Intake check runs 4x a day; no build work in progress
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
-  - Merge studio-agents #33 so intake #39 (qa-tdd refresh) can run
   - Decide the CI runner pin (ubuntu-latest moved to 26.04; Playwright install fails)
   - 60-second phone check and iPhone rescan of three real photos
   - CLAUDE.md never-deploy rule vs Pages deploying on push
-blockers:
-  - Intake #39 waits on studio-agents #33
+blockers: []
 -->
 
 ## Planning IDs (Oct 21, 2026)
@@ -38,6 +36,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Oct 31 Intake check: #39 done: qa-tdd synced from studio-agents main (qa report contract), `scripts/check-qa-report.mjs` added, CLAUDE.md gets the "Relay qa-tdd's verdict as-is" rule; qa-tdd ran once on this branch (its qa block is in PR #41).
 - Oct 31 Intake check: #40 done: status header added at the top of this file (Studio Console reads it), `scripts/check-handoff-status.sh` installed from studio-agents, and a warn-only step added to handoff-check.
 - Oct 31 Intake check: #38 (studio Demo bar) closed as not planned. The app shows no sample data, and the illustrated sample already has its "not a real person" caption. #39 is blocked (see Blockers).
 - 2026-10-29, review-rounds skill (branch `claude/project-thread-jtg48o`): `.claude/skills/review-rounds/SKILL.md` writes down the review loop used for ES-R1 to R68 (rounds, P0 to P2, review file format, stop rule), and `ux-reviewer` preloads it with a `skills:` line, since its tool list has no Skill tool. Chase asked for it in the "Find reusable agents and libraries" thread and approved the merge.
@@ -153,5 +152,4 @@ _Updated 2026-10-22._
 - Studio refresh (Oct 28): install-rules kept the existing `.claude/settings.json` and `handoff-check.yml`; both are identical to the studio templates, so nothing needed merging by hand.
 
 ## Blockers
-- Intake #39 (refresh qa-tdd from studio-agents) waits on studio-agents PR #33 merging: the "Relay qa-tdd's verdict as-is" paragraph the intake asks for isn't on studio-agents main yet. Labeled `needs-chase`. Once #33 is merged, the next Intake check picks #39 up again. (Oct 31)
-- README screenshots no longer need a real photo: they use the illustrated sample.
+- None. (README screenshots no longer need a real photo: they use the illustrated sample.)
