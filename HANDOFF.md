@@ -23,6 +23,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Oct 31 Intake check: #38 (studio Demo bar) closed as not planned. The app shows no sample data, and the illustrated sample already has its "not a real person" caption. #39 is blocked (see Blockers).
 - 2026-10-29, review-rounds skill (branch `claude/project-thread-jtg48o`): `.claude/skills/review-rounds/SKILL.md` writes down the review loop used for ES-R1 to R68 (rounds, P0 to P2, review file format, stop rule), and `ux-reviewer` preloads it with a `skills:` line, since its tool list has no Skill tool. Chase asked for it in the "Find reusable agents and libraries" thread and approved the merge.
 - 2026-10-28 studio refresh merged as PR #35: agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh`, Studio agents table in CLAUDE.md.
 - 2026-10-24 night shift, round 7 (branch `m2.23-round7`, stacked on `m2.22-screenshots`): ux-reviewer verified all 15 round-6 fixes and found 7 more, all fixed here with tests first: R62 (P1) the palm reading scrolls into view when it's ready; R63 laptops say "Click and hold"; R64 laptop photo lead matches its buttons; R65 link preview text and og.png pitch the on-device aura; R66 README points to See the aura demo; R67 Try the sample first when nobody's in the photo; R68 README aura shots have square, clean corners, and the palm README shot no longer shows a background seam. Nothing at P2 or above is left.
@@ -136,4 +137,5 @@ _Updated 2026-10-22._
 - Studio refresh (Oct 28): install-rules kept the existing `.claude/settings.json` and `handoff-check.yml`; both are identical to the studio templates, so nothing needed merging by hand.
 
 ## Blockers
-- None. (README screenshots no longer need a real photo: they use the illustrated sample.)
+- Intake #39 (refresh qa-tdd from studio-agents) waits on studio-agents PR #33 merging: the "Relay qa-tdd's verdict as-is" paragraph the intake asks for isn't on studio-agents main yet. Labeled `needs-chase`. Once #33 is merged, the next Intake check picks #39 up again. (Oct 31)
+- README screenshots no longer need a real photo: they use the illustrated sample.
