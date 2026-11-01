@@ -12,4 +12,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   },
+  // Synced as-is from studio-agents (scripts/sync-tools.sh); a re-sync would undo local edits.
+  {
+    files: ['scripts/ux-rules.mjs', 'scripts/ux-shots.mjs'],
+    rules: { 'no-empty': ['error', { allowEmptyCatch: true }] },
+  },
 );

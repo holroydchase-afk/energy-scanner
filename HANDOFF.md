@@ -23,6 +23,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- 2026-10-29, studio re-sync (branch `claude/project-thread-qfo5la`): ran studio-agents `main` (b6a9a8b) `scripts/sync.sh`, `scripts/sync-tools.sh` and `scripts/install-rules.sh` on this repo. New: the upgraded `ux-reviewer` (visual critic, two critics per screen, 0-10 score, Layer 1 G rules, preloads `review-rounds`), `.claude/design-rules.md`, `scripts/ux-shots.mjs` and `scripts/ux-rules.mjs` (Playwright visual and rule checks), the Supabase line in `privacy-security`, and the agent run log (`scripts/log-agent-run.sh` hook in `.claude/settings.json`, `scripts/check-agent-runs.sh` step in `agents-check.yml`). Hand-merged the files install-rules kept: `.claude/settings.json` and `agents-check.yml` now match the templates, `studio-checks.json` keeps `roots: ["src"]` and adds `agents.verify` (`npm run check`, 3 runs on CI), CLAUDE.md gets the "every agent must really have run" paragraph. `review-rounds` is now upstream and identical, so the next sync keeps it. ESLint allows empty `catch {}` in the two synced tools only (a re-sync would undo edits to them). No project-only agents existed; all 7 agents are studio ones. Lint, typecheck and unit tests (115) green 3x; e2e 18 passed, 1 skipped.
 - 2026-10-29, review-rounds skill (branch `claude/project-thread-jtg48o`): `.claude/skills/review-rounds/SKILL.md` writes down the review loop used for ES-R1 to R68 (rounds, P0 to P2, review file format, stop rule), and `ux-reviewer` preloads it with a `skills:` line, since its tool list has no Skill tool. Chase asked for it in the "Find reusable agents and libraries" thread and approved the merge.
 - 2026-10-28 studio refresh merged as PR #35: agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh`, Studio agents table in CLAUDE.md.
 - 2026-10-24 night shift, round 7 (branch `m2.23-round7`, stacked on `m2.22-screenshots`): ux-reviewer verified all 15 round-6 fixes and found 7 more, all fixed here with tests first: R62 (P1) the palm reading scrolls into view when it's ready; R63 laptops say "Click and hold"; R64 laptop photo lead matches its buttons; R65 link preview text and og.png pitch the on-device aura; R66 README points to See the aura demo; R67 Try the sample first when nobody's in the photo; R68 README aura shots have square, clean corners, and the palm README shot no longer shows a background seam. Nothing at P2 or above is left.
@@ -98,7 +99,8 @@ _Updated 2026-10-22._
 - Nothing.
 
 ## Exact next step
-- Product Studio: copy the review-rounds skill and the ux-reviewer `skills:` line into studio-agents, so the next `scripts/sync.sh` keeps them (intake in `/mnt/project-files/reuse/intake-review-rounds.md`). Then build the ux-reviewer eval from ES-R1 to R68.
+- Chase: review and merge the studio re-sync PR. From then on, agents named on a PR's `Agents:` line must show up in `.claude/agent-runs/<branch>.log` (the hook writes it in sessions that load the repo's agents; commit it with the PR).
+- Next UI pass: ux-reviewer runs `node scripts/ux-rules.mjs dist/index.html` then `node scripts/ux-shots.mjs dist/index.html` for its 0-10 score (in a cloud sandbox, Playwright may need the preinstalled Chromium).
 - Chase: a 60-second phone check of the live site (link preview, first screen, See the aura demo, palm scan, Save/Share), and rescan his three real photos on his iPhone (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
 - Hardening follow-up (Polish Freeze allows it): `scripts/check-logs.mjs` (installed, not wired) flags four `console.*` calls that log whole error objects (`src/ui/result.ts` x3, `src/aura/renderer.ts`). Fix them to log `e.name`, then add `node scripts/check-logs.mjs` to `npm test`.
 - CLAUDE.md still says never deploy although Pages deploys on every push to the default branch; that rule is Chase's to update.
@@ -111,6 +113,8 @@ _Updated 2026-10-22._
 - In a Claude cloud sandbox the e2e needs `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e` (the preinstalled Chromium build differs from Playwright 1.56.1's default); CI is unaffected.
 
 ## Decisions to review
+- 2026-10-29 re-sync: `agents.verify` in `studio-checks.json` is `[ -d node_modules ] || npm ci; npm run check`, so CI reruns lint, typecheck and unit tests 3x whenever a PR claims qa-tdd ran. Swap to a lighter command if agents-check gets slow.
+- 2026-10-29 re-sync: this cloud session couldn't load the repo's `.claude/agents` (the Agent tool only offered built-in types), so the PR says `qa-tdd skipped` and the main session ran the suites 3x itself. Hand-written log entries are banned, so none were added.
 - The review-rounds skill lives in this repo for now and ux-reviewer was edited locally (Oct 29). A studio-agents re-sync would drop the `skills:` line until Product Studio adds it upstream.
 - Web app (Vite + TS) with in-browser MediaPipe segmentation instead of a native app: fastest to demo and link from chaseholroyd.com.
 - TypeScript pinned to 5.9 (not 7) because typescript-eslint does not support 7 yet.
