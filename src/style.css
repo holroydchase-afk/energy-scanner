@@ -32,6 +32,8 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 .foot { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 16px 0 calc(24px + env(safe-area-inset-bottom, 0px)); }
 .foot p { margin: 0 0 4px; }
 .foot .credit { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 20px; }
+/* Phone browsers (Safari's bottom bar) can float over the page end, so the last line can scroll clear of it. */
+@media (pointer: coarse) { .foot { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
 .foot a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--fg); text-underline-offset: 3px; }
 .foot a:focus-visible { outline: 3px solid var(--moon); outline-offset: 2px; border-radius: 6px; }
 
@@ -77,6 +79,8 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 .pitch span { flex: 1 1 22ch; }
 .clock { font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .clock b { display: block; color: var(--fg); font-size: 1.1rem; font-weight: 400; }
+.clock .pretend { margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: var(--moon); color: #14183a; font-size: 0.75rem; vertical-align: 2px; }
+.clock .pretend[hidden] { display: none; }
 .steps-wrap { margin-top: 16px; }
 .steplbl { display: flex; justify-content: space-between; font-family: ui-monospace, Menlo, monospace; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
@@ -127,6 +131,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 .parent input[type='checkbox'] { width: 24px; height: 24px; margin: 0; accent-color: var(--glow); }
 .parent input[type='time'] { background: #1b2250; color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; min-height: 44px; }
 .parent .row { display: flex; align-items: center; gap: 10px; }
+.parent .row:has(> [hidden]:only-child), .parent [hidden] { display: none; }
 .parent [data-fake] { font-family: ui-monospace, Menlo, monospace; }
 .parent input[type='range'] { flex: 1; min-width: 0; height: 44px; margin: 0; accent-color: var(--glow); }
 .parent p { margin: 0; }

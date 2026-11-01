@@ -37,6 +37,16 @@ function loadDefaultSegmenter(): Promise<Segmenter> {
 const HOLD_MS = 2600;
 const RING = 295.3;
 
+/** "3 h earlier", "1 h 35 min earlier", "45 min later", or "real time". */
+function offsetLabel(min: number): string {
+  if (min === 0) return 'real time';
+  const a = Math.abs(min);
+  const h = Math.floor(a / 60);
+  const m = a % 60;
+  const parts = [h ? `${h} h` : '', m ? `${m} min` : ''].filter(Boolean).join(' ');
+  return `${parts} ${min < 0 ? 'earlier' : 'later'}`;
+}
+
 /**
  * The bedtime Energy Scanner: kids work through their routine, then scan. The scan is either the
  * palm pad (press and hold) or a photo, where their energy glows off them as an animated aura.
@@ -63,7 +73,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   root.innerHTML = `
     <header class="bt-head">
       <h1 class="logo">Energy Scanner</h1>
-      <div class="clock"><b data-clock>--:--</b>bedtime <span data-bed></span></div>
+      <div class="clock"><b><span data-clock>--:--</span><span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
     </header>
     <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
     <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
@@ -101,6 +111,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <label>Bedtime <input type="time" data-input="bed" /></label>
         <label for="fake-time">Try a different time</label>
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
+        <div class="row"><button type="button" class="btn small" data-action="real-time" hidden>Back to real time</button></div>
         <label>Always read Grey Energy <input type="checkbox" data-input="always" /></label>
         <div class="row"><button type="button" class="btn small" data-action="clear">Clear tonight's steps</button></div>
         <p>With Always Grey on, every scan comes back Grey.</p>
@@ -466,13 +477,23 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     store.set('bed', bed);
     tick();
   });
-  $<HTMLInputElement>('[data-input="fake"]').addEventListener('input', (e) => {
-    const range = e.target as HTMLInputElement;
-    offsetMin = Number(range.value);
-    const shown = offsetMin === 0 ? 'real time' : `${offsetMin > 0 ? '+' : ''}${offsetMin} min`;
+  // A pretend time is for grown-ups trying the colors; the header says so, and one tap undoes it.
+  const fakeRange = $<HTMLInputElement>('[data-input="fake"]');
+  const realTimeBtn = $<HTMLButtonElement>('[data-action="real-time"]');
+  const setOffset = (min: number) => {
+    offsetMin = min;
+    fakeRange.value = String(min);
+    const shown = offsetLabel(min);
     $('[data-fake]').textContent = shown;
-    range.setAttribute('aria-valuetext', shown);
+    fakeRange.setAttribute('aria-valuetext', shown);
+    $('[data-pretend]').hidden = min === 0;
+    realTimeBtn.hidden = min === 0;
     tick();
+  };
+  fakeRange.addEventListener('input', () => setOffset(Number(fakeRange.value)));
+  realTimeBtn.addEventListener('click', () => {
+    setOffset(0);
+    fakeRange.focus();
   });
   always.addEventListener('change', () => {
     alwaysGrey = always.checked;
