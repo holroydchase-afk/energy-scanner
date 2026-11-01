@@ -1,5 +1,17 @@
 # Handoff
 
+<!-- status
+stage: live
+goal: portfolio
+milestone: ES-M2 (Polish Freeze: harden and UI polish only)
+now: Intake check runs 4x a day; no build work in progress
+next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
+waiting_on_chase:
+  - 60-second phone check and iPhone rescan of three real photos
+  - CLAUDE.md never-deploy rule vs Pages deploying on push
+blockers: []
+-->
+
 ## Planning IDs (Oct 21, 2026)
 The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1.1.1`; product code `ES` across products). Old labels stay in git history and branch names. New work uses the new IDs, starting at M2.
 
@@ -23,6 +35,10 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Nov 1: CI `test` job pinned to `ubuntu-24.04` (Chase's call): `ubuntu-latest` moved to 26.04, where Playwright 1.56.1 can't install Chromium. Unpin once a Playwright upgrade supports 26.04.
+- Oct 31 Intake check: #39 done: qa-tdd synced from studio-agents main (qa report contract), `scripts/check-qa-report.mjs` added, CLAUDE.md gets the "Relay qa-tdd's verdict as-is" rule; qa-tdd ran once on this branch (its qa block is in PR #41).
+- Oct 31 Intake check: #40 done: status header added at the top of this file (Studio Console reads it), `scripts/check-handoff-status.sh` installed from studio-agents, and a warn-only step added to handoff-check.
+- Oct 31 Intake check: #38 (studio Demo bar) closed as not planned. The app shows no sample data, and the illustrated sample already has its "not a real person" caption. #39 was blocked on studio-agents #33 until it merged that evening.
 - 2026-10-29, studio re-sync (branch `claude/project-thread-qfo5la`): ran studio-agents `main` (b6a9a8b) `scripts/sync.sh`, `scripts/sync-tools.sh` and `scripts/install-rules.sh` on this repo. New: the upgraded `ux-reviewer` (visual critic, two critics per screen, 0-10 score, Layer 1 G rules, preloads `review-rounds`), `.claude/design-rules.md`, `scripts/ux-shots.mjs` and `scripts/ux-rules.mjs` (Playwright visual and rule checks), the Supabase line in `privacy-security`, and the agent run log (`scripts/log-agent-run.sh` hook in `.claude/settings.json`, `scripts/check-agent-runs.sh` step in `agents-check.yml`). Hand-merged the files install-rules kept: `.claude/settings.json` and `agents-check.yml` now match the templates, `studio-checks.json` keeps `roots: ["src"]` and adds `agents.verify` (`npm run check`, 3 runs on CI), CLAUDE.md gets the "every agent must really have run" paragraph. `review-rounds` is now upstream and identical, so the next sync keeps it. ESLint allows empty `catch {}` in the two synced tools only (a re-sync would undo edits to them). No project-only agents existed; all 7 agents are studio ones. Lint, typecheck and unit tests (115) green 3x; e2e 18 passed, 1 skipped.
 - 2026-10-29, review-rounds skill (branch `claude/project-thread-jtg48o`): `.claude/skills/review-rounds/SKILL.md` writes down the review loop used for ES-R1 to R68 (rounds, P0 to P2, review file format, stop rule), and `ux-reviewer` preloads it with a `skills:` line, since its tool list has no Skill tool. Chase asked for it in the "Find reusable agents and libraries" thread and approved the merge.
 - 2026-10-28 studio refresh merged as PR #35: agents re-synced from studio-agents (adds `architect`), `agents-check` workflow, `scripts/check-agents.sh`, Studio agents table in CLAUDE.md.
