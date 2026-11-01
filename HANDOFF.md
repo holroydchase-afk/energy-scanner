@@ -7,7 +7,6 @@ milestone: ES-M2 (Polish Freeze: harden and UI polish only)
 now: Intake check runs 4x a day; no build work in progress
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
-  - Decide the CI runner pin (ubuntu-latest moved to 26.04; Playwright install fails)
   - 60-second phone check and iPhone rescan of three real photos
   - CLAUDE.md never-deploy rule vs Pages deploying on push
 blockers: []
@@ -36,6 +35,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Nov 1: CI `test` job pinned to `ubuntu-24.04` (Chase's call): `ubuntu-latest` moved to 26.04, where Playwright 1.56.1 can't install Chromium. Unpin once a Playwright upgrade supports 26.04.
 - Oct 31 Intake check: #39 done: qa-tdd synced from studio-agents main (qa report contract), `scripts/check-qa-report.mjs` added, CLAUDE.md gets the "Relay qa-tdd's verdict as-is" rule; qa-tdd ran once on this branch (its qa block is in PR #41).
 - Oct 31 Intake check: #40 done: status header added at the top of this file (Studio Console reads it), `scripts/check-handoff-status.sh` installed from studio-agents, and a warn-only step added to handoff-check.
 - Oct 31 Intake check: #38 (studio Demo bar) closed as not planned. The app shows no sample data, and the illustrated sample already has its "not a real person" caption. #39 is blocked (see Blockers).
