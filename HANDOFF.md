@@ -4,11 +4,10 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: PR for ES-R69 to R71 (phone screenshot polish) waiting on Chase's review
+now: intake #43 studio standard (PR #44), merging on Chase's "Test and merge all"; #42 (ES-R69 to R71) merged Nov 2
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
-  - CLAUDE.md never-deploy rule vs Pages deploying on push
 blockers: []
 -->
 
@@ -35,7 +34,8 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
-- Nov 1, phone screenshot polish (branch `claude/project-thread-g6bi4s`, from Chase's iPhone shots of the live app), failing tests first:
+- Nov 1, intake #43 (studio standard), in progress: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
+- Nov 1, phone screenshot polish (merged as PR #42 on Nov 2) (branch `claude/project-thread-g6bi4s`, from Chase's iPhone shots of the live app), failing tests first:
   - ES-R69 (P1): a pretend time from the Grown-ups slider looked like the real clock (header said 5:14 AM at 8:14). The header now shows a "pretend" tag and a "Back to real time" button appears under the slider.
   - ES-R70 (P2): the slider reads "3 h earlier" / "45 min later" instead of "-180 min".
   - ES-R71 (P2): on touch phones the footer gets 80px extra bottom room so Safari's floating bottom bar no longer covers the privacy line (confirm on an iPhone).
