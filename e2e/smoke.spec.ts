@@ -105,3 +105,13 @@ test('ES-R65 the link preview text pitches the on-device aura', async ({ page })
   const content = await page.locator('meta[property="og:description"]').getAttribute('content');
   expect(content).toContain('Nothing is uploaded');
 });
+
+test.describe('ES-R71 on a touch phone', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('the footer leaves room for a browser bar floating over the bottom', async ({ page }) => {
+    await page.goto('/');
+    const pad = await page.locator('.foot').evaluate((el) => parseFloat(getComputedStyle(el).paddingBottom));
+    expect(pad).toBeGreaterThanOrEqual(72);
+  });
+});

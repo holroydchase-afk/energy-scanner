@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: intake #43 studio standard (PR #44), merging on Chase's "Test and merge all"
+now: intake #43 studio standard (PR #44), merging on Chase's "Test and merge all"; #42 (ES-R69 to R71) merged Nov 2
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -35,6 +35,11 @@ _Updated 2026-10-22._
 
 ## Done
 - Nov 1, intake #43 (studio standard), in progress: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
+- Nov 1, phone screenshot polish (merged as PR #42 on Nov 2) (branch `claude/project-thread-g6bi4s`, from Chase's iPhone shots of the live app), failing tests first:
+  - ES-R69 (P1): a pretend time from the Grown-ups slider looked like the real clock (header said 5:14 AM at 8:14). The header now shows a "pretend" tag and a "Back to real time" button appears under the slider.
+  - ES-R70 (P2): the slider reads "3 h earlier" / "45 min later" instead of "-180 min".
+  - ES-R71 (P2): on touch phones the footer gets 80px extra bottom room so Safari's floating bottom bar no longer covers the privacy line (confirm on an iPhone).
+  - Checked, not a bug: Rainbow at 5 AM with 0 of 5 steps is by design (15 h before an 8 PM bedtime reads wide awake).
 - Nov 1: CI `test` job pinned to `ubuntu-24.04` (Chase's call): `ubuntu-latest` moved to 26.04, where Playwright 1.56.1 can't install Chromium. Unpin once a Playwright upgrade supports 26.04.
 - Oct 31 Intake check: #39 done: qa-tdd synced from studio-agents main (qa report contract), `scripts/check-qa-report.mjs` added, CLAUDE.md gets the "Relay qa-tdd's verdict as-is" rule; qa-tdd ran once on this branch (its qa block is in PR #41).
 - Oct 31 Intake check: #40 done: status header added at the top of this file (Studio Console reads it), `scripts/check-handoff-status.sh` installed from studio-agents, and a warn-only step added to handoff-check.
