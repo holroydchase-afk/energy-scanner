@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: PR for ES-R69 to R71 (phone screenshot polish) waiting on Chase's review
+now: QA follow-up for #42 (QA-R1 pretend tag spacing, QA-R2 gap tests) in a draft PR
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -35,6 +35,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Nov 2, qa-tdd pass on #42 (after it merged): suites green 3x; QA-R1 (P2) the header read "7:00 PMpretend" with no space for screen readers or copied text, fixed with a real space; QA-R2 (P2) gap tests for slider edges, focus return, hidden reset row, 320px header and desktop footer added (`src/qa-pretend.test.ts`, `e2e/qa-pretend.spec.ts`). qa-tdd ran as a general-purpose agent with the qa-tdd brief, since cloud sessions can't load repo agent types.
 - Nov 1, phone screenshot polish (branch `claude/project-thread-g6bi4s`, from Chase's iPhone shots of the live app), failing tests first:
   - ES-R69 (P1): a pretend time from the Grown-ups slider looked like the real clock (header said 5:14 AM at 8:14). The header now shows a "pretend" tag and a "Back to real time" button appears under the slider.
   - ES-R70 (P2): the slider reads "3 h earlier" / "45 min later" instead of "-180 min".
