@@ -326,6 +326,41 @@ describe('bedtime app', () => {
     expect(main.contains(root.querySelector('.reading-card'))).toBe(true);
   });
 
+  it('ES-R69 a pretend time is marked in the header and resets to real time in one tap', () => {
+    const root = mount({ now: () => new Date(2026, 10, 1, 8, 14) });
+    const range = root.querySelector<HTMLInputElement>('[data-input="fake"]')!;
+    const tag = root.querySelector<HTMLElement>('[data-pretend]')!;
+    const reset = root.querySelector<HTMLButtonElement>('[data-action="real-time"]')!;
+    expect(tag.hidden).toBe(true);
+    expect(reset.hidden).toBe(true);
+    range.value = '-180';
+    range.dispatchEvent(new Event('input'));
+    expect(root.querySelector('[data-clock]')!.textContent).toContain('5:14');
+    expect(tag.hidden).toBe(false);
+    expect(tag.textContent).toMatch(/pretend/i);
+    expect(reset.hidden).toBe(false);
+    reset.click();
+    expect(range.value).toBe('0');
+    expect(root.querySelector('[data-clock]')!.textContent).toContain('8:14');
+    expect(tag.hidden).toBe(true);
+    expect(reset.hidden).toBe(true);
+    expect(range.getAttribute('aria-valuetext')).toBe('real time');
+  });
+
+  it('ES-R70 the time offset reads in hours and minutes, earlier or later', () => {
+    const root = mount();
+    const range = root.querySelector<HTMLInputElement>('[data-input="fake"]')!;
+    const set = (v: string) => {
+      range.value = v;
+      range.dispatchEvent(new Event('input'));
+      return root.querySelector('[data-fake]')!.textContent;
+    };
+    expect(set('-180')).toBe('3 h earlier');
+    expect(set('-95')).toBe('1 h 35 min earlier');
+    expect(set('45')).toBe('45 min later');
+    expect(set('0')).toBe('real time');
+  });
+
   it('ES-R45 unmount removes page-wide listeners and the clock', () => {
     vi.useFakeTimers();
     const root = document.createElement('div');
