@@ -4,11 +4,10 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: intake #43, studio standard adoption (draft PR); CLAUDE.md rewrite waits on Chase's go
+now: intake #43 studio standard (PR #44), merging on Chase's "Test and merge all"
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
-  - Go on the CLAUDE.md rewrite for the studio standard (intake #43): never-merge becomes the live-demo gate
 blockers: []
 -->
 
@@ -35,7 +34,7 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
-- Nov 1, intake #43 (studio standard), in progress: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. Still to do: the CLAUDE.md rewrite (standard line, agents section with the story-keeper row, and the never-merge rule changed to the live-demo gate), which waits on Chase's go.
+- Nov 1, intake #43 (studio standard), in progress: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
 - Nov 1: CI `test` job pinned to `ubuntu-24.04` (Chase's call): `ubuntu-latest` moved to 26.04, where Playwright 1.56.1 can't install Chromium. Unpin once a Playwright upgrade supports 26.04.
 - Oct 31 Intake check: #39 done: qa-tdd synced from studio-agents main (qa report contract), `scripts/check-qa-report.mjs` added, CLAUDE.md gets the "Relay qa-tdd's verdict as-is" rule; qa-tdd ran once on this branch (its qa block is in PR #41).
 - Oct 31 Intake check: #40 done: status header added at the top of this file (Studio Console reads it), `scripts/check-handoff-status.sh` installed from studio-agents, and a warn-only step added to handoff-check.
