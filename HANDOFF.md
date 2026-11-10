@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: intake #43 studio standard (PR #44), merging on Chase's "Test and merge all"; #42 (ES-R69 to R71) merged Nov 2
+now: Nov 10, #45 QA follow-up (QA-R1, QA-R2) retested and merged as one PR on Chase's "retest and merge"; #44 studio standard merged
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -25,7 +25,8 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Portfolio / public presence
-_Updated 2026-10-22._
+_Updated 2026-11-10._
+- **Nov 10:** live app header now reads "7:00 PM pretend" with a real space when a pretend time is set (QA-R1, from #45); on very narrow phones the pretend tag sits under the time (QA-R3).
 - **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. Merged as PR #16 and live since Oct 23.
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
 - **Portfolio page:** https://chaseholroyd.com/energy-scanner.html (source: `tools/build.py` in `holroydchase-afk.github.io`). ES-M2.3 (portfolio PR #8, merged Oct 21): its "Try it" button opens the live app at /energy-scanner/, and the copy covers the palm scan and the on-device photo aura. The old /demo/energy-scanner/ snapshot stays one release, unlinked, then is removed.
@@ -34,7 +35,9 @@ _Updated 2026-10-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
-- Nov 1, intake #43 (studio standard), in progress: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
+- Nov 10, retest and merge (Chase): the only open PR was #45; it was brought up to date with the default branch (HANDOFF conflict only), all suites rerun 3x, and merged as one PR. #45 closed as superseded. Goes live: the header reads "7:00 PM pretend" with a real space (QA-R1). CI then caught the extra space pushing the 320px header 4px past the screen (QA-R3, P2, CI's monospace font is wider than the sandbox's); fixed by letting the pretend tag wrap under the time when space runs out, with a stricter header-overflow test that failed first. The rest is tests.
+- Nov 2, qa-tdd pass on #42 (after it merged): suites green 3x; QA-R1 (P2) the header read "7:00 PMpretend" with no space for screen readers or copied text, fixed with a real space; QA-R2 (P2) gap tests for slider edges, focus return, hidden reset row, 320px header and desktop footer added (`src/qa-pretend.test.ts`, `e2e/qa-pretend.spec.ts`). qa-tdd ran as a general-purpose agent with the qa-tdd brief, since cloud sessions can't load repo agent types.
+- Nov 2, intake #43 (studio standard), merged as PR #44: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
 - Nov 1, phone screenshot polish (merged as PR #42 on Nov 2) (branch `claude/project-thread-g6bi4s`, from Chase's iPhone shots of the live app), failing tests first:
   - ES-R69 (P1): a pretend time from the Grown-ups slider looked like the real clock (header said 5:14 AM at 8:14). The header now shows a "pretend" tag and a "Back to real time" button appears under the slider.
   - ES-R70 (P2): the slider reads "3 h earlier" / "45 min later" instead of "-180 min".
