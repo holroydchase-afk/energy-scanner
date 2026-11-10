@@ -79,7 +79,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: 
 .pitch span { flex: 1 1 22ch; }
 .clock { font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .clock b { display: block; color: var(--fg); font-size: 1.1rem; font-weight: 400; }
-.clock .pretend { margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: var(--moon); color: #14183a; font-size: 0.75rem; vertical-align: 2px; }
+.clock .pretend { margin-left: 2px; padding: 1px 6px; border-radius: 6px; background: var(--moon); color: #14183a; font-size: 0.75rem; vertical-align: 2px; }
 .clock .pretend[hidden] { display: none; }
 .steps-wrap { margin-top: 16px; }
 .steplbl { display: flex; justify-content: space-between; font-family: ui-monospace, Menlo, monospace; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }

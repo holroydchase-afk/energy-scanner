@@ -73,7 +73,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   root.innerHTML = `
     <header class="bt-head">
       <h1 class="logo">Energy Scanner</h1>
-      <div class="clock"><b><span data-clock>--:--</span><span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
+      <div class="clock"><b><span data-clock>--:--</span> <span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
     </header>
     <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
     <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
