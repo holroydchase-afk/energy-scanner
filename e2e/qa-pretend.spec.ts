@@ -28,6 +28,8 @@ test('ES-R69 the pretend tag fits the header on a 320px phone', async ({ page })
   await expect(page.locator('[data-pretend]')).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+  const head = await page.locator('.bt-head').evaluate((el) => el.scrollWidth - el.clientWidth);
+  expect(head).toBeLessThanOrEqual(0);
 });
 
 test('ES-R71 a mouse-and-keyboard desktop keeps the normal footer padding', async ({ page }) => {
