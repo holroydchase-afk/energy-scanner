@@ -1,0 +1,19 @@
+# Studio security kit (studio-agents templates/security). Weekly update PRs, minor and
+# patch grouped into one. Security fixes also come as their own PRs when
+# Dependabot security updates is on in Settings.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

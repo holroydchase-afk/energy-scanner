@@ -24,6 +24,9 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | M6 / Hardening | ES-M1.6 | Harden | #6 |
 | (milestone) | ES-M1 | Demoable v1 | |
 
+## Security kit (Nov 10)
+- Installed the studio security kit (gitleaks history scan, personal-data scan, dependency review, CodeQL, Dependabot, SECURITY.md) so private content cannot land in this public repo. CI-only; the built app is unchanged. Privacy scan is clean. Chase: turn on the repo security toggles listed in pm-tools STUDIO-STATUS.
+
 ## Portfolio / public presence
 _Updated 2026-11-10._
 - **Nov 10:** live app header now reads "7:00 PM pretend" with a real space when a pretend time is set (QA-R1, from #45); on very narrow phones the pretend tag sits under the time (QA-R3).
