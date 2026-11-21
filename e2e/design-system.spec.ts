@@ -395,3 +395,107 @@ test('ES-M2.4 D1 (P4) a visible Scan button gives the same reading as press-and-
   await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
 });
+
+// ---------- DS-R18 to DS-R22: after-review P2 findings (ux-after 2026-11-21). Written red first by qa-tdd. ----------
+
+/** Text-line tops of an element's own text (not its controls), to tell if a label wraps mid-label. */
+function lineTops(el: Element): number[] {
+  const tops = new Set<number>();
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (!n.textContent?.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(n);
+    for (const r of range.getClientRects()) if (r.width > 0) tops.add(Math.round(r.top));
+  }
+  return [...tops];
+}
+
+for (const width of [390, 320]) {
+  test(`DS-R18 Grown-ups Look options are three stacked 48px rows on the Grown-ups edge at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 320 ? 640 : 844 });
+    await open(page, 'grown-ups');
+    const options = page.getByRole('radiogroup', { name: 'Look' }).getByRole('radio');
+    await expect(options).toHaveCount(3);
+    const rows = await options.evaluateAll((els, fnSrc) => {
+      const tops = new Function(`return ${fnSrc}`)() as (el: Element) => number[];
+      return els.map((el) => {
+        const row = el.closest('label') ?? el;
+        const r = row.getBoundingClientRect();
+        return { name: (row.textContent ?? '').trim(), left: r.left, top: r.top, bottom: r.bottom, h: r.height, lines: tops(row).length };
+      });
+    }, lineTops.toString());
+    expect(rows.map((r) => r.name)).toEqual(['Light', 'Dark', 'Match phone']);
+    for (const r of rows) {
+      expect.soft(r.h, `${r.name} row is at least 48px high`).toBeGreaterThanOrEqual(47.5);
+      expect.soft(r.lines, `${r.name} label is on one line`).toBe(1);
+    }
+    for (let i = 1; i < rows.length; i++) {
+      expect.soft(rows[i]!.top, `${rows[i]!.name} sits on its own row under ${rows[i - 1]!.name}`).toBeGreaterThanOrEqual(rows[i - 1]!.bottom - 0.5);
+    }
+    // The edge every other Grown-ups row starts on (Bedtime, Always Grey).
+    const edges = await page.locator('.grownups').evaluate((g) => {
+      const bed = g.querySelector('[data-input="bed"]')!.closest('label')!.getBoundingClientRect().left;
+      const always = g.querySelector('[data-input="always"]')!.closest('label')!.getBoundingClientRect().left;
+      return { bed, always };
+    });
+    expect(Math.abs(edges.bed - edges.always), 'the other Grown-ups rows share one edge').toBeLessThanOrEqual(0.5);
+    expect.soft(rows.map((r) => Math.round(r.left)), 'Look options start on the Grown-ups edge').toEqual(rows.map(() => Math.round(edges.bed)));
+  });
+}
+
+test('DS-R20 once a palm reading shows, the pad Scan button is hidden; it returns on Scan again', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const scan = page.getByRole('button', { name: 'Scan', exact: true });
+  await expect(scan).toBeVisible();
+  await scan.click();
+  await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('button', { name: 'Scan again' })).toBeVisible();
+  await expect(page.locator('[data-action="scan"]'), 'only one visible "Scan" button after a scan').toBeHidden();
+  await page.getByRole('button', { name: 'Scan again' }).click();
+  await expect(page.getByRole('button', { name: 'Scan', exact: true })).toBeVisible();
+});
+
+test.describe('DS-R21 Grown-ups at 1280px', () => {
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test('DS-R21 the Grown-ups panel is at most 560px wide', async ({ page }) => {
+    await open(page, 'grown-ups');
+    const w = await page.locator('.grownups .parent').evaluate((el) => el.getBoundingClientRect().width);
+    expect(w).toBeLessThanOrEqual(560);
+  });
+
+  test('DS-R21 the Always Grey help text sits within 16px below its switch row', async ({ page }) => {
+    await open(page, 'grown-ups');
+    const row = await page.getByRole('checkbox', { name: /Always read Grey Energy/ }).evaluate((el) => el.closest('label')!.getBoundingClientRect().bottom);
+    const help = await page.getByText('With Always Grey on, every scan comes back Grey.').evaluate((el) => el.getBoundingClientRect().top);
+    const gap = help - row;
+    expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeGreaterThanOrEqual(0);
+    expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeLessThanOrEqual(16);
+  });
+
+  test('DS-R21 the "Try a different time" label sits within 16px above the slider', async ({ page }) => {
+    await open(page, 'grown-ups');
+    const slider = page.getByRole('slider', { name: 'Try a different time' });
+    const top = await slider.evaluate((el) => el.getBoundingClientRect().top);
+    const textBottom = await page.locator('label[for="fake-time"]').evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return Math.max(...[...range.getClientRects()].map((r) => r.bottom));
+    });
+    const gap = top - textBottom;
+    expect(gap, `label text is ${gap.toFixed(1)}px above the slider`).toBeGreaterThanOrEqual(0);
+    expect(gap, `label text is ${gap.toFixed(1)}px above the slider`).toBeLessThanOrEqual(16);
+  });
+});
+
+test('DS-R22 the tagline, pitch and reading text wrap pretty (no orphan last word)', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await open(page, 'palm result');
+  const got = await page.evaluate(() => Object.fromEntries(['.tagline', '.pitch', '.rc-text'].map((sel) => {
+    const el = document.querySelector(sel);
+    return [sel, el ? getComputedStyle(el).getPropertyValue('text-wrap-style') : 'missing'];
+  })));
+  expect(got).toEqual({ '.tagline': 'pretty', '.pitch': 'pretty', '.rc-text': 'pretty' });
+});

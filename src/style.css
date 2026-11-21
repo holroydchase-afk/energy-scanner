@@ -184,8 +184,8 @@ h1, h2, p { margin: 0; }
 .clock .pretend { padding: 0 var(--space-xs); border-radius: var(--radius-small); background: var(--fill); color: var(--ink); font-weight: 400; white-space: nowrap; }
 .byline { margin: 0 0 var(--space-xs); color: var(--muted); }
 .byline a { display: inline-flex; align-items: center; min-height: var(--target); }
-.tagline { margin: 0 0 var(--space-sm); color: var(--muted); }
-.pitch { margin: 0 0 var(--space-md); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-lg); }
+.tagline { margin: 0 0 var(--space-sm); color: var(--muted); text-wrap: pretty; }
+.pitch { margin: 0 0 var(--space-md); text-wrap: pretty; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-lg); }
 .pitch span { flex: 1 1 22ch; }
 
 /* Buttons (STUDIO-CORE section 6): plain = ink on fill; tinted = accent on accentSoft, one per screen;
@@ -263,6 +263,7 @@ h1, h2, p { margin: 0; }
 .batt .cell { width: 44px; height: 20px; border: 2px solid var(--ink); border-radius: 4px; position: relative; padding: 2px; }
 .batt .cell::after { content: ''; position: absolute; right: -6px; top: 5px; width: 3px; height: 7px; background: var(--ink); border-radius: 1px; }
 .batt .fill { height: 100%; background: var(--energy); border-radius: 1px; }
+.rc-text { text-wrap: pretty; }
 .reading-card .rc-note { color: var(--muted); }
 .reading-card .rc-todo { color: var(--muted); }
 .reading-card .rc-todo.all-done { color: var(--ink); }
@@ -274,7 +275,11 @@ h1, h2, p { margin: 0; }
 .grownups summary::-webkit-details-marker { display: none; }
 .grownups summary::before { content: '▸'; }
 .grownups[open] summary::before { content: '▾'; }
-.parent { display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-md); }
+.parent { display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-md); max-width: 560px; }
+/* A label that names the control under it sits tight above it (DS-R21). */
+.parent label.above { min-height: 0; margin-bottom: calc(-1 * var(--space-xs)); }
+/* Help text sits right under its switch row (DS-R21). */
+.parent .help { display: flex; flex-direction: column; gap: var(--space-sm); margin-top: calc(-1 * var(--space-xs)); }
 .parent label { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); min-height: var(--target); cursor: pointer; color: var(--ink); }
 .parent .switch { justify-content: flex-start; }
 .parent .switch span:first-child { flex: 1; }
@@ -283,9 +288,10 @@ h1, h2, p { margin: 0; }
 .parent .row { display: flex; align-items: center; gap: var(--space-md); }
 .parent .row:has(> [hidden]:only-child) { display: none; }
 .parent input[type='range'] { flex: 1; min-width: 0; height: var(--target); margin: 0; accent-color: var(--accent); }
-.look { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-md); }
-.look legend { float: left; margin-right: var(--space-sm); color: var(--ink); }
-.parent .look label { justify-content: flex-start; gap: var(--space-sm); padding: 0 var(--space-sm); }
+.look { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-sm); }
+.look legend { padding: 0; margin-bottom: var(--space-xs); color: var(--ink); }
+/* Three stacked 48px rows on the Grown-ups edge (DS-R18). */
+.parent .look label { justify-content: flex-start; gap: var(--space-sm); padding: 0; }
 
 /* Footer */
 .foot { text-align: center; color: var(--muted); padding: var(--space-lg) 0 calc(var(--space-xl) + env(safe-area-inset-bottom, 0px)); }

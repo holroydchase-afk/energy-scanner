@@ -116,13 +116,15 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <label><input type="radio" name="look" value="auto" data-look /> Match phone</label>
         </fieldset>
         <label>Bedtime <input type="time" data-input="bed" /></label>
-        <label for="fake-time">Try a different time</label>
+        <label for="fake-time" class="above">Try a different time</label>
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <div class="row"><button type="button" class="btn" data-action="real-time" hidden>Back to real time</button></div>
         <label class="switch"><span>Always read Grey Energy</span> <input type="checkbox" data-input="always" /> <span data-onoff>Off</span></label>
+        <div class="help">
+          <p>With Always Grey on, every scan comes back Grey.</p>
+          <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
+        </div>
         <div class="row"><button type="button" class="btn" data-action="clear">Clear tonight's steps</button></div>
-        <p>With Always Grey on, every scan comes back Grey.</p>
-        <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
       </div>
     </details>
     <footer class="foot">
@@ -233,6 +235,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       </div>
     `;
     const pad = $('.pad');
+    const scanBtn = $('[data-action="scan"]');
     const prog = root.querySelector<SVGCircleElement>('.prog')!;
     const hint = $('[data-hint]');
     const hold = options.holdMs ?? HOLD_MS;
@@ -257,6 +260,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       syncMain();
       t0 = performance.now();
       card.hidden = true;
+      scanBtn.hidden = false;
       setEnergyColor(null);
       pad.classList.remove('done');
       pad.classList.add('scanning');
@@ -284,6 +288,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const energy = scanEnergy();
       const level = levelFor(energy);
       hint.textContent = 'Scan complete';
+      // One "Scan" on screen: the reading's Scan again takes over (DS-R20).
+      scanBtn.hidden = true;
       showReading(energy, level);
       revealCard();
     };
@@ -292,7 +298,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       if (holding && auto) auto = false; // a hand on the pad during a button scan takes over the hold
       start(e);
     };
-    $('[data-action="scan"]').addEventListener('click', () => start(undefined, false));
+    scanBtn.addEventListener('click', () => start(undefined, false));
     const lift = (id: number | string) => {
       // Only a finger (or key) that pressed the pad can end the hold.
       if (!touching.delete(id)) return;
