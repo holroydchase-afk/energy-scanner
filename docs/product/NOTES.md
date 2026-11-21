@@ -101,7 +101,7 @@ Owned by positioning. Public copy only uses claims listed here.
 | Photos never leave your device; no uploads | CSP `connect-src 'self'` in `vite.config.ts`; `e2e/smoke.spec.ts` (CSP blocks other origins); `e2e/aura.spec.ts` (every request stays on the app's origin) |
 | The AI runs on your device, not in the cloud | `src/segment/mediapipe.ts`; model in `public/models/`, runtime copied to `public/mediapipe/` |
 | Not even a CDN sees a request | Model and wasm served from the app's own origin (`mediapipe.ts`, `scripts/copy-mediapipe-wasm.mjs`); `e2e/aura.spec.ts` origin check |
-| No server, account, analytics or cookies | Static Vite build, one runtime dependency (`package.json`); CSP |
+| No server, account, analytics or cookies | Static Vite build, two runtime dependencies (`package.json`: the MediaPipe runtime and the bundled Atkinson Hyperlegible Next font); CSP |
 | A 250 KB person-segmentation model | `public/models/selfie_segmenter.tflite` (249,537 bytes) |
 | Try it with no photo: an illustrated sample, not a real person | `src/photo/sample.ts`; `e2e/aura.spec.ts` sample test; `samples/SOURCES.md` |
 | No real person's photo is published | `samples/SOURCES.md`; `CLAUDE.md` hard rule |

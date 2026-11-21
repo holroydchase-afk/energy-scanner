@@ -43,7 +43,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       <p class="caption" hidden></p>
       <p class="status" role="status" aria-live="polite">Scanning energy…</p>
       <div class="actions" data-slot="actions">
-        <button type="button" class="btn primary" data-action="share" hidden>Share</button>
+        <button type="button" class="btn tinted" data-action="share" hidden>Share</button>
         <button type="button" class="btn" data-action="save-image" hidden>Save image</button>
         <button type="button" class="btn" data-action="save-video" hidden>Save video</button>
         <button type="button" class="btn" data-action="reset">${options.resetLabel ?? 'New photo'}</button>
@@ -156,7 +156,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
     // The share sheet is a phone thing; desktops get the save buttons.
     button('share').hidden = typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function';
     // One main button: Share where there's a share sheet, otherwise Save image.
-    button('save-image').classList.toggle('primary', button('share').hidden);
+    button('save-image').classList.toggle('tinted', button('share').hidden);
   };
   // Cancels a recording in progress when this view goes away (New photo, another mode).
   const saving = new AbortController();

@@ -120,7 +120,7 @@ _Updated 2026-11-10._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Nothing.
+- ES-M2.4 Studio design system (Paper), branch `claude/project-thread-e25yzo`, uncommitted. qa-tdd's DS-* tests are green (unit 141, e2e 72 + 1 skipped); `ux-rules --primary .tinted --strict --strict-visual` 0 findings. Built: `src/design/theme.ts` (Paper color math written from STUDIO-CORE §3, not ported: Hearth's code is AGPL), `scripts/gen-themes.mjs` (`npm run themes`) writes the color vars into a marked block in `src/style.css`, token-only `style.css`, bundled Atkinson Hyperlegible Next 5.3.0 (OFL, `licenses/OFL-1.1.txt`), tinted/quiet buttons, Scan button on the pad, Look (Light/Dark/Match phone) in Grown-ups, Always Grey On/Off words, step check marks, reading name in ink with an energy dot, solid caption band on saved images. Next: qa-tdd 3x, ux-reviewer showcase review (light and dark), privacy-security (new font dependency), then `npm run screenshots` as the last commit; live demo changes, so Chase's go before merge.
 
 ## Exact next step
 - Chase: review and merge the studio re-sync PR. From then on, agents named on a PR's `Agents:` line must show up in `.claude/agent-runs/<branch>.log` (the hook writes it in sessions that load the repo's agents; commit it with the PR).

@@ -1,4 +1,8 @@
 import type { EnergyType } from '../aura/types';
+import { paletteFor } from '../design/theme';
+
+/** The studio font stack, bundled with the app (DS-5). */
+const FONT = '"Atkinson Hyperlegible Next", system-ui, sans-serif';
 
 export const VIDEO_SECONDS = 4;
 export const VIDEO_FPS = 30;
@@ -43,20 +47,19 @@ export function drawCaptioned(target: HTMLCanvasElement, source: HTMLCanvasEleme
   const { width, height } = target;
   ctx.drawImage(source, 0, 0);
   const unit = Math.max(12, Math.round(Math.min(width, height) / 32));
-  const band = unit * 4;
-  const g = ctx.createLinearGradient(0, height - band, 0, height);
-  g.addColorStop(0, 'rgba(0,0,0,0)');
-  g.addColorStop(1, 'rgba(0,0,0,0.55)');
-  ctx.fillStyle = g;
+  // A solid band, so the words never sit on the photo (STUDIO-CORE principle 5). Paper dark colors.
+  const band = unit * 3;
+  const colors = paletteFor(true);
+  ctx.fillStyle = colors.bg;
   ctx.fillRect(0, height - band, width, band);
   ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#fff';
-  ctx.font = `700 ${Math.round(unit * 1.3)}px system-ui, sans-serif`;
-  ctx.fillText(captionFor(energy), unit, height - unit * 1.1);
-  ctx.font = `500 ${Math.round(unit * 0.7)}px system-ui, sans-serif`;
-  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillStyle = colors.ink;
+  ctx.font = `600 ${Math.round(unit * 1.3)}px ${FONT}`;
+  ctx.fillText(captionFor(energy), unit, height - unit * 1.05);
+  ctx.font = `400 ${Math.round(unit * 0.8)}px ${FONT}`;
+  ctx.fillStyle = colors.muted;
   const brand = 'Energy Scanner';
-  ctx.fillText(brand, width - unit - ctx.measureText(brand).width, height - unit * 1.1);
+  ctx.fillText(brand, width - unit - ctx.measureText(brand).width, height - unit * 1.05);
 }
 
 export function canvasToBlob(canvas: HTMLCanvasElement, type = 'image/png'): Promise<Blob> {
