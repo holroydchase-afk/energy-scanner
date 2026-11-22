@@ -54,7 +54,7 @@ async function open(device, { alwaysGrey = true, evening = false } = {}) {
 }
 
 async function sample(page) {
-  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('radio', { name: 'Photo' }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click({ force: true });
   await page.waitForSelector('canvas.aura', { timeout: 60_000 });
   await page.waitForTimeout(2500);
