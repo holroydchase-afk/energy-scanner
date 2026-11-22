@@ -226,7 +226,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <div class="beam"></div>
           <div class="hand" aria-hidden="true">${icon('hand', 96, 1.5)}</div>
         </button>
-        <p class="hint" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
+        <p class="hint visually-hidden" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
         <button type="button" class="btn" data-action="scan">Scan</button>
       </div>
     `;
@@ -260,7 +260,9 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       setEnergyColor(null);
       pad.classList.remove('done');
       pad.classList.add('scanning');
-      hint.textContent = auto ? 'Scanning…' : 'Scanning… keep holding';
+      // The ring and beam show the state; the words are for screen readers (TXT-R3).
+      hint.classList.add('visually-hidden');
+      hint.textContent = 'Scanning';
       loop();
     };
     const stop = () => {
@@ -283,7 +285,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       }
       const energy = scanEnergy();
       const level = levelFor(energy);
-      hint.textContent = 'Scan complete';
+      hint.textContent = 'Done';
       // One "Scan" on screen: the reading's Scan again takes over (DS-R20).
       scanBtn.hidden = true;
       showReading(energy, level);
@@ -553,7 +555,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const energy = scanEnergy();
       const level = levelFor(energy);
       const hint = root.querySelector('[data-hint]');
-      if (hint) hint.textContent = 'Scan complete';
+      if (hint) hint.textContent = 'Done';
       showReading(energy, level);
       revealCard();
       $('[data-action="again"]').focus();
