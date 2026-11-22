@@ -265,15 +265,10 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       hint.textContent = 'Scanning';
       loop();
     };
+    // A tap never fails (TXT-R4): a release before the ring fills carries on as a button scan.
     const stop = () => {
       if (!holding || auto) return;
-      holding = false;
-      cancelAnimationFrame(raf);
-      pad.classList.remove('scanning');
-      prog.style.strokeDashoffset = String(RING);
-      // The one hint a sighted person sees: an early release (TXT-R4 fallback).
-      hint.textContent = 'Keep holding';
-      hint.classList.remove('visually-hidden');
+      auto = true;
     };
     const finish = () => {
       holding = false;

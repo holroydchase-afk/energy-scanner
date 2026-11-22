@@ -235,20 +235,3 @@ for (const phone of [true, false]) {
     await ctx.close();
   });
 }
-
-// ---------- Step 5a: "Keep holding" (always ships). The 4b commit replaces this test. ----------
-test('AC-TXT4b an early release shows exactly "Keep holding", and no reading', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  await page.locator('.pad').hover();
-  await page.mouse.down();
-  await page.waitForTimeout(200);
-  await page.mouse.up();
-  const hint = page.locator('[data-hint]');
-  await expect(hint).toHaveText('Keep holding');
-  await expect(hint).toBeVisible();
-  expect(await hint.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThan(1);
-  await expect(page.getByText(/Too fast/)).toHaveCount(0);
-  await page.waitForTimeout(3_000);
-  await expect(page.getByTestId('energy-reading')).toBeHidden();
-});

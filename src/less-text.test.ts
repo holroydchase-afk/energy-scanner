@@ -336,21 +336,4 @@ describe('ES-M2.5 less text', () => {
   });
 
   // Step 4 (AC-TXT7, drag state) needs real CSS visibility: see e2e/less-text.spec.ts.
-
-  // ---------- Step 5a: "Keep holding" (always ships). The 4b commit replaces this test. ----------
-  describe('step 5a, Keep holding', () => {
-    it('AC-TXT4b an early release says exactly "Keep holding", shown, and no reading is counted', async () => {
-      const root = mount({ holdMs: 600 });
-      const pad = root.querySelector('.pad')!;
-      pad.dispatchEvent(new Event('pointerdown'));
-      await wait(200);
-      pad.dispatchEvent(new Event('pointerup'));
-      const hint = root.querySelector<HTMLElement>('[data-hint]')!;
-      expect(hint.textContent).toBe('Keep holding');
-      expect(hint.classList.contains('visually-hidden'), 'the one visible hint').toBe(false);
-      expect(seenText(root)).not.toMatch(/Too fast/);
-      await wait(600);
-      expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(true);
-    });
-  });
 });
