@@ -214,7 +214,6 @@ h1, h2, p { margin: 0; }
 
 .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; scroll-margin-top: var(--space-md); }
 .hint { color: var(--muted); }
-@media (hover: none) { .dropzone .hint { display: none; } }
 
 /* Palm pad: product content, its own colors. */
 .pad-zone { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
@@ -238,7 +237,10 @@ h1, h2, p { margin: 0; }
 .orb { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #fff 0%, #ffd36e 18%, #ff6ec7 45%, #8b7bff 70%, transparent 72%); filter: blur(2px); animation: pulse 3s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { transform: scale(0.92); opacity: 0.85; } 50% { transform: scale(1.05); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
-.sample { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-sm) var(--space-md); color: var(--muted); }
+/* While a file is dragged over the page, the photo screen shows where it goes (TXT-R7). */
+.dropzone .drop-label { display: none; color: var(--accent); font-weight: 600; }
+.dragging .dropzone { outline: 2px dashed var(--accent); outline-offset: calc(-1 * var(--space-xs)); border-radius: var(--radius-medium); }
+.dragging .dropzone .drop-label { display: block; }
 .viewer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-lg); }
 .photo { display: block; max-width: 100%; max-height: 70vh; max-height: 70svh; height: auto; border-radius: var(--radius-photo); }
 /* On a phone, leave room under the photo for its caption and buttons (ES-R51). */

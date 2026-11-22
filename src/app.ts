@@ -334,8 +334,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="actions">
           ${actions}
         </div>
-        <p class="hint">or drop a photo anywhere on this page</p>
-        ${finePointer() ? '' : '<p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>'}
+        ${finePointer() ? '' : '<button type="button" class="btn quiet" data-action="sample">Try the sample</button>'}
+        <p class="drop-label">Drop to scan</p>
       </div>
     `;
   };
