@@ -105,9 +105,9 @@ describe('bedtime app', () => {
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
     expect(note.textContent).toBe('Always Grey is on (a grown-up setting), so every scan reads Grey.');
-    // ES-R53: the way to the colors is the main button, next to Scan again.
+    // ES-R53: the way to the colors is the main button, next to Scan again (DS-8: tinted, not filled).
     const see = card.querySelector<HTMLElement>('.rc-actions [data-action="see-colors"]')!;
-    expect([see.hidden, see.classList.contains('primary')]).toEqual([false, true]);
+    expect([see.hidden, see.classList.contains('tinted')]).toEqual([false, true]);
     // ES-R60: the hint doesn't repeat the card's title.
     expect(root.querySelector('[data-hint]')!.textContent).toBe('Scan complete');
   });
@@ -214,8 +214,8 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(root.querySelector('[role="status"]')!.textContent).toMatch(/No person found/);
     expect(root.querySelector('.viewer [data-action="sample"]')?.textContent).toBe('Try the sample');
-    // ES-R59: the way forward is the main button.
-    expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('primary')).toBe(true);
+    // ES-R59: the way forward is the main button (DS-8: tinted, not filled).
+    expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('tinted')).toBe(true);
   });
 
   it('ES-R63, R64 on a laptop the words say click, and upload or try the sample', () => {
@@ -251,7 +251,8 @@ describe('bedtime app', () => {
       click(root, '[data-mode="photo"]');
       expect(root.querySelector('[data-action="camera"]')).toBeNull();
       const first = root.querySelector('.dropzone .actions .btn')!;
-      expect([first.textContent, first.classList.contains('primary')]).toEqual(['Try the sample', true]);
+      // DS-8: the main button is tinted, not filled.
+      expect([first.textContent, first.classList.contains('tinted')]).toEqual(['Try the sample', true]);
       expect(root.querySelector('[data-action="upload"]')).not.toBeNull();
     } finally {
       window.matchMedia = original;

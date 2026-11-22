@@ -103,17 +103,22 @@ try {
 
   // Link preview (1200x630): the Rainbow aura beside the name and promise.
   const aura = readFileSync(`${out}/aura-rainbow.png`).toString('base64');
+  // Studio Paper look (src/design/tokens.json) in the bundled Atkinson Hyperlegible Next.
+  const fontDir = 'node_modules/@fontsource/atkinson-hyperlegible-next/files';
+  const face = (w) => `@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:${w};src:url(data:font/woff2;base64,${readFileSync(`${fontDir}/atkinson-hyperlegible-next-latin-${w}-normal.woff2`).toString('base64')}) format("woff2")}`;
   const card = await browser.newPage({ viewport: { width: 1200, height: 630 } });
   await card.setContent(`
+    <style>${face(400)}${face(600)}</style>
     <body style="margin:0;width:1200px;height:630px;display:flex;align-items:center;gap:56px;padding:0 72px;box-sizing:border-box;
-      background:radial-gradient(ellipse at 70% 0%,#1d2457,#07060d 70%);color:#f3f0ff;font-family:Inter,system-ui,sans-serif">
-      <img src="data:image/png;base64,${aura}" style="height:540px;border-radius:24px" />
+      background:#F7F7F4;color:#1E1B17;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif">
+      <img src="data:image/png;base64,${aura}" style="height:540px;border-radius:16px" />
       <div>
-        <div style="font-size:72px;font-weight:800;line-height:1;background:linear-gradient(90deg,#ffd36e,#ff6ec7,#8b7bff,#4fe3ff);-webkit-background-clip:text;color:transparent">Energy Scanner</div>
+        <div style="font-size:72px;font-weight:600;line-height:1">Energy Scanner</div>
         <p style="font-size:34px;line-height:1.3;margin:28px 0 0">A bedtime helper for kids: finish the steps, then scan.</p>
-        <p style="font-size:26px;color:#b9b3d9;margin:24px 0 0">A live AI aura that runs on your device. Nothing is uploaded.</p>
+        <p style="font-size:26px;line-height:1.3;color:#5C564E;margin:24px 0 0">A live AI aura that runs on your device. Nothing is uploaded.</p>
       </div>
     </body>`);
+  await card.evaluate(() => document.fonts.ready);
   await card.screenshot({ path: 'public/og.png' });
   console.log(`screenshots written to ${out}/ and public/og.png`);
 } finally {

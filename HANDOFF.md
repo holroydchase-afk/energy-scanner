@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: Nov 10, #45 QA follow-up (QA-R1, QA-R2) retested and merged as one PR on Chase's "retest and merge"; #44 studio standard merged
+now: Nov 22, ES-M2.4 Paper restyle (PR #48) merging on Chase's go; tokens.json licensed MIT (PS-R1)
 next: wire scripts/check-logs.mjs into npm test after fixing the four whole-error console logs
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -26,6 +26,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 
 ## Portfolio / public presence
 _Updated 2026-11-10._
+- **Nov 21:** once the restyle PR merges (on Chase's go), the live demo is restyled to the studio Paper design system: Atkinson Hyperlegible Next, light and dark looks, one accent.
 - **Nov 10:** live app header now reads "7:00 PM pretend" with a real space when a pretend time is set (QA-R1, from #45); on very narrow phones the pretend tag sits under the time (QA-R3).
 - **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. Merged as PR #16 and live since Oct 23.
 - **Live app:** https://chaseholroyd.com/energy-scanner/. Pages is on; the first deploy from the default branch succeeded Oct 21 23:32 UTC (Actions run "pages" #1), so ES-M2.2 is done.
@@ -120,7 +121,11 @@ _Updated 2026-11-10._
 - License audit (2026-10-21, branch `claude/project-thread-flqnac`): added `LICENSE` (MIT, matching package.json), `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` for the bundled MediaPipe model and wasm runtime (Apache 2.0, Google).
 
 ## In progress
-- Nothing.
+- ES-M2.4 Studio design system (Paper): the restyle PR is committed on branch `claude/project-thread-e25yzo` (293ec69 plus the DS-R18 to DS-R22 follow-up) and merges as PR #48 on Chase's go (Nov 22). The agents check is red only because the run-log hook didn't fire in the cloud session; Chase accepted that. Built: `src/design/theme.ts` (Paper color math written from STUDIO-CORE §3, not ported), `scripts/gen-themes.mjs` (`npm run themes`), token-only `style.css`, bundled Atkinson Hyperlegible Next 5.3.0 (OFL, `licenses/OFL-1.1.txt`), tinted/quiet buttons, Scan button on the pad, Look (Light/Dark/Match phone) in Grown-ups, Always Grey On/Off words, step check marks, reading name in ink with an energy dot, solid caption band on saved images. ux-reviewer after-review scored 7/10 (was 5/10), no P0/P1. Nov 21 follow-up, failing tests first: Look options are three stacked 48px rows on the Grown-ups edge (DS-R18); the pad's Scan button hides once the reading shows and returns on Scan again (DS-R20); Grown-ups panel max 560px, Always Grey help text right under its switch, "Try a different time" label tight above the slider (DS-R21); `text-wrap: pretty` on tagline, pitch and reading text (DS-R22). Unit and e2e green (79 passed, 1 skipped).
+
+## Parked (Polish Freeze)
+- DS-R17 (P2): replace the emoji in steps, mode buttons and the pad with one line-icon set, one stroke width (AC-DS7). The next biggest gap: the last thing holding UI at 7/10 instead of 8.
+- DS-R19 (P2): confirm before Clear tonight's steps (inline "Clear all of tonight's steps?" with "Clear steps" and "Keep", AC-DS9).
 
 ## Exact next step
 - Chase: review and merge the studio re-sync PR. From then on, agents named on a PR's `Agents:` line must show up in `.claude/agent-runs/<branch>.log` (the hook writes it in sessions that load the repo's agents; commit it with the PR).
@@ -137,6 +142,7 @@ _Updated 2026-11-10._
 - In a Claude cloud sandbox the e2e needs `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e` (the preinstalled Chromium build differs from Playwright 1.56.1's default); CI is unaffected.
 
 ## Decisions to review
+- PS-R1 (Nov 21, resolved Nov 22): `src/design/tokens.json` is copied from Hearth (AGPL); Chase OK'd licensing this copy MIT here ("Ok MIT"), noted in `src/design/README.md`.
 - 2026-10-29 re-sync: `agents.verify` in `studio-checks.json` is `[ -d node_modules ] || npm ci; npm run check`, so CI reruns lint, typecheck and unit tests 3x whenever a PR claims qa-tdd ran. Swap to a lighter command if agents-check gets slow.
 - 2026-10-29 re-sync: this cloud session couldn't load the repo's `.claude/agents` (the Agent tool only offered built-in types), so the PR says `qa-tdd skipped` and the main session ran the suites 3x itself. Hand-written log entries are banned, so none were added.
 - The review-rounds skill lives in this repo for now and ux-reviewer was edited locally (Oct 29). A studio-agents re-sync would drop the `skills:` line until Product Studio adds it upstream.

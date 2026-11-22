@@ -87,7 +87,8 @@ describe('showResult', () => {
       getSegmenter: async () => fakeSegmenter((x, y) => Math.hypot(x - 32, y - 32) < 16),
     });
     await flush();
-    expect(stage.querySelector('[data-action="save-image"]')!.classList.contains('primary')).toBe(true);
+    // DS-8: the main button is tinted, not filled.
+    expect(stage.querySelector('[data-action="save-image"]')!.classList.contains('tinted')).toBe(true);
     view.destroy();
   });
 
