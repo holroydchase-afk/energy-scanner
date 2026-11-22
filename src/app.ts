@@ -3,6 +3,7 @@ import { store } from './bedtime/store';
 import { fileToCanvas } from './photo/image';
 import { drawSamplePerson, SAMPLE_CAPTION } from './photo/sample';
 import type { Segmenter } from './segment/types';
+import { icon } from './ui/icons';
 import { showResult, type ResultView } from './ui/result';
 
 export interface AppOptions {
@@ -80,12 +81,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     <p class="pitch"><span class="tagline">A bedtime routine for kids, with an AI aura that runs on your device.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
-      <div class="steplbl"><span>Tap each step when done</span><span data-count></span></div>
       <div class="steps"></div>
     </section>
     <div class="mode" role="radiogroup" aria-label="Scan with">
-      <button type="button" role="radio" data-mode="palm"><span aria-hidden="true">✋</span> Palm scan</button>
-      <button type="button" role="radio" data-mode="photo"><span aria-hidden="true">📷</span> Photo scan</button>
+      <button type="button" role="radio" data-mode="palm">${icon('hand', 20)}<span>Palm</span></button>
+      <button type="button" role="radio" data-mode="photo">${icon('camera', 20)}<span>Photo</span></button>
     </div>
     <div class="scan-area">
     <div class="stage" data-testid="stage"></div>
@@ -169,10 +169,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   };
 
   const renderSteps = () => {
+    // A hollow check circle reads as "tap to tick"; ticked, it fills with a check (TXT-R2).
     $('.steps').innerHTML = STEPS.map(
-      (s) => `<button type="button" class="step" data-step="${s.id}" aria-pressed="${done.has(s.id)}"><span class="ic" aria-hidden="true">${s.icon}</span>${s.label}${done.has(s.id) ? '<span class="tick" aria-hidden="true">✓</span>' : ''}</button>`,
+      (s) =>
+        `<button type="button" class="step" data-step="${s.id}" aria-pressed="${done.has(s.id)}">${icon(s.icon, 28)}<span>${s.label}</span><span class="check" aria-hidden="true">${done.has(s.id) ? icon('check', 14, 3) : ''}</span></button>`,
     ).join('');
-    $('[data-count]').textContent = `${done.size} of ${STEPS.length}`;
   };
 
   const scanEnergy = (): number =>
@@ -223,7 +224,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
             <circle class="prog" cx="50" cy="50" r="47" fill="none" stroke="var(--energy)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${RING}" stroke-dashoffset="${RING}"/>
           </svg>
           <div class="beam"></div>
-          <div class="hand" aria-hidden="true">✋</div>
+          <div class="hand" aria-hidden="true">${icon('hand', 96, 1.5)}</div>
         </button>
         <p class="hint" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
         <button type="button" class="btn" data-action="scan">Scan</button>

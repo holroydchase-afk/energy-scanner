@@ -260,7 +260,9 @@ describe('ES-M2.5 less text', () => {
       const row = notices.split('\n').find((l) => /Lucide/.test(l));
       expect(row, 'THIRD_PARTY_NOTICES.md has a Lucide row').toBeTruthy();
       expect(row).toMatch(/ISC/);
-      expect(existsSync(fileURLToPath(new URL('../licenses/ISC-lucide.txt', import.meta.url))), 'licenses/ISC-lucide.txt').toBe(true);
+      // Path in a variable: Vite rewrites a literal `new URL('../file', import.meta.url)` to http://localhost once the file exists.
+      const license = '../licenses/ISC-lucide.txt';
+      expect(existsSync(fileURLToPath(new URL(license, import.meta.url))), 'licenses/ISC-lucide.txt').toBe(true);
     });
 
     it('AC-TXT14 TXT-R14 the mode switch reads Palm and Photo, and the group is still named "Scan with"', () => {

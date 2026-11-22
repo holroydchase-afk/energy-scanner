@@ -4,16 +4,17 @@ import type { EnergyType, Rgb } from '../aura/types';
 
 export interface Step {
   id: string;
-  icon: string;
+  /** A Lucide line icon name (src/ui/icons.ts). */
+  icon: 'bath' | 'shirt' | 'toothbrush' | 'toilet' | 'book-open';
   label: string;
 }
 
 export const STEPS: readonly Step[] = [
-  { id: 'bath', icon: '🛁', label: 'Bath' },
-  { id: 'pjs', icon: '👕', label: 'PJs' },
-  { id: 'teeth', icon: '🪥', label: 'Teeth' },
-  { id: 'potty', icon: '🚽', label: 'Potty' },
-  { id: 'book', icon: '📖', label: 'Book' },
+  { id: 'bath', icon: 'bath', label: 'Bath' },
+  { id: 'pjs', icon: 'shirt', label: 'PJs' },
+  { id: 'teeth', icon: 'toothbrush', label: 'Teeth' },
+  { id: 'potty', icon: 'toilet', label: 'Potty' },
+  { id: 'book', icon: 'book-open', label: 'Book' },
 ];
 
 export interface Level {

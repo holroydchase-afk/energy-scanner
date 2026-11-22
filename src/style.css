@@ -198,17 +198,18 @@ h1, h2, p { margin: 0; }
 
 /* Bedtime steps */
 .steps-wrap { margin-top: var(--space-lg); }
-.steplbl { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--space-md); color: var(--muted); margin-bottom: var(--space-sm); }
 .steps { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
-.step { position: relative; flex: 1 1 0; font: inherit; font-weight: 600; color: var(--ink); background: var(--fill); border: 2px solid transparent; border-radius: var(--radius-medium); padding: var(--space-sm) 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-xs); cursor: pointer; min-height: calc(var(--target) + var(--space-lg)); }
-.step .ic { font-size: 1.5rem; line-height: 1; filter: grayscale(0.5); opacity: 0.85; }
+.step { position: relative; flex: 1 1 0; font: inherit; font-weight: 600; color: var(--ink); background: var(--fill); border: 2px solid transparent; border-radius: var(--radius-medium); padding: var(--space-xl) 0 var(--space-sm); display: flex; flex-direction: column; align-items: center; gap: var(--space-xs); cursor: pointer; min-height: calc(var(--target) + var(--space-lg)); }
+.step > .icon { flex: none; }
 .step[aria-pressed='true'] { border-color: var(--accent); }
-.step[aria-pressed='true'] .ic { filter: none; opacity: 1; }
-.step .tick { position: absolute; top: 0; right: var(--space-xs); color: var(--accent); }
+/* The check circle (TXT-R2): hollow when not done, filled accent with a check when done. */
+.step .check { position: absolute; top: var(--space-xs); right: var(--space-xs); width: 20px; height: 20px; border: 2px solid var(--line); border-radius: var(--radius-pill); background: transparent; color: var(--accent-ink); display: grid; place-items: center; }
+.step[aria-pressed='true'] .check { background: var(--accent); border-color: var(--accent); }
 
 /* Palm or photo */
 .mode { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-sm); margin: var(--space-lg) auto 0; scroll-margin-top: var(--space-md); }
-.mode button { font: inherit; font-weight: 600; color: var(--ink); background: var(--fill); border: 2px solid transparent; border-radius: var(--radius-pill); padding: var(--space-sm) var(--space-lg); min-height: var(--target); cursor: pointer; white-space: nowrap; }
+.mode button { font: inherit; font-weight: 600; color: var(--ink); background: var(--fill); border: 2px solid transparent; border-radius: var(--radius-pill); padding: var(--space-sm) var(--space-lg); min-height: var(--target); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--space-sm); }
+.mode button .icon { flex: none; }
 .mode button[aria-checked='true'] { border-color: var(--accent); }
 
 .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; scroll-margin-top: var(--space-md); }
@@ -219,7 +220,7 @@ h1, h2, p { margin: 0; }
 .pad-zone { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
 .pad { position: relative; width: min(72vw, 280px); aspect-ratio: 1; border-radius: 50%; border: none; background: radial-gradient(circle at 50% 45%, #232b63, #141a40 70%); box-shadow: 0 0 0 2px #2e3670, 0 0 40px rgba(124, 242, 224, 0.12) inset; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overflow: hidden; color: #f3f0ff; }
 .pad svg.ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.pad .hand { position: absolute; inset: 0; display: grid; place-items: center; font-size: 84px; opacity: 0.85; transition: transform 0.3s; }
+.pad .hand { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0.85; transition: transform 0.3s; }
 .pad.scanning .hand { transform: scale(1.06); }
 .pad .beam { position: absolute; left: 8%; right: 8%; height: 3px; top: 20%; background: var(--energy); box-shadow: 0 0 18px 4px var(--energy); border-radius: 3px; opacity: 0; }
 .pad.scanning .beam { opacity: 1; animation: beam 1.1s ease-in-out infinite alternate; }
@@ -298,4 +299,4 @@ h1, h2, p { margin: 0; }
 @media (pointer: coarse) { .foot { padding-bottom: calc(var(--space-xxl) * 2.5 + env(safe-area-inset-bottom, 0px)); } }
 .foot a { display: inline-flex; align-items: center; min-height: var(--target); }
 
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
