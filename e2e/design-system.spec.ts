@@ -470,7 +470,7 @@ test.describe('DS-R21 Grown-ups at 1280px', () => {
     await open(page, 'grown-ups');
     // TXT-R10, R11: "Always Grey" and one help line.
     const row = await page.getByRole('checkbox', { name: /^Always Grey/ }).evaluate((el) => el.closest('label')!.getBoundingClientRect().bottom, undefined, { timeout: 5_000 });
-    const help = await page.getByText('Every scan reads Grey.', { exact: true }).evaluate((el) => el.getBoundingClientRect().top);
+    const help = await page.getByText(/^(On: e|E)very scan reads Grey\.$/).evaluate((el) => el.getBoundingClientRect().top);
     const gap = help - row;
     expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeGreaterThanOrEqual(0);
     expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeLessThanOrEqual(16);
@@ -498,6 +498,8 @@ test('DS-R22 the tagline and reading text wrap pretty (no orphan last word); TXT
     const el = document.querySelector(sel);
     return [sel, el ? getComputedStyle(el).getPropertyValue('text-wrap-style') : 'missing'];
   })));
-  expect(got).toEqual({ '.tagline': 'pretty', '.rc-text': 'pretty' });
+  // TXT-R20 may switch the tagline to balance; both keep the last word from sitting alone.
+  expect(got['.tagline']).toMatch(/^(pretty|balance)$/);
+  expect(got['.rc-text']).toBe('pretty');
   await expect(page.getByText('Nothing is uploaded')).toHaveCount(0);
 });

@@ -157,6 +157,8 @@ test.describe('step 3 on a touch phone', () => {
 
   test('AC-TXT1 TXT-R1, R3 the Scan button is in view on load at 390x844', async ({ page }) => {
     await page.goto('/');
+    // QA-R1: measure with the bundled font, not whatever fallback the machine has (CI's is wider).
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
     const box = (await page.getByRole('button', { name: 'Scan', exact: true }).boundingBox())!;
     expect(box.y + box.height, `Scan bottom ${box.y + box.height}`).toBeLessThanOrEqual(844);
   });
@@ -233,5 +235,79 @@ for (const phone of [true, false]) {
     await page.dispatchEvent('body', 'drop', { dataTransfer });
     await expect(drop).toBeHidden();
     await ctx.close();
+  });
+}
+
+// ---------- Fix round after the rescore (TXT-R19, R20) ----------
+/** WCAG contrast between two CSS colors as painted (any color syntax, alpha composited over `under`). */
+function contrast(page: Page, fg: string, bg: string, under: string): Promise<number> {
+  return page.evaluate(({ f, b, u }) => {
+    const c = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!;
+    const paint = (...layers: string[]) => {
+      c.clearRect(0, 0, 1, 1);
+      for (const l of layers) { c.fillStyle = l; c.fillRect(0, 0, 1, 1); }
+      const [r = 0, g = 0, bl = 0] = c.getImageData(0, 0, 1, 1).data;
+      const lin = (v: number) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(bl);
+    };
+    const back = paint(u, b);
+    const front = paint(u, b, f);
+    return (Math.max(back, front) + 0.05) / (Math.min(back, front) + 0.05);
+  }, { f: fg, b: bg, u: under });
+}
+
+test.describe('TXT-R19 the empty check circle is visible', () => {
+  test.use(PHONE);
+  for (const scheme of ['light', 'dark'] as const) {
+    test(`AC-TXT19 TXT-R19 an unticked step's check circle border reaches 3:1 against the step (${scheme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto('/');
+      const steps = page.locator('.step[aria-pressed="false"]');
+      await expect(steps).toHaveCount(5);
+      for (let i = 0; i < 5; i++) {
+        const c = await steps.nth(i).evaluate((step) => {
+          const check = step.querySelector('.check')!;
+          let under = 'white';
+          for (let el = step.parentElement; el; el = el.parentElement) {
+            const bg = getComputedStyle(el).backgroundColor;
+            if (bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') { under = bg; break; }
+          }
+          return { border: getComputedStyle(check).borderTopColor, width: parseFloat(getComputedStyle(check).borderTopWidth), step: getComputedStyle(step).backgroundColor, under };
+        });
+        expect(c.width, 'the circle has a border').toBeGreaterThanOrEqual(1.5);
+        const ratio = await contrast(page, c.border, c.step, c.under);
+        expect(ratio, `step ${i}: ${c.border} on ${c.step} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+      }
+      // The other direction: a ticked step still uses the accent fill.
+      await page.getByRole('button', { name: 'Teeth' }).click();
+      const accent = await color(page, 'var(--accent)');
+      await expect.poll(() => page.locator('[data-step="teeth"] .check').evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(accent);
+    });
+  }
+});
+
+for (const width of [390, 320]) {
+  test(`AC-TXT20 TXT-R20 the tagline never leaves one or two words alone on its last line at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    const lines = await page.locator('.tagline').evaluate((el) => {
+      const text = el.firstChild as Text;
+      const words: { w: string; top: number }[] = [];
+      const re = /\S+/g;
+      for (let m = re.exec(text.data); m; m = re.exec(text.data)) {
+        const r = document.createRange();
+        r.setStart(text, m.index);
+        r.setEnd(text, m.index + m[0].length);
+        words.push({ w: m[0], top: Math.round(r.getBoundingClientRect().top) });
+      }
+      const byLine = new Map<number, string[]>();
+      for (const { w, top } of words) {
+        const key = [...byLine.keys()].find((k) => Math.abs(k - top) < 4) ?? top;
+        byLine.set(key, [...(byLine.get(key) ?? []), w]);
+      }
+      return [...byLine.values()].map((ws) => ws.join(' '));
+    });
+    if (lines.length > 1) expect(lines.at(-1)!.split(' ').length, JSON.stringify(lines)).toBeGreaterThanOrEqual(3);
   });
 }

@@ -136,10 +136,17 @@ describe('ES-M2.5 less text', () => {
       expect([...laptop.querySelectorAll('.dropzone button')].map((b) => norm(b.textContent))).toEqual(['Try the sample', 'Choose a photo']);
     });
 
+    it('AC-TXT22 TXT-R22 with Always Grey off, the help says what On does: "On: every scan reads Grey."', () => {
+      const root = mount();
+      const always = root.querySelector<HTMLInputElement>('[data-input="always"]')!;
+      expect(always.checked, 'first visit: Always Grey is off').toBe(false);
+      expect(norm(root.querySelector<HTMLElement>('.grownups .help')!.textContent)).toBe('On: every scan reads Grey.');
+    });
+
     it('AC-TXT10 TXT-R10 Grown-ups help is one short line, tied to the Always Grey switch', () => {
       const root = mount();
       const help = root.querySelector<HTMLElement>('.grownups .help')!;
-      expect(norm(help.textContent)).toBe('Every scan reads Grey.');
+      // Exact wording moved to AC-TXT22 (TXT-R22); this one keeps the length and the link to the switch.
       expect(norm(help.textContent).split(' ').length).toBeLessThanOrEqual(5);
       const always = root.querySelector<HTMLInputElement>('[data-input="always"]')!;
       const ids = (always.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
