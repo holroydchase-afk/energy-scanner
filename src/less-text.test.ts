@@ -61,7 +61,7 @@ async function palmScan(root: HTMLElement) {
   await wait(60);
 }
 
-const TAGLINE = 'A bedtime routine for kids, with an AI aura that runs on your device.';
+const TAGLINE = "A kids' bedtime routine with an on-device AI aura.";
 
 describe('ES-M2.5 less text', () => {
   beforeEach(() => {

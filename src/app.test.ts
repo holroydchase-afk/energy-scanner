@@ -49,7 +49,7 @@ describe('bedtime app', () => {
   it('says what it is and links back to the portfolio and the code', () => {
     const root = mount();
     // ES-M2.5 TXT-R1, R13: one tagline; the footer keeps only the code link (the byline has the case study).
-    expect(root.querySelector('.tagline')?.textContent).toBe('A bedtime routine for kids, with an AI aura that runs on your device.');
+    expect(root.querySelector('.tagline')?.textContent).toBe("A kids' bedtime routine with an on-device AI aura.");
     const links = [...root.querySelectorAll<HTMLAnchorElement>('.foot a')].map((a) => [a.textContent, a.href]);
     expect(links).toEqual([['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner']]);
     // ES-R55: who made it, near the top.
@@ -157,7 +157,7 @@ describe('bedtime app', () => {
     const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
     const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
     // TXT-R1: the pitch is merged into the one tagline.
-    expect(root.querySelector('.tagline')!.textContent).toContain('AI aura that runs on your device');
+    expect(root.querySelector('.tagline')!.textContent).toContain('on-device AI aura');
     click(root, '[data-action="demo"]');
     expect(root.querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');

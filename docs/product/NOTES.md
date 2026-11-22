@@ -100,6 +100,8 @@ Owned by positioning. Public copy only uses claims listed here.
 |---|---|
 | Photos never leave your device; no uploads | CSP `connect-src 'self'` in `vite.config.ts`; `e2e/smoke.spec.ts` (CSP blocks other origins); `e2e/aura.spec.ts` (every request stays on the app's origin) |
 | The AI runs on your device, not in the cloud | `src/segment/mediapipe.ts`; model in `public/models/`, runtime copied to `public/mediapipe/` |
+| On-screen tagline (2026-11-22, ES-M2.5): "A kids' bedtime routine with an on-device AI aura." | "On-device AI" = MediaPipe person segmentation in the browser (rows above). The AI finds the person's outline; the aura itself is a shader and the color comes from the clock and steps, not the AI. Never word it as AI reading a child's energy. Palm scan uses no AI |
+| Footer (2026-11-22, ES-M2.5): "Photos never leave your device." + "Code on GitHub" | Privacy rows above; `LICENSE`. Share and Save act only when the user taps them, through the phone's own share sheet or download |
 | Not even a CDN sees a request | Model and wasm served from the app's own origin (`mediapipe.ts`, `scripts/copy-mediapipe-wasm.mjs`); `e2e/aura.spec.ts` origin check |
 | No server, account, analytics or cookies | Static Vite build, two runtime dependencies (`package.json`: the MediaPipe runtime and the bundled Atkinson Hyperlegible Next font); CSP |
 | A 250 KB person-segmentation model | `public/models/selfie_segmenter.tflite` (249,537 bytes) |

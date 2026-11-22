@@ -56,7 +56,7 @@ for (const size of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) 
   test(`AC-TXT1 TXT-R1 the first screen says what it is in one line at ${size.width}px`, async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto('/');
-    await expect(page.locator('p', { hasText: 'A bedtime routine for kids' })).toHaveText(/^\s*A bedtime routine for kids, with an AI aura that runs on your device\.\s*(See the aura demo)?\s*$/);
+    await expect(page.locator('p', { hasText: "A kids' bedtime routine" })).toHaveText(/^\s*A kids' bedtime routine with an on-device AI aura\.\s*(See the aura demo)?\s*$/);
     await expect(page.getByText('Nothing is uploaded')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'See the aura demo' })).toBeVisible();
   });

@@ -78,7 +78,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <div class="clock"><b><span data-clock>--:--</span> <span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
     </header>
     <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
-    <p class="pitch"><span class="tagline">A bedtime routine for kids, with an AI aura that runs on your device.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
+    <p class="pitch"><span class="tagline">A kids' bedtime routine with an on-device AI aura.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
       <div class="steps"></div>

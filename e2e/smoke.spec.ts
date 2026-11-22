@@ -78,7 +78,7 @@ test('ES-R48 the first phone screen pitches the on-device aura, and the demo but
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   // TXT-R1: the pitch is the one tagline now.
-  const tagline = page.getByText('A bedtime routine for kids, with an AI aura that runs on your device.');
+  const tagline = page.getByText("A kids' bedtime routine with an on-device AI aura.");
   await expect(tagline).toBeInViewport({ ratio: 1 });
   await page.getByRole('button', { name: 'See the aura demo' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });

@@ -38,7 +38,7 @@ _Updated 2026-11-22._
 
 ## Done
 - Nov 22, ES-M2.5 less text (branch `claude/project-thread-2xwlcu`, review `docs/reviews/2026-11-22-less-text.md`), failing tests first (8b7e308), built in staff-pm's order, one commit per step:
-  - Step 1 strings: one tagline "A bedtime routine for kids, with an AI aura that runs on your device." (TXT-R1); no steps-left line on the reading (R5); "Choose a photo", not "Upload" (R6); See the aura demo hidden in photo mode (R8); Grown-ups help is "Every scan reads Grey.", the algorithm paragraph moved to CASE-STUDY.md (R10); short labels Pretend time, Always Grey, Clear steps, Automatic (R11); "Always Grey is on." (R12); footer is the privacy line and Code on GitHub (R13); "Scanning energy…" is screen-reader only while scanning (R17).
+  - Step 1 strings: one tagline "A kids' bedtime routine with an on-device AI aura." (TXT-R1); no steps-left line on the reading (R5); "Choose a photo", not "Upload" (R6); See the aura demo hidden in photo mode (R8); Grown-ups help is "Every scan reads Grey.", the algorithm paragraph moved to CASE-STUDY.md (R10); short labels Pretend time, Always Grey, Clear steps, Automatic (R11); "Always Grey is on." (R12); footer is the privacy line and Code on GitHub (R13); "Scanning energy…" is screen-reader only while scanning (R17).
   - Step 2 icons: Lucide 1.77.0 line icons copied into `src/ui/icons.ts` (ISC, `licenses/ISC-lucide.txt`, no dependency, no CDN) for steps, mode switch (Palm / Photo) and pad; check circles replace "Tap each step when done" and "0 of 5" (R9, R14, R2).
   - Step 3 silent pad: the pad hint is screen-reader only ("Scanning", "Done"); the idle ring breathes, still with reduced motion (R3).
   - Step 4 drag state: the photo screen is just its buttons; "Drop to scan" with a dashed accent outline shows only while a file is dragged (R7).
@@ -181,4 +181,5 @@ _Updated 2026-11-22._
 - Studio refresh (Oct 28): install-rules kept the existing `.claude/settings.json` and `handoff-check.yml`; both are identical to the studio templates, so nothing needed merging by hand.
 
 ## Blockers
+- Resolved Nov 22: AC-TXT1c word budgets (palm 45, photo pick 50) failed with the planned copy (47 and 51; the review's after-count was off). staff-pm kept the budgets and the "By" and "bedtime" words, and shortened the tagline to "A kids' bedtime routine with an on-device AI aura." (9 words, was 14): palm is now 42, photo pick 46.
 - None. (README screenshots no longer need a real photo: they use the illustrated sample.)
