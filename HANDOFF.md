@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; waiting on Chase's go and his TXT-R4 call
+now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; Chase chose tap-finishes for TXT-R4 (Nov 22); waiting on his merge go
 next: qa-tdd runs all suites 3x on the fix round; then the next gap is layout (pad in empty canvas at 1280, reading below the fold after See the aura demo at 390)
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -43,7 +43,7 @@ _Updated 2026-11-22._
   - Step 2 icons: Lucide 1.77.0 line icons copied into `src/ui/icons.ts` (ISC, `licenses/ISC-lucide.txt`, no dependency, no CDN) for steps, mode switch (Palm / Photo) and pad; check circles replace "Tap each step when done" and "0 of 5" (R9, R14, R2).
   - Step 3 silent pad: the pad hint is screen-reader only ("Scanning", "Done"); the idle ring breathes, still with reduced motion (R3).
   - Step 4 drag state: the photo screen is just its buttons; "Drop to scan" with a dashed accent outline shows only while a file is dragged (R7).
-  - Step 5: an early release says "Keep holding" (4a, always ships); then a short press finishes as a button scan (4b, TXT-R4, pending Chase, its own last commit).
+  - Step 5: an early release says "Keep holding" (4a, always ships); then a short press finishes as a button scan (4b, TXT-R4, Chase chose it Nov 22).
 - Nov 10, retest and merge (Chase): the only open PR was #45; it was brought up to date with the default branch (HANDOFF conflict only), all suites rerun 3x, and merged as one PR. #45 closed as superseded. Goes live: the header reads "7:00 PM pretend" with a real space (QA-R1). CI then caught the extra space pushing the 320px header 4px past the screen (QA-R3, P2, CI's monospace font is wider than the sandbox's); fixed by letting the pretend tag wrap under the time when space runs out, with a stricter header-overflow test that failed first. The rest is tests.
 - Nov 2, qa-tdd pass on #42 (after it merged): suites green 3x; QA-R1 (P2) the header read "7:00 PMpretend" with no space for screen readers or copied text, fixed with a real space; QA-R2 (P2) gap tests for slider edges, focus return, hidden reset row, 320px header and desktop footer added (`src/qa-pretend.test.ts`, `e2e/qa-pretend.spec.ts`). qa-tdd ran as a general-purpose agent with the qa-tdd brief, since cloud sessions can't load repo agent types.
 - Nov 2, intake #43 (studio standard), merged as PR #44: studio agents, tools and rules re-synced from studio-agents main (story-keeper added; `log-agent-run.sh` now works in cloud sessions). Seeded `docs/product/NOTES.md` (decisions ES-DEC-1 to 11, lessons, marketing claims register) and `docs/product/ACCOUNTS.md` from the repo's history. No product-specific agent knowledge exists yet, so there's no `docs/eng/AGENT-NOTES.md`. CLAUDE.md now has the standard line, the current agents section (with story-keeper), and the shipping rule. Never merge became merge on green, with a live-demo gate (Chase's go, Nov 2).
@@ -154,7 +154,7 @@ _Updated 2026-11-22._
 - In a Claude cloud sandbox the e2e needs `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e` (the preinstalled Chromium build differs from Playwright 1.56.1's default); CI is unaffected.
 
 ## Decisions to review
-- TXT-R4 (Nov 22, pending Chase): a press on the pad shorter than the hold now finishes as a button scan, so a tap never fails (Scan button unchanged, principle 4 kept). It changes the original hold-to-scan mechanic. If Chase says no, `git revert` the last commit (4b) and the "Keep holding" fallback (4a) comes back with its tests.
+- TXT-R4 (Nov 22, decided: Chase chose "Tap finishes the scan"): a press on the pad shorter than the hold now finishes as a button scan, so a tap never fails (Scan button unchanged, principle 4 kept). It changes the original hold-to-scan mechanic. If Chase says no, `git revert` the last commit (4b) and the "Keep holding" fallback (4a) comes back with its tests.
 - PS-R1 (Nov 21, resolved Nov 22): `src/design/tokens.json` is copied from Hearth (AGPL); Chase OK'd licensing this copy MIT here ("Ok MIT"), noted in `src/design/README.md`.
 - 2026-10-29 re-sync: `agents.verify` in `studio-checks.json` is `[ -d node_modules ] || npm ci; npm run check`, so CI reruns lint, typecheck and unit tests 3x whenever a PR claims qa-tdd ran. Swap to a lighter command if agents-check gets slow.
 - 2026-10-29 re-sync: this cloud session couldn't load the repo's `.claude/agents` (the Agent tool only offered built-in types), so the PR says `qa-tdd skipped` and the main session ran the suites 3x itself. Hand-written log entries are banned, so none were added.
