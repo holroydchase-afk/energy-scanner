@@ -1,8 +1,9 @@
-import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, todoLine, type Level } from './bedtime/energy';
+import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, type Level } from './bedtime/energy';
 import { store } from './bedtime/store';
 import { fileToCanvas } from './photo/image';
 import { drawSamplePerson, SAMPLE_CAPTION } from './photo/sample';
 import type { Segmenter } from './segment/types';
+import { icon } from './ui/icons';
 import { showResult, type ResultView } from './ui/result';
 
 export interface AppOptions {
@@ -77,16 +78,14 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <div class="clock"><b><span data-clock>--:--</span> <span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
     </header>
     <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
-    <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
-    <p class="pitch"><span>Photo scan draws a live aura around a person with AI that runs on your device. Nothing is uploaded.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
+    <p class="pitch"><span class="tagline">A kids' bedtime routine with an on-device AI aura.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
-      <div class="steplbl"><span>Tap each step when done</span><span data-count></span></div>
       <div class="steps"></div>
     </section>
     <div class="mode" role="radiogroup" aria-label="Scan with">
-      <button type="button" role="radio" data-mode="palm"><span aria-hidden="true">✋</span> Palm scan</button>
-      <button type="button" role="radio" data-mode="photo"><span aria-hidden="true">📷</span> Photo scan</button>
+      <button type="button" role="radio" data-mode="palm">${icon('hand', 20)}<span>Palm</span></button>
+      <button type="button" role="radio" data-mode="photo">${icon('camera', 20)}<span>Photo</span></button>
     </div>
     <div class="scan-area">
     <div class="stage" data-testid="stage"></div>
@@ -97,8 +96,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="batt"><div class="cell"><div class="fill"></div></div><span class="pct"></span></div>
       </div>
       <p class="rc-text"></p>
-      <p class="rc-todo"></p>
-      <p class="rc-note" hidden>Always Grey is on (a grown-up setting), so every scan reads Grey.</p>
+      <p class="rc-note" hidden>Always Grey is on.</p>
       <div class="rc-actions">
         <button type="button" class="btn tinted" data-action="see-colors" hidden>See every color</button>
         <button type="button" class="btn" data-action="again">Scan again</button>
@@ -113,25 +111,22 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <legend id="look-label">Look</legend>
           <label><input type="radio" name="look" value="light" data-look /> Light</label>
           <label><input type="radio" name="look" value="dark" data-look /> Dark</label>
-          <label><input type="radio" name="look" value="auto" data-look /> Match phone</label>
+          <label><input type="radio" name="look" value="auto" data-look /> Automatic</label>
         </fieldset>
         <label>Bedtime <input type="time" data-input="bed" /></label>
-        <label for="fake-time" class="above">Try a different time</label>
+        <label for="fake-time" class="above">Pretend time</label>
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <div class="row"><button type="button" class="btn" data-action="real-time" hidden>Back to real time</button></div>
-        <label class="switch"><span>Always read Grey Energy</span> <input type="checkbox" data-input="always" /> <span data-onoff>Off</span></label>
-        <div class="help">
-          <p>With Always Grey on, every scan comes back Grey.</p>
-          <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
-        </div>
-        <div class="row"><button type="button" class="btn" data-action="clear">Clear tonight's steps</button></div>
+        <label class="switch"><span>Always Grey</span> <input type="checkbox" data-input="always" aria-describedby="always-help" /> <span data-onoff>Off</span></label>
+        <p class="help" id="always-help">On: every scan reads Grey.</p>
+        <div class="row"><button type="button" class="btn" data-action="clear">Clear steps</button></div>
       </div>
     </details>
     <footer class="foot">
-      <p>Runs entirely in your browser. Photos never leave your device.</p>
-      <p class="credit"><a href="https://chaseholroyd.com/energy-scanner.html">Read the case study</a><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+      <p>Photos never leave your device.</p>
+      <p class="credit"><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
     </footer>
-    <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" aria-label="Upload a photo" />
+    <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" aria-label="Choose a photo" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" aria-label="Take a photo" />
   `;
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
@@ -174,10 +169,11 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   };
 
   const renderSteps = () => {
+    // A hollow check circle reads as "tap to tick"; ticked, it fills with a check (TXT-R2).
     $('.steps').innerHTML = STEPS.map(
-      (s) => `<button type="button" class="step" data-step="${s.id}" aria-pressed="${done.has(s.id)}"><span class="ic" aria-hidden="true">${s.icon}</span>${s.label}${done.has(s.id) ? '<span class="tick" aria-hidden="true">✓</span>' : ''}</button>`,
+      (s) =>
+        `<button type="button" class="step" data-step="${s.id}" aria-pressed="${done.has(s.id)}">${icon(s.icon, 28)}<span>${s.label}</span><span class="check" aria-hidden="true">${done.has(s.id) ? icon('check', 14, 3) : ''}</span></button>`,
     ).join('');
-    $('[data-count]').textContent = `${done.size} of ${STEPS.length}`;
   };
 
   const scanEnergy = (): number =>
@@ -197,6 +193,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   /** One tinted button per screen: See the aura demo leads unless the screen has its own main action. */
   const syncMain = () => {
     const demo = $('[data-action="demo"]');
+    // In photo mode Try the sample is the same action, so the sample has one name (TXT-R8).
+    demo.hidden = mode === 'photo';
     const other = mode === 'photo' || (!card.hidden && !$('[data-action="see-colors"]').hidden);
     demo.classList.toggle('tinted', !other);
     demo.classList.toggle('quiet', other);
@@ -209,8 +207,6 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.pct').textContent = `${energy}%`;
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
-    $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
-    $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
     $('[data-action="see-colors"]').hidden = !alwaysGrey;
     $('[data-action="again"]').textContent = lastPhoto ? 'Scan this photo again' : 'Scan again';
@@ -228,9 +224,9 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
             <circle class="prog" cx="50" cy="50" r="47" fill="none" stroke="var(--energy)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${RING}" stroke-dashoffset="${RING}"/>
           </svg>
           <div class="beam"></div>
-          <div class="hand" aria-hidden="true">✋</div>
+          <div class="hand" aria-hidden="true">${icon('hand', 96, 1.5)}</div>
         </button>
-        <p class="hint" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
+        <p class="hint visually-hidden" data-hint aria-live="polite">${finePointer() ? 'Click and hold the scanner until the circle fills' : 'Put your hand on the scanner and hold'}</p>
         <button type="button" class="btn" data-action="scan">Scan</button>
       </div>
     `;
@@ -264,16 +260,15 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       setEnergyColor(null);
       pad.classList.remove('done');
       pad.classList.add('scanning');
-      hint.textContent = auto ? 'Scanning…' : 'Scanning… keep holding';
+      // The ring and beam show the state; the words are for screen readers (TXT-R3).
+      hint.classList.add('visually-hidden');
+      hint.textContent = 'Scanning';
       loop();
     };
+    // A tap never fails (TXT-R4): a release before the ring fills carries on as a button scan.
     const stop = () => {
       if (!holding || auto) return;
-      holding = false;
-      cancelAnimationFrame(raf);
-      pad.classList.remove('scanning');
-      prog.style.strokeDashoffset = String(RING);
-      hint.textContent = 'Too fast! Hold until the circle fills';
+      auto = true;
     };
     const finish = () => {
       holding = false;
@@ -287,7 +282,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       }
       const energy = scanEnergy();
       const level = levelFor(energy);
-      hint.textContent = 'Scan complete';
+      hint.textContent = 'Done';
       // One "Scan" on screen: the reading's Scan again takes over (DS-R20).
       scanBtn.hidden = true;
       showReading(energy, level);
@@ -327,18 +322,17 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   const showPhotoStart = () => {
     const actions = finePointer()
       ? `<button type="button" class="btn tinted" data-action="sample">Try the sample</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>`
+          <button type="button" class="btn" data-action="upload">Choose a photo</button>`
       : `<button type="button" class="btn tinted" data-action="camera">Take a photo</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>`;
+          <button type="button" class="btn" data-action="upload">Choose a photo</button>`;
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
-        <p class="lead">${finePointer() ? 'Upload a photo or try the sample, and the scanner shows the energy glowing off the person.' : 'Take a photo and the scanner shows the energy glowing off you.'}</p>
         <div class="actions">
           ${actions}
         </div>
-        <p class="hint">or drop a photo anywhere on this page</p>
-        ${finePointer() ? '' : '<p class="sample">No photo handy? <button type="button" class="btn" data-action="sample">Try the sample</button></p>'}
+        ${finePointer() ? '' : '<button type="button" class="btn quiet" data-action="sample">Try the sample</button>'}
+        <p class="drop-label">Drop to scan</p>
       </div>
     `;
   };
@@ -535,7 +529,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     store.set('alwaysGrey', alwaysGrey);
     onOff();
   });
-  // Look: Light, Dark, or Match phone (no data-theme, so the CSS follows the phone).
+  // Look: Light, Dark, or Automatic (no data-theme, so the CSS follows the phone).
   const savedLook = store.get<unknown>('look', 'auto');
   const setLook = (look: Look) => {
     if (look === 'auto') document.documentElement.removeAttribute('data-theme');
@@ -558,7 +552,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       const energy = scanEnergy();
       const level = levelFor(energy);
       const hint = root.querySelector('[data-hint]');
-      if (hint) hint.textContent = 'Scan complete';
+      if (hint) hint.textContent = 'Done';
       showReading(energy, level);
       revealCard();
       $('[data-action="again"]').focus();

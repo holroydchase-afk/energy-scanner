@@ -41,7 +41,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
         <div class="scan" aria-hidden="true"><div class="scanline"></div></div>
       </div>
       <p class="caption" hidden></p>
-      <p class="status" role="status" aria-live="polite">Scanning energy…</p>
+      <p class="status visually-hidden" role="status" aria-live="polite">Scanning energy…</p>
       <div class="actions" data-slot="actions">
         <button type="button" class="btn tinted" data-action="share" hidden>Share</button>
         <button type="button" class="btn" data-action="save-image" hidden>Save image</button>
@@ -50,6 +50,8 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       </div>
     </div>
   `;
+  // While scanning, the scanline is the visible state; the words are for screen readers (TXT-R17).
+  // A problem after that is shown.
   const frame = stage.querySelector<HTMLElement>('.frame')!;
   const status = stage.querySelector<HTMLElement>('.status')!;
   const caption = stage.querySelector<HTMLElement>('.caption')!;
@@ -76,6 +78,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       frame.classList.remove('scanning');
       status.textContent = 'The energy scanner could not start. Check your connection and try again, or try another browser. ';
       status.classList.add('warn');
+      status.classList.remove('visually-hidden');
       const retry = document.createElement('button');
       retry.type = 'button';
       retry.className = 'btn';
@@ -83,6 +86,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       retry.addEventListener('click', () => {
         status.textContent = 'Scanning energy…';
         status.classList.remove('warn');
+        status.classList.add('visually-hidden');
         frame.classList.add('scanning');
         void run();
       });
@@ -105,6 +109,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       frame.classList.add('noperson');
       status.textContent = 'No person found in this photo. Try one where someone is clearly visible.';
       status.classList.add('warn');
+      status.classList.remove('visually-hidden');
       options.onNoPerson?.();
       return;
     }
@@ -115,6 +120,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       console.error(e);
       status.textContent = "This browser couldn't draw the aura. Try another browser, like Safari or Chrome.";
       status.classList.add('warn');
+      status.classList.remove('visually-hidden');
       return;
     }
     // The phone can drop the GPU picture (e.g. while the app is in the background).
@@ -124,6 +130,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       for (const a of ['share', 'save-image', 'save-video']) button(a).hidden = true;
       status.textContent = 'The aura stopped drawing while the phone was busy. Tap New photo to scan again.';
       status.classList.add('warn');
+      status.classList.remove('visually-hidden');
     });
     renderer.canvas.classList.add('photo', 'aura');
     renderer.canvas.setAttribute('role', 'img');
@@ -172,6 +179,7 @@ export function showResult(stage: HTMLElement, photo: HTMLCanvasElement, options
       console.error(e);
       status.textContent = 'Saving did not work in this browser. Try a screenshot instead.';
       status.classList.add('warn');
+      status.classList.remove('visually-hidden');
     } finally {
       b.disabled = false;
       b.textContent = original;

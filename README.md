@@ -7,8 +7,8 @@ Everything runs in your browser. **Photos never leave your device.** There is no
 **Try it:** [chaseholroyd.com/energy-scanner](https://chaseholroyd.com/energy-scanner/), on a phone or laptop. No sign-up. No photo handy? Tap **See the aura demo**.
 
 <p align="center">
-  <img src="docs/screenshots/start-mobile.png" alt="Start screen: what it is, a See the aura demo button, bedtime steps, the Palm scan and Photo scan switch, and the palm pad" width="200" />
-  <img src="docs/screenshots/palm-mobile.png" alt="A palm scan an hour before bedtime reading Red Rocket Energy, with the steps left tonight" width="200" />
+  <img src="docs/screenshots/start-mobile.png" alt="Start screen: what it is, a See the aura demo button, bedtime steps, the Palm and Photo switch, and the palm pad" width="200" />
+  <img src="docs/screenshots/palm-mobile.png" alt="A palm scan an hour before bedtime reading Red Rocket Energy" width="200" />
   <img src="docs/screenshots/aura-rainbow.png" alt="The illustrated sample child with a glowing Rainbow aura" width="200" />
   <img src="docs/screenshots/aura-grey.png" alt="The same sample with a soft Grey aura at bedtime" width="200" />
 </p>
@@ -22,8 +22,8 @@ npm run dev        # open the printed localhost URL
 ```
 
 1. Tick off the **bedtime steps**: Bath, PJs, Teeth, Potty, Book.
-2. Pick the scan: **Palm scan** (press and hold until the ring fills) or **Photo scan** (take or upload a photo, or try the illustrated sample).
-3. The reading shows an energy color, a battery level and what's left to do. In a photo scan the aura glows off the child in that color: softer and slower when sleepy, blazing when it's Rainbow.
+2. Pick the scan: **Palm** (hold the hand until the ring fills) or **Photo** (take or choose a photo, or try the illustrated sample).
+3. The reading shows an energy color, and a battery level. In a photo scan the aura glows off the child in that color: softer and slower when sleepy, blazing when it's Rainbow.
 4. Grown-ups set bedtime and the Always Grey switch, and can **Save** or **Share** a photo scan.
 
 With the switch off, the reading follows the clock and the routine: the closer to bedtime and the more steps done, the sleepier the color. It never reads Rainbow once every step is done.

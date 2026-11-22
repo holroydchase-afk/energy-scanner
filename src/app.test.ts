@@ -24,6 +24,8 @@ function mount(options: AppOptions = {}) {
 }
 
 const click = (root: HTMLElement, sel: string) => root.querySelector<HTMLElement>(sel)!.click();
+/** Steps ticked tonight, read from the buttons (TXT-R2 cut the "0 of 5" count). */
+const ticked = (root: HTMLElement) => root.querySelectorAll('.step[aria-pressed="true"]').length;
 
 describe('bedtime app', () => {
   beforeEach(() => {
@@ -46,27 +48,26 @@ describe('bedtime app', () => {
 
   it('says what it is and links back to the portfolio and the code', () => {
     const root = mount();
-    expect(root.querySelector('.tagline')?.textContent).toBe('A bedtime helper for kids: finish the steps, then scan.');
+    // ES-M2.5 TXT-R1, R13: one tagline; the footer keeps only the code link (the byline has the case study).
+    expect(root.querySelector('.tagline')?.textContent).toBe("A kids' bedtime routine with an on-device AI aura.");
     const links = [...root.querySelectorAll<HTMLAnchorElement>('.foot a')].map((a) => [a.textContent, a.href]);
-    expect(links).toEqual([
-      ['Read the case study', 'https://chaseholroyd.com/energy-scanner.html'],
-      ['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner'],
-    ]);
+    expect(links).toEqual([['Code on GitHub', 'https://github.com/holroydchase-afk/energy-scanner']]);
     // ES-R55: who made it, near the top.
     const byline = [...root.querySelectorAll<HTMLAnchorElement>('.byline a')].map((a) => [a.textContent, a.href]);
     expect(byline).toEqual([
       ['Chase Holroyd', 'https://chaseholroyd.com/'],
       ['Case study', 'https://chaseholroyd.com/energy-scanner.html'],
     ]);
-    // ES-R56: the steps say they can be tapped.
-    expect(root.querySelector('.steplbl span')?.textContent).toBe('Tap each step when done');
+    // ES-R56, now TXT-R2: the steps show they can be tapped with a check circle, not words.
+    expect(root.textContent).not.toContain('Tap each step when done');
+    for (const s of root.querySelectorAll('.step')) expect(s.querySelector('.check')).not.toBeNull();
   });
 
   it('ticks off steps and remembers them tonight', () => {
     const root = mount();
     click(root, '[data-step="teeth"]');
     expect(root.querySelector('[data-step="teeth"]')!.getAttribute('aria-pressed')).toBe('true');
-    expect(root.querySelector('[data-count]')!.textContent).toBe('1 of 5');
+    expect(ticked(root)).toBe(1);
     const again = mount();
     expect(again.querySelector('[data-step="teeth"]')!.getAttribute('aria-pressed')).toBe('true');
   });
@@ -101,15 +102,16 @@ describe('bedtime app', () => {
     const card = root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!;
     expect(card.hidden).toBe(false);
     expect(card.querySelector('.rc-name')!.textContent).toBe('Grey Energy');
-    expect(card.querySelector('.rc-todo')!.textContent).toBe('Steps left tonight: Bath, PJs, Teeth, Potty, Book.');
+    // TXT-R5: the card doesn't repeat the steps.
+    expect(card.textContent).not.toContain('Steps left');
     const note = card.querySelector<HTMLElement>('.rc-note')!;
     expect(note.hidden).toBe(false);
-    expect(note.textContent).toBe('Always Grey is on (a grown-up setting), so every scan reads Grey.');
+    expect(note.textContent).toBe('Always Grey is on.');
     // ES-R53: the way to the colors is the main button, next to Scan again (DS-8: tinted, not filled).
     const see = card.querySelector<HTMLElement>('.rc-actions [data-action="see-colors"]')!;
     expect([see.hidden, see.classList.contains('tinted')]).toEqual([false, true]);
-    // ES-R60: the hint doesn't repeat the card's title.
-    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scan complete');
+    // ES-R60: the hint doesn't repeat the card's title (TXT-R3: screen-reader only, "Done").
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Done');
   });
 
   it('See every color turns Always Grey off and scans again in color', async () => {
@@ -154,9 +156,8 @@ describe('bedtime app', () => {
   it('ES-R48 the first screen pitches the on-device aura with a one-tap demo', async () => {
     const person = { width: 4, height: 4, data: new Float32Array(16).fill(1) };
     const root = mount({ minScanMs: 0, getSegmenter: async () => ({ segment: async () => person }) as never });
-    const pitch = root.querySelector('.pitch')!.textContent!;
-    expect(pitch).toContain('AI that runs on your device');
-    expect(pitch).toContain('Nothing is uploaded');
+    // TXT-R1: the pitch is merged into the one tagline.
+    expect(root.querySelector('.tagline')!.textContent).toContain('on-device AI aura');
     click(root, '[data-action="demo"]');
     expect(root.querySelector('[data-mode="photo"]')!.getAttribute('aria-checked')).toBe('true');
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
@@ -164,14 +165,8 @@ describe('bedtime app', () => {
     expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(false);
   });
 
-  it('a palm scan released too early is not counted', () => {
-    const root = mount({ holdMs: 10_000 });
-    const pad = root.querySelector('.pad')!;
-    pad.dispatchEvent(new Event('pointerdown'));
-    pad.dispatchEvent(new Event('pointerup'));
-    expect(root.querySelector('[data-hint]')!.textContent).toMatch(/Too fast/);
-    expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(true);
-  });
+  // "a palm scan released too early is not counted" moved to AC-TXT4b in src/less-text.test.ts (ES-M2.5 step 5a),
+  // so the 4b commit (tap never fails, src/less-text-tap.test.ts) replaces one test in one place.
 
   it('reads by the clock when Always Grey is off', async () => {
     // Noon with an 8pm bedtime and nothing done: lots of energy.
@@ -218,20 +213,23 @@ describe('bedtime app', () => {
     expect(root.querySelector('.viewer [data-action="sample"]')!.classList.contains('tinted')).toBe(true);
   });
 
-  it('ES-R63, R64 on a laptop the words say click, and upload or try the sample', () => {
+  it('ES-R63, R64 (now TXT-R3, R7) neither a laptop nor a phone shows a how-to sentence on the pad or photo screen', () => {
     const original = window.matchMedia;
     window.matchMedia = ((q: string) => ({ matches: q.includes('pointer: fine'), media: q })) as never;
     try {
       const root = mount();
-      expect(root.querySelector('[data-hint]')!.textContent).toBe('Click and hold the scanner until the circle fills');
+      expect(root.querySelector('[data-hint]')!.classList.contains('visually-hidden')).toBe(true);
       click(root, '[data-mode="photo"]');
-      expect(root.querySelector('.dropzone .lead')!.textContent).toBe('Upload a photo or try the sample, and the scanner shows the energy glowing off the person.');
+      expect(root.querySelector('.dropzone .lead')).toBeNull();
+      expect(root.querySelector('.dropzone')!.textContent).not.toMatch(/glowing off/);
     } finally {
       window.matchMedia = original;
     }
-    // A phone keeps its words.
     localStorage.clear();
-    expect(mount().querySelector('[data-hint]')!.textContent).toBe('Put your hand on the scanner and hold');
+    const phone = mount();
+    expect(phone.querySelector('[data-hint]')!.classList.contains('visually-hidden')).toBe(true);
+    click(phone, '[data-mode="photo"]');
+    expect(phone.querySelector('.dropzone .lead')).toBeNull();
   });
 
   it('ES-R67 when nobody is in the photo, Try the sample comes first', async () => {
@@ -320,7 +318,7 @@ describe('bedtime app', () => {
     expect(root.querySelector('[data-hint]')!.getAttribute('aria-live')).toBe('polite');
     for (const b of root.querySelectorAll('[data-mode]')) expect(b.querySelector('[aria-hidden="true"]')).not.toBeNull();
     const range = root.querySelector<HTMLInputElement>('[data-input="fake"]')!;
-    expect(range.labels?.[0]?.textContent).toContain('Try a different time');
+    expect(range.labels?.[0]?.textContent).toContain('Pretend time');
     expect(range.getAttribute('aria-valuetext')).toBe('real time');
     const main = root.querySelector('main')!;
     expect(main.contains(root.querySelector('.steps'))).toBe(true);
@@ -380,10 +378,10 @@ describe('bedtime app', () => {
     let t = new Date(2026, 9, 22, 19, 0);
     const root = mount({ now: () => t });
     for (const id of ['bath', 'pjs', 'teeth', 'potty', 'book']) click(root, `[data-step="${id}"]`);
-    expect(root.querySelector('[data-count]')!.textContent).toBe('5 of 5');
+    expect(ticked(root)).toBe(5);
     t = new Date(2026, 9, 23, 19, 0);
     vi.advanceTimersByTime(15_000);
-    expect(root.querySelector('[data-count]')!.textContent).toBe('0 of 5');
+    expect(ticked(root)).toBe(0);
     for (const b of root.querySelectorAll('.step')) expect(b.getAttribute('aria-pressed')).toBe('false');
     click(root, '[data-step="bath"]');
     expect(JSON.parse(localStorage.getItem('steps-2026-10-23')!)).toEqual(['bath']);
@@ -399,12 +397,12 @@ describe('bedtime app', () => {
       const root = mount({ now: () => now });
       expect(root.querySelector('.pad')).not.toBeNull();
       expect(root.querySelector('[data-bed]')!.textContent).toMatch(/^8:00\s?PM$/);
-      expect(root.querySelector('[data-count]')!.textContent).toBe('0 of 5');
+      expect(ticked(root)).toBe(0);
     }
     localStorage.setItem(nightKey(now), '"bathbook"');
-    expect(mount({ now: () => now }).querySelector('[data-count]')!.textContent).toBe('0 of 5');
+    expect(ticked(mount({ now: () => now }))).toBe(0);
     localStorage.setItem(nightKey(now), '["bath","bath","nope"]');
-    expect(mount({ now: () => now }).querySelector('[data-count]')!.textContent).toBe('1 of 5');
+    expect(ticked(mount({ now: () => now }))).toBe(1);
   });
 
   it('ES-R39 palm scan keeps going while any finger is still on the pad', () => {
@@ -414,9 +412,10 @@ describe('bedtime app', () => {
     pad.dispatchEvent(ev('pointerdown', 1));
     pad.dispatchEvent(ev('pointerdown', 2));
     pad.dispatchEvent(ev('pointerup', 1));
-    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scanning… keep holding');
-    pad.dispatchEvent(ev('pointerup', 2));
-    expect(root.querySelector('[data-hint]')!.textContent).toMatch(/Too fast/);
+    // TXT-R3: screen-reader text is "Scanning"; the ring keeps filling.
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scanning');
+    expect(pad.classList.contains('scanning')).toBe(true);
+    // What the last lift does is step 5 (AC-TXT4b / AC-TXT4), tested in src/less-text*.test.ts.
   });
 
   it('ES-R40 switching to Photo scan mid-hold cancels the palm scan', async () => {
@@ -478,6 +477,7 @@ describe('bedtime app', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(scans).toBe(2);
     expect(root.querySelector('.caption')?.textContent).toBe('Illustrated sample, not a real person');
-    expect(root.querySelector('.rc-todo')!.textContent).not.toContain('Teeth');
+    expect(root.querySelector('[data-step="teeth"]')!.getAttribute('aria-pressed')).toBe('true');
+    expect(root.querySelector('[data-testid="energy-reading"]')!.textContent).not.toContain('Steps left');
   });
 });

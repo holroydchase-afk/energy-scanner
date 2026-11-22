@@ -28,6 +28,8 @@ Bedtime at our house was a nightly negotiation. "Five more minutes" works better
 | Save and share | A captioned image or short video, shared from the phone, explains itself when it reaches family | A small app name on every export |
 | Cut: accounts, history, streaks, live video | None of them serve the bedtime moment | Live video aura is the obvious next step |
 
+How Always Grey reads, in the app's old Grown-ups help (now one line, "Every scan reads Grey."): With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.
+
 ## How it was built
 
 I planned and specified it, and an AI coding agent built it against written milestones, done-criteria and hard rules: tests before every push, never merge, never commit photos of real people, photos never leave the device. Each milestone was a pull request I reviewed: scaffold with lint, typecheck, unit and real-browser tests; photo in; the aura (segmentation, a distance field around the person, a WebGL shader); save and share; the bedtime flow; the native camera; and a recruiter-ready review with fixes.

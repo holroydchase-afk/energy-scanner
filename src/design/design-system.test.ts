@@ -382,15 +382,16 @@ describe('ES-M2.4 app markup', () => {
     expect([...root.querySelectorAll('.primary')].map((e) => e.textContent)).toEqual([]);
   });
 
-  it('DS-11 a done step shows a check mark as well as aria-pressed', () => {
+  it('DS-11 a done step shows a check mark as well as aria-pressed (TXT-R2: a check circle, not a text tick)', () => {
     const root = mount();
     const teeth = root.querySelector<HTMLElement>('[data-step="teeth"]')!;
-    expect(teeth.textContent).not.toContain('✓');
+    expect(teeth.querySelector('.check')).not.toBeNull();
     teeth.click();
     const now = root.querySelector<HTMLElement>('[data-step="teeth"]')!;
     expect(now.getAttribute('aria-pressed')).toBe('true');
-    expect(now.textContent).toContain('✓');
-    expect(root.querySelector('[data-step="bath"]')!.textContent).not.toContain('✓');
+    expect(now.querySelector('.check svg'), 'ticked: the check circle draws a check').not.toBeNull();
+    expect(root.textContent).not.toContain('✓');
+    expect(root.querySelector('[data-step="bath"]')!.getAttribute('aria-pressed')).toBe('false');
   });
 
   it('DS-11 Always Grey says Off or On in words beside the checkbox', () => {
@@ -403,7 +404,7 @@ describe('ES-M2.4 app markup', () => {
     expect(words()).not.toMatch(/\bOff\b/);
   });
 
-  it('DS-12 Grown-ups has Look: Light / Dark / Match phone, default Match phone, saved, sets html[data-theme]', () => {
+  it('DS-12 Grown-ups has Look: Light / Dark / Automatic (TXT-R11), default Automatic, saved, sets html[data-theme]', () => {
     const findLook = (root: HTMLElement) => {
       const groups = [...root.querySelectorAll<HTMLElement>('.grownups [role="radiogroup"], .grownups fieldset')];
       const named = (g: HTMLElement) => {
@@ -419,8 +420,8 @@ describe('ES-M2.4 app markup', () => {
     };
     const root = mount();
     const look = findLook(root);
-    expect(look.radios.map(look.label)).toEqual(['Light', 'Dark', 'Match phone']);
-    expect(look.radios.filter(look.checked).map(look.label)).toEqual(['Match phone']);
+    expect(look.radios.map(look.label)).toEqual(['Light', 'Dark', 'Automatic']);
+    expect(look.radios.filter(look.checked).map(look.label)).toEqual(['Automatic']);
     expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
 
     look.radios[1]!.click();
@@ -451,6 +452,6 @@ describe('ES-M2.4 app markup', () => {
     expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(true);
     await wait(400);
     expect(root.querySelector<HTMLElement>('[data-testid="energy-reading"]')!.hidden).toBe(false);
-    expect(root.querySelector('[data-hint]')!.textContent).toBe('Scan complete');
+    expect(root.querySelector('[data-hint]')!.textContent).toBe('Done'); // TXT-R3
   });
 });

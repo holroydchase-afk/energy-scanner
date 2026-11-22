@@ -10,8 +10,8 @@ const SCREENS: Screen[] = ['start', 'palm', 'palm result', 'photo start', 'photo
 async function open(page: Page, screen: Screen) {
   await page.goto('/');
   if (screen === 'palm') {
-    await page.getByRole('radio', { name: /Photo scan/ }).click();
-    await page.getByRole('radio', { name: /Palm scan/ }).click();
+    await page.getByRole('radio', { name: 'Photo' }).click();
+    await page.getByRole('radio', { name: 'Palm' }).click();
   }
   if (screen === 'palm result') {
     // The press-and-hold path (ES-M2.4 D1's Scan button is tested on its own).
@@ -20,7 +20,7 @@ async function open(page: Page, screen: Screen) {
     await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 10_000 });
     await page.keyboard.up('Space');
   }
-  if (screen === 'photo start' || screen === 'photo result') await page.getByRole('radio', { name: /Photo scan/ }).click();
+  if (screen === 'photo start' || screen === 'photo result') await page.getByRole('radio', { name: 'Photo' }).click();
   if (screen === 'photo result') {
     await page.getByRole('button', { name: 'Try the sample' }).first().click();
     await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
@@ -379,8 +379,8 @@ test('DS-11 the picked scan mode shows a 2px accent outline, not color alone', a
     const border = s.borderTopStyle === 'solid' && s.borderTopWidth === '2px' ? s.borderTopColor : '';
     return { checked: el.getAttribute('aria-checked'), outline, border };
   };
-  const palm = await page.getByRole('radio', { name: /Palm scan/ }).evaluate(edge);
-  const photo = await page.getByRole('radio', { name: /Photo scan/ }).evaluate(edge);
+  const palm = await page.getByRole('radio', { name: 'Palm' }).evaluate(edge);
+  const photo = await page.getByRole('radio', { name: 'Photo' }).evaluate(edge);
   expect(palm.checked).toBe('true');
   expect(palm.outline === accent || palm.border === accent, `picked: ${JSON.stringify(palm)}`).toBe(true);
   expect(photo.checked).toBe('false');
@@ -425,7 +425,7 @@ for (const width of [390, 320]) {
         return { name: (row.textContent ?? '').trim(), left: r.left, top: r.top, bottom: r.bottom, h: r.height, lines: tops(row).length };
       });
     }, lineTops.toString());
-    expect(rows.map((r) => r.name)).toEqual(['Light', 'Dark', 'Match phone']);
+    expect(rows.map((r) => r.name)).toEqual(['Light', 'Dark', 'Automatic']); // TXT-R11
     for (const r of rows) {
       expect.soft(r.h, `${r.name} row is at least 48px high`).toBeGreaterThanOrEqual(47.5);
       expect.soft(r.lines, `${r.name} label is on one line`).toBe(1);
@@ -468,17 +468,18 @@ test.describe('DS-R21 Grown-ups at 1280px', () => {
 
   test('DS-R21 the Always Grey help text sits within 16px below its switch row', async ({ page }) => {
     await open(page, 'grown-ups');
-    const row = await page.getByRole('checkbox', { name: /Always read Grey Energy/ }).evaluate((el) => el.closest('label')!.getBoundingClientRect().bottom);
-    const help = await page.getByText('With Always Grey on, every scan comes back Grey.').evaluate((el) => el.getBoundingClientRect().top);
+    // TXT-R10, R11: "Always Grey" and one help line.
+    const row = await page.getByRole('checkbox', { name: /^Always Grey/ }).evaluate((el) => el.closest('label')!.getBoundingClientRect().bottom, undefined, { timeout: 5_000 });
+    const help = await page.getByText(/^(On: e|E)very scan reads Grey\.$/).evaluate((el) => el.getBoundingClientRect().top);
     const gap = help - row;
     expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeGreaterThanOrEqual(0);
     expect(gap, `help text is ${gap.toFixed(1)}px below the switch row`).toBeLessThanOrEqual(16);
   });
 
-  test('DS-R21 the "Try a different time" label sits within 16px above the slider', async ({ page }) => {
+  test('DS-R21 the "Pretend time" label (TXT-R11) sits within 16px above the slider', async ({ page }) => {
     await open(page, 'grown-ups');
-    const slider = page.getByRole('slider', { name: 'Try a different time' });
-    const top = await slider.evaluate((el) => el.getBoundingClientRect().top);
+    const slider = page.getByRole('slider', { name: 'Pretend time' });
+    const top = await slider.evaluate((el) => el.getBoundingClientRect().top, undefined, { timeout: 5_000 });
     const textBottom = await page.locator('label[for="fake-time"]').evaluate((el) => {
       const range = document.createRange();
       range.selectNodeContents(el);
@@ -490,12 +491,15 @@ test.describe('DS-R21 Grown-ups at 1280px', () => {
   });
 });
 
-test('DS-R22 the tagline, pitch and reading text wrap pretty (no orphan last word)', async ({ page }) => {
+test('DS-R22 the tagline and reading text wrap pretty (no orphan last word); TXT-R1 cut the pitch', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page, 'palm result');
-  const got = await page.evaluate(() => Object.fromEntries(['.tagline', '.pitch', '.rc-text'].map((sel) => {
+  const got = await page.evaluate(() => Object.fromEntries(['.tagline', '.rc-text'].map((sel) => {
     const el = document.querySelector(sel);
     return [sel, el ? getComputedStyle(el).getPropertyValue('text-wrap-style') : 'missing'];
   })));
-  expect(got).toEqual({ '.tagline': 'pretty', '.pitch': 'pretty', '.rc-text': 'pretty' });
+  // TXT-R20 may switch the tagline to balance; both keep the last word from sitting alone.
+  expect(got['.tagline']).toMatch(/^(pretty|balance)$/);
+  expect(got['.rc-text']).toBe('pretty');
+  await expect(page.getByText('Nothing is uploaded')).toHaveCount(0);
 });
