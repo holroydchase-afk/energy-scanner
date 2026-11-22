@@ -271,7 +271,9 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       cancelAnimationFrame(raf);
       pad.classList.remove('scanning');
       prog.style.strokeDashoffset = String(RING);
-      hint.textContent = 'Too fast! Hold until the circle fills';
+      // The one hint a sighted person sees: an early release (TXT-R4 fallback).
+      hint.textContent = 'Keep holding';
+      hint.classList.remove('visually-hidden');
     };
     const finish = () => {
       holding = false;
