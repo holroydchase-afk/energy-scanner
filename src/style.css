@@ -184,9 +184,9 @@ h1, h2, p { margin: 0; }
 .clock .pretend { padding: 0 var(--space-xs); border-radius: var(--radius-small); background: var(--fill); color: var(--ink); font-weight: 400; white-space: nowrap; }
 .byline { margin: 0 0 var(--space-xs); color: var(--muted); }
 .byline a { display: inline-flex; align-items: center; min-height: var(--target); }
-.tagline { margin: 0 0 var(--space-sm); color: var(--muted); text-wrap: pretty; }
+/* One muted line under the title (TXT-R1); on a phone the demo button wraps under it. */
 .pitch { margin: 0 0 var(--space-md); text-wrap: pretty; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-lg); }
-.pitch span { flex: 1 1 22ch; }
+.tagline { flex: 1 1 22ch; color: var(--muted); text-wrap: pretty; }
 
 /* Buttons (STUDIO-CORE section 6): plain = ink on fill; tinted = accent on accentSoft, one per screen;
    quiet = accent words. No filled buttons. */
@@ -233,7 +233,6 @@ h1, h2, p { margin: 0; }
 .orb { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #fff 0%, #ffd36e 18%, #ff6ec7 45%, #8b7bff 70%, transparent 72%); filter: blur(2px); animation: pulse 3s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { transform: scale(0.92); opacity: 0.85; } 50% { transform: scale(1.05); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
-.lead { margin: 0; max-width: 30ch; }
 .sample { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-sm) var(--space-md); color: var(--muted); }
 .viewer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-lg); }
 .photo { display: block; max-width: 100%; max-height: 70vh; max-height: 70svh; height: auto; border-radius: var(--radius-photo); }
@@ -265,8 +264,6 @@ h1, h2, p { margin: 0; }
 .batt .fill { height: 100%; background: var(--energy); border-radius: 1px; }
 .rc-text { text-wrap: pretty; }
 .reading-card .rc-note { color: var(--muted); }
-.reading-card .rc-todo { color: var(--muted); }
-.reading-card .rc-todo.all-done { color: var(--ink); }
 .rc-actions { display: flex; flex-wrap: wrap; gap: var(--space-md); }
 
 /* Grown-ups */

@@ -1,4 +1,4 @@
-import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, todoLine, type Level } from './bedtime/energy';
+import { auraFeel, bedtimeFor, computeEnergy, levelFor, nightKey, STEPS, type Level } from './bedtime/energy';
 import { store } from './bedtime/store';
 import { fileToCanvas } from './photo/image';
 import { drawSamplePerson, SAMPLE_CAPTION } from './photo/sample';
@@ -77,8 +77,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
       <div class="clock"><b><span data-clock>--:--</span> <span class="pretend" data-pretend hidden>pretend</span></b>bedtime <span data-bed></span></div>
     </header>
     <p class="byline">By <a href="https://chaseholroyd.com/">Chase Holroyd</a> · <a href="https://chaseholroyd.com/energy-scanner.html">Case study</a></p>
-    <p class="tagline">A bedtime helper for kids: finish the steps, then scan.</p>
-    <p class="pitch"><span>Photo scan draws a live aura around a person with AI that runs on your device. Nothing is uploaded.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
+    <p class="pitch"><span class="tagline">A bedtime routine for kids, with an AI aura that runs on your device.</span> <button type="button" class="btn tinted" data-action="demo">See the aura demo</button></p>
     <main class="main">
     <section class="steps-wrap" aria-label="Bedtime steps">
       <div class="steplbl"><span>Tap each step when done</span><span data-count></span></div>
@@ -97,8 +96,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="batt"><div class="cell"><div class="fill"></div></div><span class="pct"></span></div>
       </div>
       <p class="rc-text"></p>
-      <p class="rc-todo"></p>
-      <p class="rc-note" hidden>Always Grey is on (a grown-up setting), so every scan reads Grey.</p>
+      <p class="rc-note" hidden>Always Grey is on.</p>
       <div class="rc-actions">
         <button type="button" class="btn tinted" data-action="see-colors" hidden>See every color</button>
         <button type="button" class="btn" data-action="again">Scan again</button>
@@ -113,25 +111,22 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
           <legend id="look-label">Look</legend>
           <label><input type="radio" name="look" value="light" data-look /> Light</label>
           <label><input type="radio" name="look" value="dark" data-look /> Dark</label>
-          <label><input type="radio" name="look" value="auto" data-look /> Match phone</label>
+          <label><input type="radio" name="look" value="auto" data-look /> Automatic</label>
         </fieldset>
         <label>Bedtime <input type="time" data-input="bed" /></label>
-        <label for="fake-time" class="above">Try a different time</label>
+        <label for="fake-time" class="above">Pretend time</label>
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <div class="row"><button type="button" class="btn" data-action="real-time" hidden>Back to real time</button></div>
-        <label class="switch"><span>Always read Grey Energy</span> <input type="checkbox" data-input="always" /> <span data-onoff>Off</span></label>
-        <div class="help">
-          <p>With Always Grey on, every scan comes back Grey.</p>
-          <p>With it off, the color follows the clock and the steps: closer to bedtime and more steps done means a sleepier color. It never says Rainbow once all five steps are done.</p>
-        </div>
-        <div class="row"><button type="button" class="btn" data-action="clear">Clear tonight's steps</button></div>
+        <label class="switch"><span>Always Grey</span> <input type="checkbox" data-input="always" aria-describedby="always-help" /> <span data-onoff>Off</span></label>
+        <p class="help" id="always-help">Every scan reads Grey.</p>
+        <div class="row"><button type="button" class="btn" data-action="clear">Clear steps</button></div>
       </div>
     </details>
     <footer class="foot">
-      <p>Runs entirely in your browser. Photos never leave your device.</p>
-      <p class="credit"><a href="https://chaseholroyd.com/energy-scanner.html">Read the case study</a><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
+      <p>Photos never leave your device.</p>
+      <p class="credit"><a href="https://github.com/holroydchase-afk/energy-scanner">Code on GitHub</a></p>
     </footer>
-    <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" aria-label="Upload a photo" />
+    <input type="file" accept="image/*" class="visually-hidden" data-input="upload" tabindex="-1" aria-hidden="true" aria-label="Choose a photo" />
     <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-input="capture" tabindex="-1" aria-hidden="true" aria-label="Take a photo" />
   `;
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
@@ -197,6 +192,8 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   /** One tinted button per screen: See the aura demo leads unless the screen has its own main action. */
   const syncMain = () => {
     const demo = $('[data-action="demo"]');
+    // In photo mode Try the sample is the same action, so the sample has one name (TXT-R8).
+    demo.hidden = mode === 'photo';
     const other = mode === 'photo' || (!card.hidden && !$('[data-action="see-colors"]').hidden);
     demo.classList.toggle('tinted', !other);
     demo.classList.toggle('quiet', other);
@@ -209,8 +206,6 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     $('.pct').textContent = `${energy}%`;
     $('.fill').style.width = `${energy}%`;
     $('.rc-text').textContent = level.texts[Math.floor(random() * level.texts.length)] ?? level.texts[0]!;
-    $('.rc-todo').textContent = todoLine(STEPS.filter((s) => !done.has(s.id)));
-    $('.rc-todo').classList.toggle('all-done', done.size === STEPS.length);
     $('.rc-note').hidden = !alwaysGrey;
     $('[data-action="see-colors"]').hidden = !alwaysGrey;
     $('[data-action="again"]').textContent = lastPhoto ? 'Scan this photo again' : 'Scan again';
@@ -327,13 +322,12 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
   const showPhotoStart = () => {
     const actions = finePointer()
       ? `<button type="button" class="btn tinted" data-action="sample">Try the sample</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>`
+          <button type="button" class="btn" data-action="upload">Choose a photo</button>`
       : `<button type="button" class="btn tinted" data-action="camera">Take a photo</button>
-          <button type="button" class="btn" data-action="upload">Upload a photo</button>`;
+          <button type="button" class="btn" data-action="upload">Choose a photo</button>`;
     stage.innerHTML = `
       <div class="dropzone" data-testid="dropzone">
         <div class="orb" aria-hidden="true"></div>
-        <p class="lead">${finePointer() ? 'Upload a photo or try the sample, and the scanner shows the energy glowing off the person.' : 'Take a photo and the scanner shows the energy glowing off you.'}</p>
         <div class="actions">
           ${actions}
         </div>
@@ -535,7 +529,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
     store.set('alwaysGrey', alwaysGrey);
     onOff();
   });
-  // Look: Light, Dark, or Match phone (no data-theme, so the CSS follows the phone).
+  // Look: Light, Dark, or Automatic (no data-theme, so the CSS follows the phone).
   const savedLook = store.get<unknown>('look', 'auto');
   const setLook = (look: Look) => {
     if (look === 'auto') document.documentElement.removeAttribute('data-theme');
