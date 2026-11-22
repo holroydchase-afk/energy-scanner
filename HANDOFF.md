@@ -4,8 +4,8 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; Chase chose tap-finishes for TXT-R4 (Nov 22); waiting on his merge go
-next: qa-tdd runs all suites 3x on the fix round; then the next gap is layout (pad in empty canvas at 1280, reading below the fold after See the aura demo at 390)
+now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; merged as PR #49 on Chase's go (Nov 22 04:40 UTC), Pages run #14 deployed
+next: next UI gap is layout (pad in empty canvas at 1280, reading below the fold after See the aura demo at 390)
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
 blockers: []
@@ -26,7 +26,7 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 
 ## Portfolio / public presence
 _Updated 2026-11-22._
-- **Nov 22:** once ES-M2.5 merges (on Chase's go), the live demo shows far less text: one tagline line, no how-to sentences on the pad or photo screen, short Grown-ups labels, a one-line footer, and Lucide line icons instead of emoji.
+- **Nov 22:** live since PR #49 merged (Pages run #14): the demo shows far less text: one tagline line, no how-to sentences on the pad or photo screen, short Grown-ups labels, a one-line footer, and Lucide line icons instead of emoji, and a quick tap on the hand finishes the scan.
 - **Nov 21:** once the restyle PR merges (on Chase's go), the live demo is restyled to the studio Paper design system: Atkinson Hyperlegible Next, light and dark looks, one accent.
 - **Nov 10:** live app header now reads "7:00 PM pretend" with a real space when a pretend time is set (QA-R1, from #45); on very narrow phones the pretend tag sits under the time (QA-R3).
 - **Recruiter-ready sprint v2 (Oct 22):** first screen now says what it is, the footer links back to chaseholroyd.com/energy-scanner.html and GitHub, Try the sample shows the aura without a photo, README screenshots and CASE-STUDY.md match the app, and shared links get a preview image. Merged as PR #16 and live since Oct 23.
