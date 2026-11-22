@@ -29,7 +29,7 @@ test.describe('on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   test('take a photo hands off to the native camera and loads the result', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('radio', { name: /Photo scan/ }).click();
+    await page.getByRole('radio', { name: 'Photo' }).click();
     await expect(page.locator('[data-input="capture"]')).toHaveAttribute('capture', 'environment');
     const png = await makePng(page, 600, 800);
     const chooser = page.waitForEvent('filechooser');
@@ -42,7 +42,7 @@ test.describe('on a phone', () => {
 
 test('ES-R49 on a laptop the sample leads and there is no camera button', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('radio', { name: 'Photo' }).click();
   await expect(page.getByRole('button', { name: 'Take a photo' })).toHaveCount(0);
   await expect(page.locator('.dropzone .actions .btn').first()).toHaveText('Try the sample');
 });
@@ -57,7 +57,7 @@ test('on a phone, the not-an-image error shows on screen under the buttons', asy
   for (const viewport of [{ width: 390, height: 844 }, { width: 320, height: 640 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/');
-    await page.getByRole('radio', { name: /Photo scan/ }).click();
+    await page.getByRole('radio', { name: 'Photo' }).click();
     await page.locator('[data-input="upload"]').setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hi') });
     const alert = page.getByRole('alert');
     await expect(alert).toContainText('not an image');

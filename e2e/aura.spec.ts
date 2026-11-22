@@ -20,7 +20,7 @@ test('the scanner loads on-device and reports when nobody is in the photo', asyn
 test('the illustrated sample gets an animated aura, and saves as image and video', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
-  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('radio', { name: 'Photo' }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click();
   await expect(page.getByText('Illustrated sample, not a real person')).toBeVisible();
   const aura = page.locator('canvas.aura');
@@ -46,7 +46,7 @@ test('See every color re-scans the sample in color, and the layout fits', async 
   await page.clock.setFixedTime(new Date('2026-10-22T12:00:00')); // noon, bedtime far off
   await page.addInitScript(() => localStorage.setItem('alwaysGrey', 'true'));
   await page.goto('/');
-  await page.getByRole('radio', { name: /Photo scan/ }).click();
+  await page.getByRole('radio', { name: 'Photo' }).click();
   await page.getByRole('button', { name: 'Try the sample' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
   await page.waitForTimeout(800);

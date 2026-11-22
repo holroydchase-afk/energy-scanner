@@ -33,7 +33,8 @@ test('palm scan: hold the pad to get a reading', async ({ page }) => {
   await expect(page.getByTestId('energy-reading')).toBeVisible({ timeout: 6_000 });
   await page.mouse.up();
   await expect(page.getByTestId('energy-reading')).toContainText('Grey Energy');
-  await expect(page.getByTestId('energy-reading')).toContainText('PJs, Teeth, Potty, Book');
+  // TXT-R5: the reading doesn't repeat the steps.
+  await expect(page.getByTestId('energy-reading')).not.toContainText('Steps left');
 });
 
 test('shared links get a preview image', async ({ page, request }) => {
@@ -58,7 +59,7 @@ test('ES-R46 on a wide screen the palm pad stays put when the reading appears', 
   expect(Math.abs(after!.x + after!.width / 2 - (before!.x + before!.width / 2))).toBeLessThanOrEqual(2);
 });
 
-test('ES-R47 on a wide screen the palm reading is centred under the pad, and ES-R50 the to-do line is quiet', async ({ page }) => {
+test('ES-R47 on a wide screen the palm reading is centred under the pad (ES-R50 to-do line cut by TXT-R5)', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/');
   const pad = page.locator('.pad');
@@ -70,14 +71,15 @@ test('ES-R47 on a wide screen the palm reading is centred under the pad, and ES-
   const p = (await pad.boundingBox())!;
   const c = (await card.boundingBox())!;
   expect(Math.abs(c.x + c.width / 2 - (p.x + p.width / 2))).toBeLessThanOrEqual(2);
-  const weight = await page.locator('.rc-todo').evaluate((el) => Number(getComputedStyle(el).fontWeight));
-  expect(weight).toBeLessThanOrEqual(600);
+  await expect(page.locator('.rc-todo')).toBeHidden();
 });
 
 test('ES-R48 the first phone screen pitches the on-device aura, and the demo button shows it', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.locator('.pitch')).toBeInViewport({ ratio: 1 });
+  // TXT-R1: the pitch is the one tagline now.
+  const tagline = page.getByText('A bedtime routine for kids, with an AI aura that runs on your device.');
+  await expect(tagline).toBeInViewport({ ratio: 1 });
   await page.getByRole('button', { name: 'See the aura demo' }).click();
   await expect(page.locator('canvas.aura')).toBeVisible({ timeout: 45_000 });
 });
