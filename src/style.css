@@ -186,7 +186,7 @@ h1, h2, p { margin: 0; }
 .byline a { display: inline-flex; align-items: center; min-height: var(--target); }
 /* One muted line under the title (TXT-R1); on a phone the demo button wraps under it. */
 .pitch { margin: 0 0 var(--space-md); text-wrap: pretty; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-lg); }
-.tagline { flex: 1 1 22ch; color: var(--muted); text-wrap: pretty; }
+.tagline { flex: 1 1 22ch; color: var(--muted); text-wrap: balance; }
 
 /* Buttons (STUDIO-CORE section 6): plain = ink on fill; tinted = accent on accentSoft, one per screen;
    quiet = accent words. No filled buttons. */
@@ -203,7 +203,7 @@ h1, h2, p { margin: 0; }
 .step > .icon { flex: none; }
 .step[aria-pressed='true'] { border-color: var(--accent); }
 /* The check circle (TXT-R2): hollow when not done, filled accent with a check when done. */
-.step .check { position: absolute; top: var(--space-xs); right: var(--space-xs); width: 20px; height: 20px; border: 2px solid var(--line); border-radius: var(--radius-pill); background: transparent; color: var(--accent-ink); display: grid; place-items: center; }
+.step .check { position: absolute; top: var(--space-xs); right: var(--space-xs); width: 20px; height: 20px; border: 2px solid var(--muted); border-radius: var(--radius-pill); background: transparent; color: var(--accent-ink); display: grid; place-items: center; }
 .step[aria-pressed='true'] .check { background: var(--accent); border-color: var(--accent); }
 
 /* Palm or photo */

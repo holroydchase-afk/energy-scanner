@@ -118,7 +118,7 @@ export function mountApp(root: HTMLElement, options: AppOptions = {}): AppHandle
         <div class="row"><input type="range" id="fake-time" min="-180" max="60" step="5" value="0" data-input="fake" aria-valuetext="real time" /><span data-fake aria-hidden="true">real time</span></div>
         <div class="row"><button type="button" class="btn" data-action="real-time" hidden>Back to real time</button></div>
         <label class="switch"><span>Always Grey</span> <input type="checkbox" data-input="always" aria-describedby="always-help" /> <span data-onoff>Off</span></label>
-        <p class="help" id="always-help">Every scan reads Grey.</p>
+        <p class="help" id="always-help">On: every scan reads Grey.</p>
         <div class="row"><button type="button" class="btn" data-action="clear">Clear steps</button></div>
       </div>
     </details>

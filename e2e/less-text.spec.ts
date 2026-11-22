@@ -99,10 +99,10 @@ test.describe('AC-TXT17 on a laptop', () => {
 test.describe('AC-TXT2 check circles', () => {
   test.use(PHONE);
   for (const scheme of ['light', 'dark'] as const) {
-    test(`AC-TXT2 TXT-R2 each step has a 20px check circle: hollow --line, then filled --accent (${scheme})`, async ({ page }) => {
+    test(`AC-TXT2 TXT-R2 each step has a 20px check circle: hollow --muted (TXT-R19, was --line), then filled --accent (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme });
       await page.goto('/');
-      const line = await color(page, 'var(--line)');
+      const muted = await color(page, 'var(--muted)'); // AC-TXT19 replaced --line (1.1:1) with --muted
       const accent = await color(page, 'var(--accent)');
       const checks = page.locator('.step .check');
       await expect(checks).toHaveCount(5);
@@ -116,7 +116,7 @@ test.describe('AC-TXT2 check circles', () => {
         expect(Math.abs(c.w - 20), `width ${c.w}`).toBeLessThanOrEqual(2);
         expect(Math.abs(c.h - 20), `height ${c.h}`).toBeLessThanOrEqual(2);
         expect(c.pressed).toBe('false');
-        expect(c.border).toBe(line);
+        expect(c.border).toBe(muted);
         expect(c.fill).toBe('rgba(0, 0, 0, 0)');
       }
       await page.getByRole('button', { name: 'Teeth' }).click();

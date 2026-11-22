@@ -4,8 +4,8 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: Nov 22, ES-M2.5 less text (TXT-R1 to R14) built on claude/project-thread-2xwlcu; qa-tdd 3x, then ux-reviewer rescore, then Chase's go to merge
-next: qa-tdd runs all suites 3x on the less-text branch, then ux-reviewer rescores with word counts; Chase decides TXT-R4 (tap finishes the scan)
+now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; waiting on Chase's go and his TXT-R4 call
+next: qa-tdd runs all suites 3x on the fix round; then the next gap is layout (pad in empty canvas at 1280, reading below the fold after See the aura demo at 390)
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
 blockers: []
@@ -37,6 +37,7 @@ _Updated 2026-11-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Nov 22, ES-M2.5 fix round after the ux-reviewer rescore (4/10 to 7.5/10 at 390, 7/10 at 1280), failing tests first (777fcdf): the empty check circle's border is `--muted`, 3:1 or better in light and dark (TXT-R19, P1; AC-TXT2's e2e now expects `--muted`, as AC-TXT19 says); the tagline uses `text-wrap: balance`, so "AI aura." no longer sits alone at 390 or 320 (R20); the Grown-ups help reads "On: every scan reads Grey." so it doesn't look like the current state under Off (R22). No token changes.
 - Nov 22, ES-M2.5 less text (branch `claude/project-thread-2xwlcu`, review `docs/reviews/2026-11-22-less-text.md`), failing tests first (8b7e308), built in staff-pm's order, one commit per step:
   - Step 1 strings: one tagline "A kids' bedtime routine with an on-device AI aura." (TXT-R1); no steps-left line on the reading (R5); "Choose a photo", not "Upload" (R6); See the aura demo hidden in photo mode (R8); Grown-ups help is "Every scan reads Grey.", the algorithm paragraph moved to CASE-STUDY.md (R10); short labels Pretend time, Always Grey, Clear steps, Automatic (R11); "Always Grey is on." (R12); footer is the privacy line and Code on GitHub (R13); "Scanning energy…" is screen-reader only while scanning (R17).
   - Step 2 icons: Lucide 1.77.0 line icons copied into `src/ui/icons.ts` (ISC, `licenses/ISC-lucide.txt`, no dependency, no CDN) for steps, mode switch (Palm / Photo) and pad; check circles replace "Tap each step when done" and "0 of 5" (R9, R14, R2).
@@ -138,6 +139,7 @@ _Updated 2026-11-22._
 - DS-R19 (P2): confirm before Clear tonight's steps (inline "Clear all of tonight's steps?" with "Clear steps" and "Keep", AC-DS9).
 
 ## Exact next step
+- Next gap (layout, not text): at 1280 the palm pad sits in a lot of empty canvas; at 390 the reading lands below the fold after See the aura demo. TXT-R21: the Lucide toothbrush may read as a pen at 28px; check it with a real kid in AC-TXT-M (fallback: `smile`).
 - Chase: review and merge the studio re-sync PR. From then on, agents named on a PR's `Agents:` line must show up in `.claude/agent-runs/<branch>.log` (the hook writes it in sessions that load the repo's agents; commit it with the PR).
 - Next UI pass: ux-reviewer runs `node scripts/ux-rules.mjs dist/index.html` then `node scripts/ux-shots.mjs dist/index.html` for its 0-10 score (in a cloud sandbox, Playwright may need the preinstalled Chromium).
 - Chase: a 60-second phone check of the live site (link preview, first screen, See the aura demo, palm scan, Save/Share), and rescan his three real photos on his iPhone (AC-R21a/R22b/R23b/R28 in `docs/reviews/2026-10-23-ui-review.md`); paste `/mnt/project-files/power-hour/intake-product-studio.md` into Product Studio.
