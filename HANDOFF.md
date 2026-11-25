@@ -196,3 +196,6 @@ _Updated 2026-11-25._
 ## Blockers
 - Resolved Nov 22: AC-TXT1c word budgets (palm 45, photo pick 50) failed with the planned copy (47 and 51; the review's after-count was off). staff-pm kept the budgets and the "By" and "bedtime" words, and shortened the tagline to "A kids' bedtime routine with an on-device AI aura." (9 words, was 14): palm is now 42, photo pick 46.
 - None. (README screenshots no longer need a real photo: they use the illustrated sample.)
+
+## Repo best-practices pass (2026-11-25)
+- Done: SUPPORT.md README-AI-line codeql(actions, javascript-typescript) README-badge. Added from the GitHub, Linux Foundation and Syracuse checklists (studio-agents docs/repo-standards.md). Left for this project to review: CHANGELOG.md, THIRD_PARTY_NOTICES, wording of the README AI-use line against the claims register, repo description and topics.
