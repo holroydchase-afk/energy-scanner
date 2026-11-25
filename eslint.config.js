@@ -17,4 +17,8 @@ export default tseslint.config(
     files: ['scripts/ux-rules.mjs', 'scripts/ux-shots.mjs'],
     rules: { 'no-empty': ['error', { allowEmptyCatch: true }] },
   },
+  {
+    files: ['scripts/check-private.mjs'],
+    rules: { '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_$' }] },
+  },
 );
