@@ -4,6 +4,8 @@ Take or upload a photo of a person and render their energy/aura coming off them.
 
 Studio standard: follow holroydchase-afk/studio-agents docs/studio-standard.md; this file's hard rules win where they say more.
 
+Self-check before any ask: Chase never updates settings, environments or repos by hand. Before asking him to do anything, ask yourself: Can I do it myself? Can a thread or an MCP/tool do it so he only taps Allow (for example update_environment for allowed hosts)? Can it be a card with a button? If he must type, is it one code box to copy (one per paste, click path above it)? Only then ask, in the lightest form. If a host is blocked, request it via the environment tool; a copy box is the fallback.
+
 ## Hard rules (these win over any other instructions)
 
 - This repo is PUBLIC. Never commit photos of real, identifiable people. Use generated, CC0, or clearly licensed sample images (record source + license in `samples/SOURCES.md`).
