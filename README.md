@@ -57,7 +57,7 @@ flowchart LR
 TypeScript, Vite, WebGL2, MediaPipe Tasks Vision, MediaRecorder and Web Share APIs. Tested with Vitest (unit) and Playwright (real browser).
 
 ```bash
-npm run check      # lint + typecheck + unit tests
+npm run check      # lint + typecheck + unit tests + privacy scan
 npm run build && npm run test:e2e   # browser tests in headless Chromium
 ```
 

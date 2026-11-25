@@ -15,6 +15,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: bash scripts/check-agents.sh
+      - run: node scripts/check-private.mjs
       - run: npm ci
       - run: npm run check
       - run: npm run build
