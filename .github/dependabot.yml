@@ -1,0 +1,26 @@
+# Weekly update PRs, minor and patch grouped into one per ecosystem (studio-agents repo standards).
+# A dependency PR changes the built app, so it waits for Chase's go like any live-demo change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Pinned on purpose (see HANDOFF.md): Playwright matches the preinstalled Chromium,
+      # TypeScript stays on 5.x until typescript-eslint supports 7.
+      - dependency-name: "@playwright/test"
+      - dependency-name: "playwright"
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
