@@ -158,6 +158,9 @@
   --energy: #7cf2e0;
   font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
 }
+/* The portfolio site header (/assets/demo-bar.js) adds a fixed 52px #site-bar. When it is on the
+   page, anything we scroll to has to clear it; with no bar the fallback stays 0px. */
+:root:has(#site-bar) { --site-bar-h: 52px; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--bg); }
@@ -207,12 +210,12 @@ h1, h2, p { margin: 0; }
 .step[aria-pressed='true'] .check { background: var(--accent); border-color: var(--accent); }
 
 /* Palm or photo */
-.mode { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-sm); margin: var(--space-lg) auto 0; scroll-margin-top: var(--space-md); }
+.mode { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-sm); margin: var(--space-lg) auto 0; scroll-margin-top: calc(var(--site-bar-h, 0px) + var(--space-md)); }
 .mode button { font: inherit; font-weight: 600; color: var(--ink); background: var(--fill); border: 2px solid transparent; border-radius: var(--radius-pill); padding: var(--space-sm) var(--space-lg); min-height: var(--target); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--space-sm); }
 .mode button .icon { flex: none; }
 .mode button[aria-checked='true'] { border-color: var(--accent); }
 
-.stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; scroll-margin-top: var(--space-md); }
+.stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; scroll-margin-top: calc(var(--site-bar-h, 0px) + var(--space-md)); }
 .hint { color: var(--muted); }
 
 /* Palm pad: product content, its own colors. */
