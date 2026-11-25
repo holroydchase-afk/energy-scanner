@@ -1,5 +1,6 @@
 /**
- * Intake #60, portfolio site header (docs/product/SPEC-SITE-HEADER.md, AC-SH1..SH7).
+ * Intake #60, portfolio site header (docs/product/SPEC-SITE-HEADER.md, AC-SH1..SH7, plus
+ * AC-SH9 for the ux-reviewer defect SH-R1; AC-SH10 for SH-R2 is e2e).
  * Reads index.html from source and dist/index.html from the last `npm run build`.
  * The dist cases skip, with the reason in their title, when dist/ is missing (CI builds before e2e).
  * AC-SH6 (404 / preview fallback does not break the app) is e2e: e2e/site-header.spec.ts.
@@ -63,10 +64,20 @@ for (const f of files) {
       expect(scripts.indexOf(appModule!)).toBeLessThan(scripts.indexOf(tag));
     });
 
-    it('AC-SH4 has data-page="white"', () => {
+    // SH-R1 (P0): data-page="white" paints the page white whenever the bar's own theme is light
+    // (its default), even when the app renders its dark theme, leaving the title at ~1.2:1.
+    it('AC-SH9 (replaces AC-SH4) has no data-page attribute at all', () => {
       const tags = demoBarTags(parse(f.path));
       expect(tags).toHaveLength(1);
-      expect(tags[0]!.getAttribute('data-page')).toBe('white');
+      expect(tags[0]!.hasAttribute('data-page')).toBe(false);
+      expect(tags[0]!.getAttribute('data-page')).toBeNull();
+    });
+
+    it('AC-SH9 still has src=/assets/demo-bar.js and defer after data-page is dropped', () => {
+      const tags = demoBarTags(parse(f.path));
+      expect(tags).toHaveLength(1);
+      expect(tags[0]!.getAttribute('src')).toBe(DEMO_BAR_SRC);
+      expect(tags[0]!.hasAttribute('defer')).toBe(true);
     });
   });
 }
