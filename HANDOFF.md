@@ -4,7 +4,7 @@
 stage: live
 goal: portfolio
 milestone: ES-M2 (Polish Freeze: harden and UI polish only)
-now: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; merged as PR #49 on Chase's go (Nov 22 04:40 UTC), Pages run #14 deployed
+now: Nov 25, intakes #53-#60 picked up; site header PR (intake #60) waits for Chase's go. Before that: Nov 22, ES-M2.5 less text built and rescored (4 to 7.5/10 at 390, 7/10 at 1280), fix round TXT-R19, R20, R22 done; merged as PR #49 on Chase's go (Nov 22 04:40 UTC), Pages run #14 deployed
 next: next UI gap is layout (pad in empty canvas at 1280, reading below the fold after See the aura demo at 390)
 waiting_on_chase:
   - 60-second phone check and iPhone rescan of three real photos
@@ -25,7 +25,8 @@ The repo now uses the studio planning IDs (milestone `M1`, task `M1.1`, step `M1
 | (milestone) | ES-M1 | Demoable v1 | |
 
 ## Portfolio / public presence
-_Updated 2026-11-22._
+_Updated 2026-11-25._
+- **Nov 25 (waits for Chase's go):** the demo loads the portfolio's shared site header (`/assets/demo-bar.js`, same origin): a 52px sticky bar back to Chase Holroyd, Building, Agents and the case study. Without `data-page="white"` (it forced a white page under the dark theme, SH-R1 P0), and the Palm/Photo switch now scrolls clear of the bar (SH-R2).
 - **Nov 22:** live since PR #49 merged (Pages run #14): the demo shows far less text: one tagline line, no how-to sentences on the pad or photo screen, short Grown-ups labels, a one-line footer, and Lucide line icons instead of emoji, and a quick tap on the hand finishes the scan.
 - **Nov 21:** once the restyle PR merges (on Chase's go), the live demo is restyled to the studio Paper design system: Atkinson Hyperlegible Next, light and dark looks, one accent.
 - **Nov 10:** live app header now reads "7:00 PM pretend" with a real space when a pretend time is set (QA-R1, from #45); on very narrow phones the pretend tag sits under the time (QA-R3).
@@ -37,6 +38,8 @@ _Updated 2026-11-22._
 - **Studio-wide status** (portfolio, domain, every demo, what's waiting on Chase): https://github.com/holroydchase-afk/pm-tools/blob/main/STUDIO-STATUS.md
 
 ## Done
+- Nov 25, intake pickup (#53 to #60): #53 merged (PR #61), #58 part 1 merged (PR #62), #55 adopted (memory), #59 applied to project instructions, #54 and #57 closed with evidence (no elevation shadows; EF-ES strings were already gone), #56 parked by Chase.
+- Nov 25, intake #60 site header (branch `claude/intake-60-site-header`, spec `docs/product/SPEC-SITE-HEADER.md`), failing tests first (`src/site-header.test.ts`, `e2e/site-header.spec.ts`, AC-SH1 to SH10): one script tag in `index.html`; ux-reviewer ran the real portfolio bar locally and found SH-R1 (P0, white page under dark text) and SH-R2 (P1, switch under the bar), both fixed with tests first (one CSS change: `:root:has(#site-bar)` sets `--site-bar-h`). privacy-security read `demo-bar.js` (portfolio 238651e): no network calls, reads only its own `theme` key, never touches photos (PS-SH-R1 confirmed by reading the file).
 - Nov 25, intake #58 (repo standards, part 1): CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, bug and feature issue templates, a PR template with the Agents: line, and `.github/dependabot.yml` (github-actions and npm weekly, minor and patch grouped; Playwright and TypeScript majors ignored because they're pinned on purpose). Adapted from studio-agents' own files. Built app unchanged.
 - Nov 25, intake #53 (ask-less self-check): CLAUDE.md now has the self-check paragraph under the Studio standard line (Chase never updates settings, environments or repos by hand; do it yourself, a tool, a card, then one copy box). Docs only.
 - Nov 22, intake #50 wired to studio-agents (branch `claude/project-thread-40mnsv`, spec `docs/product/SPEC-STUDIO-WIRING.md`), failing tests first (`src/studio-wiring.test.ts`, AC-SW1 to SW8): re-ran studio-agents `sync.sh` and `install-rules.sh` (adds `release-captain`, updates `ux-reviewer`, installs `scripts/agent-prompt.sh`); hand-merged `log-agent-run.sh --as`, `check-agent-runs.sh` accepting `via-general-purpose` lines, and agents-check's "qa-tdd cannot be skipped" step (kept `setup-node@v4`). CLAUDE.md's Studio agents section now matches `templates/CLAUDE-agents.md` (opening rule, agents come from studio-agents, release-captain row). Cloud threads run agents as general-purpose with `bash scripts/agent-prompt.sh <agent> "<task>"`; they log themselves to `.claude/agent-runs/`. Built app unchanged. Still to prove (AC-SW11): the next code PR shows qa-tdd red then green with its log.
@@ -135,6 +138,9 @@ _Updated 2026-11-22._
 - ES-M2.4 Studio design system (Paper): the restyle PR is committed on branch `claude/project-thread-e25yzo` (293ec69 plus the DS-R18 to DS-R22 follow-up) and merges as PR #48 on Chase's go (Nov 22). The agents check is red only because the run-log hook didn't fire in the cloud session; Chase accepted that. Built: `src/design/theme.ts` (Paper color math written from STUDIO-CORE §3, not ported), `scripts/gen-themes.mjs` (`npm run themes`), token-only `style.css`, bundled Atkinson Hyperlegible Next 5.3.0 (OFL, `licenses/OFL-1.1.txt`), tinted/quiet buttons, Scan button on the pad, Look (Light/Dark/Match phone) in Grown-ups, Always Grey On/Off words, step check marks, reading name in ink with an energy dot, solid caption band on saved images. ux-reviewer after-review scored 7/10 (was 5/10), no P0/P1. Nov 21 follow-up, failing tests first: Look options are three stacked 48px rows on the Grown-ups edge (DS-R18); the pad's Scan button hides once the reading shows and returns on Scan again (DS-R20); Grown-ups panel max 560px, Always Grey help text right under its switch, "Try a different time" label tight above the slider (DS-R21); `text-wrap: pretty` on tagline, pitch and reading text (DS-R22). Unit and e2e green (79 passed, 1 skipped).
 
 ## Parked (Polish Freeze)
+- Intake #56 feedback widget pilot (Chase, Nov 25: park until the freeze lifts). The stock widget covers Grown-ups at 390 and doesn't match Paper; needs a styling pass. Mock: `/mnt/project-files/reviews/2026-11-25-feedback-mock/`.
+- QA-R1 (P2, #60): CI runs `npm run check` before `npm run build`, so the `dist/index.html` cases in `src/site-header.test.ts` skip on CI. Rerun that file after the build in `ci.yml`, failing test first.
+- SH-R3 (P2): Chase Holroyd and Case study appear in the bar and again in the byline under it. SH-R4 (P2): the bar keeps its own theme (light by default), so a dark-mode phone's first visit shows a white bar over the dark app; the portfolio's bar should follow `prefers-color-scheme` when no theme is saved (Product Studio's repo, intake to file). ux-reviewer after the fix round: 7/10 (was 4/10 with the P0, 6/10 before the bar).
 - TXT-R15 (P2): flavor lines to 9 words or fewer (list in AC-TXT15); needs positioning to confirm the voice. Next copy pass.
 - TXT-R16 (P2): shorter error messages (new words in the review's Errors table). Rarely seen, not the text Chase flagged.
 - TXT-R18 (P2): New photo after the sample throws a TypeError from the `webglcontextlost` handler in `src/ui/result.ts`; return early when destroyed. Own small hardening PR with a failing e2e first (AC-TXT18).
@@ -142,6 +148,7 @@ _Updated 2026-11-22._
 - DS-R19 (P2): confirm before Clear tonight's steps (inline "Clear all of tonight's steps?" with "Clear steps" and "Keep", AC-DS9).
 
 ## Exact next step
+- Chase: go on the site header PR (intake #60), then AC-SH8 on the live demo at 390 and 1280. Then decide #58 part 2: default branch to `main`, PLAN.md to `docs/internal/`, repo description and topics.
 - Next gap (layout, not text): at 1280 the palm pad sits in a lot of empty canvas; at 390 the reading lands below the fold after See the aura demo. TXT-R21: the Lucide toothbrush may read as a pen at 28px; check it with a real kid in AC-TXT-M (fallback: `smile`).
 - Chase: review and merge the studio re-sync PR. From then on, agents named on a PR's `Agents:` line must show up in `.claude/agent-runs/<branch>.log` (the hook writes it in sessions that load the repo's agents; commit it with the PR).
 - Next UI pass: ux-reviewer runs `node scripts/ux-rules.mjs dist/index.html` then `node scripts/ux-shots.mjs dist/index.html` for its 0-10 score (in a cloud sandbox, Playwright may need the preinstalled Chromium).
