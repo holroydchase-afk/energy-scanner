@@ -1,5 +1,7 @@
 # Energy Scanner
 
+[![ci](https://github.com/holroydchase-afk/energy-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/holroydchase-afk/energy-scanner/actions/workflows/ci.yml)
+
 **A bedtime helper for kids: finish your routine, then scan your energy.** Bedtime used to be a nightly negotiation. Energy Scanner lets a neutral machine say it's time instead of a parent. Kids tick off their bedtime steps, then scan: press and hold the palm pad, or take a photo and watch their energy glow off them as an animated aura. The color reads from Rainbow (way too much sparkle for sleeping) down to Grey (battery empty, time to recharge). A grown-up switch can make every scan read Grey.
 
 Everything runs in your browser. **Photos never leave your device.** There is no server, no account and no tracking.
@@ -70,3 +72,7 @@ npm run build && npm run test:e2e   # browser tests in headless Chromium
 ## License
 
 Code: MIT ([LICENSE](LICENSE)). The bundled MediaPipe model and runtime are Apache 2.0 from Google; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## How this is built
+
+Built with Claude Code (AI-assisted code, tests and docs). The maintainer directs the work and decides what ships. Tests and CI run on every pull request; the current state is in HANDOFF.md.
